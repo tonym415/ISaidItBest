@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Sign up</title>
+        <link rel="stylesheet" media="screen" href="css/screen.css">
+        <link rel="stylesheet" media="screen" href="css/styles.css">
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
+        <!--<script src="jquery/external/jquery/jquery.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.js"></script>-->
+        <script src="scripts/app.js"></script>
+        <style>
+    form.cmxform {
+        width: 50em;
+    }
+    em.error {
+        background:url("images/unchecked.gif") no-repeat 0px 0px;
+        padding-left: 16px;
+    }
+    em.success {
+        background:url("images/checked.gif") no-repeat 0px 0px;
+        padding-left: 16px;
+    }
+    form.cmxform label.error {
+        margin-left: auto;
+        width: 250px;
+    }
+    em.error {
+        color: black;
+    }
+    #warning {
+        display: none;
+    }
+    </style>
+    </head>
+    <body>
+     <!--this page primarily consists of form data. All id names are lowercase
+        -->   
+        <p>To sign up for our debate website and to begin showing your skills </p>
+        <p></p>
+        <form id="signup" class="cxform">
+        <fieldset>
+        <legend>fill out the sign up form below</legend>
+        <p>
+        <label for="name">Name:</label>
+        <input type="text" name="name" required>
+        </p>
+        <p>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        </p>
+        <p>
+        <label for="username">Username:</label>
+        <input type="text" name="username" required>
+        </p>
+        <p>
+        <label for="password">Password:</label>   <!--should this be in encrypted format.-->
+        <input type="password" name="password" required> <!--it has input type password-->
+        </p>
+        <p>
+        <label for="password2">Confirm Password:</label>
+        <input type="password" name="password2" required>  <!--this is just a way to confirm the password-->
+        </p>
+        <p>
+        <label for="paypal_account">Paypal Account Name:</label>
+        <input type="text" name="paypal_account" required>
+        </p>
+        <div id="signup_errors"></div>
+        <p></p>
+        <input type="submit" value="Submit" />
+        </fieldset> 
+        </form> <!--form info is such that all questions need to be answered. Each is
+        critical to our operations. Do not let user confirm sign up if any are
+        missing.-->
+    </body>
+</html>
