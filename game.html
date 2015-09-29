@@ -2,14 +2,9 @@
 <html>
 <head>
 	<title>Game Page</title>
-	<link rel="stylesheet" href="jquery/jquery-ui.css">
-	<link rel="stylesheet" href="css/styles.css">
-	<link rel="stylesheet" href="css/flipclock.css">
-	<script src="jquery/external/jquery/jquery.js"></script>
-	<script src="jquery/jquery-ui.js"></script>
-	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.js"></script>
-	<script src="scripts/flipclock.min.js"></script>
-	<script src="scripts/app.js"></script>
+	<link rel="stylesheet" href="assets/css/jquery-ui.css">
+	<link rel="stylesheet" href="assets/css/styles.css">
+	<link rel="stylesheet" href="assets/css/flipclock.css">
 </head>
 <body>
 <center>
@@ -53,19 +48,9 @@
 				</tr>
 				<tr>
 					<td colspan="2" align="center">
-						<input type="button" value="Submit Parameters" onclick="submitParameters()">
+						<input type="button" value="Submit Parameters" id="btn_submitParameters">
 					</td>
 				</tr>
-				<!-- <tr>
-					<td colspan="2" align="center">
-						<div id="successNotice" class="notice" style="display: none">
-							Submitting parameters...
-						</div>
-						<div id="searchingNotice" class="notice" style="display: none">
-							Searching for a game...
-						</div>
-					</td>
-				</tr> -->
 			</table>
 			</form>
 			</p>
@@ -99,4 +84,10 @@
 	</div>
 </center>
 </body>
+<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
+	<script>
+		require(['common'], function(){
+			require(['pages/game']);
+		});
+	</script>
 </html>

@@ -21,7 +21,7 @@ def loadCategoryQuestions(category):
     returnVals = []
     returnObj = {}
     returnObj[category] = {}
-    for x in range(1, 9):
+    for x in range(1, len(category) + 1):
         returnObj[category]["q%s" % x] = "%s question %d" % (category, x)
 
     returnVals.append(returnObj)

@@ -155,7 +155,7 @@ var FlipClock;
  * @copyright  2013 - Objective HTML, LLC
  * @licesnse   http://www.opensource.org/licenses/mit-license.php
  */
-	
+require(['jquery'], function(){
 (function($) {
 	
 	"use strict";
@@ -2780,3 +2780,4 @@ var FlipClock;
 	FlipClock.Lang['chinese'] = FlipClock.Lang.Chinese;
 
 }(jQuery));
+});
