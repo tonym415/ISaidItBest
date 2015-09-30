@@ -47,15 +47,16 @@ def getFunc(fStor):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="LCQ", category="anal fisting")
-    funcStr = getFunc(form)
-    eval(funcStr)
+    form = formMockup(function="LCQ", category="Political")
+    func = getFunc(form)
+    # eval(func)
+    locals()[func]()
 
 if "REQUEST_METHOD" in os.environ: 
     fs = cgi.FieldStorage()
     if 'function' in fs.keys():
         # decide which function to run
         func = getFunc(fs)
-        eval(func)
+        locals()[func]
 else:
     main()

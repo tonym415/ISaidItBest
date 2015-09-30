@@ -1,17 +1,54 @@
+/**
+ * This module sets up an  
+ * @module app
+ * @return {Object} object with specific initialization and data handling for game.html
+ */
 define(['jquery'], function($){
+	/**
+	 * Capitalizes string
+	 * @return {String} capitalized string 
+	 */
 	String.prototype.capitlize = function(){
 		return this.toLowerCase().replace( /\b\w/g, function(m){
 			return m.toUpperCase();
 		});
 	};
+/**
+		 * Converts form data to js object
+		 * @return {[type]} object
+		 */
+		$.fn.serializeForm = function() {
+		    var o = {};
+		    var a = this.serializeArray();
+		    $.each(a, function() {
+		        if (o[this.name] !== undefined) {
+		            if (!o[this.name].push) {
+		                o[this.name] = [o[this.name]];
+		            }
+		            o[this.name].push(this.value || '');
+		        } else {
+		            o[this.name] = this.value || '';
+		        }
+		    });
+		    return o;
+		};
 
-// return the app object with var/functions built in
+	/** return the app object with var/functions built in */
 	return {
-		engine : "../ISaidItBest/assets/cgi-bin/testv2.py",
+		/**
+		 * CGI script that does all the work
+		 * @type {String}
+		 */
+		engine : "/assets/cgi-bin/engine.py",
+		/**
+		 * @descriptions Gathers all parameters for the debate and puts them in given format 
+		 * @method
+		 * @return {Object} parameters in an object ready for cgi consumption
+		 */
 		submitParameters : function(){
 				errorMessage = "Invalid parameters: \n"
 				validParams = true
-				params = {"function": "loadCategoryQuestions"}
+				params = {"function": "LCQ"}
 				$("select").each(function(){
 					selectedValue = $(this).val()
 					id = $(this).context.id
@@ -48,6 +85,10 @@ define(['jquery'], function($){
 
 				return params
 			},
+		/**
+		 * loads the debate parameters, generates time clock, disables parameter selection and starts the debate 
+		 * @param  {object} data Parameters for the debate 
+		 */
 		loadDebate : function(data){
 				if (!data) return data;
 			 	$(".countdown_timer").hide()
@@ -58,7 +99,7 @@ define(['jquery'], function($){
 				$("#successNotice").fadeIn(1000, function(){
 					// notify user of the search for a game
 					 $("#searchingNotice").fadeIn(1000,function(){
-						$("#game").append("<img id='searchImg' src='../ISaidItBest/assets/images/search1.gif' />");
+						$("#game").append("<img id='searchImg' src='/assets/images/search1.gif' />");
 						$("#successNotice").fadeOut(5000,function(){
 							// when the success notice fades 
 							$("#searchingNotice").hide()

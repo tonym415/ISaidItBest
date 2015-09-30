@@ -9,9 +9,10 @@ requirejs.config({
 	paths: {
 		// The libraries to be used
 		jquery: [
-			'//code.jquery.com/jquery-1.11.3.min',
+			'//jqueryvalidation.org/files/lib/jquery-1.11.1',
+			//'//code.jquery.com/jquery-1.11.3.min',
 			// if the CDN location fails, load from this location
-			'lib/jquery-1.11.3'
+			//'lib/jquery-1.11.3'
 		],
 		jqueryUI: [
 			'//code.jquery.com/ui/1.11.4/jquery-ui.min',
@@ -19,7 +20,8 @@ requirejs.config({
 			'lib/jquery-ui'
 		],
 		validate: [
-			'//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate',
+			'//cdn.jsdelivr.net/jquery.validation/1.14.0/jquery.validate',
+			//'//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate',
 			// if the CDN location fails, load from this location
 			'lib/jquery.validate'	
 		],

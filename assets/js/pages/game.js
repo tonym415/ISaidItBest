@@ -1,5 +1,6 @@
 /**
- *  handles all functions for the game page
+ *  Handles all functions for the game page
+ *  @module  
  */
 require([
 	'jquery',
@@ -23,8 +24,13 @@ require([
 
 		
 
-
+	/**
+	 * Category selection box
+	 */
 	$(".category").selectmenu({ 
+		/**
+		 * Handles load of the subcategory select box
+		 */
 		change: function(){
 			value = $(this).val();
 			$("#subCategory")
@@ -33,7 +39,7 @@ require([
 
 				$.ajax({
 					contentType: "application/x-www-form-urlencoded",
-					data: {"function": "loadCategoryQuestions", "category" : value},
+					data: {"function": "LCQ", "category" : value},
 					type: "POST",
 					url: app.engine 
 				})
@@ -56,14 +62,19 @@ require([
 		}
 	});
 
-	// timer instantiation
+	/**
+	 * Clock instantiation
+	 * @type {FlipClock}
+	 */
 		clock = $('.countdown_timer').FlipClock({
 			autoStart: false,
 			countdown: true,
 			clockFace: 'MinuteCounter'
 		});
 
-	//function submitParameters(){
+	/**
+	 * Set click event to parameter selection button
+	 */
 	$('#btn_submitParameters').click(function(){
 		app.loadDebate(app.submitParameters());
 	});
