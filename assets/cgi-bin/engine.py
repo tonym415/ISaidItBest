@@ -16,9 +16,19 @@ def sendHeaders():
     print("Content-Type: text/html\n\n")
 
 
-def setParams(fs):
+def returnValue(data):
+    """ After function returns string send back return value """
     sendHeaders()
-    print("<p> %s </p" % fs.getvalue('function'))
+    print(json.dumps(data))
+
+
+def setParams(fs):
+    returnValue("<p> %s </p" % fs['function'])
+
+
+def submitUserInfo(fs):
+    """ submit user info to database """
+    returnValue("<p> %s </p" % fs)
 
 
 # this will eventually be a database call
@@ -31,32 +41,42 @@ def loadCategoryQuestions(category):
         returnObj[category]["q%s" % x] = "%s question %d" % (category, x)
 
     returnVals.append(returnObj)
-    sendHeaders()
-    print(json.dumps(returnVals))
+    returnValue(returnVals)
 
 
-def getFunc(fStor):
-    """ Deciphers function to run based on POSTed parameters """
-    """ Returns function name and signature to be executed """
-    funcName = fStor.getvalue('function')
-    return {
-       "LCQ" : ("%s('%s')" % 
-                       ("loadCategoryQuestions", fStor.getvalue('category')))
-    }.get(funcName,"setParams(%s)" % fStor)   
+def doFunc(fStor):
+    """ Deciphers function to run based on POSTed parameters
+        Excutes the desired function with appropriate parameters
+    """
+    fStor = cgiFieldStorageToDict(fStor)
+    funcName = fStor['function']
+    if funcName == "LCQ":
+        globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName == "SUI":
+        globals()['submitUserInfo'](fStor)
+    elif funcName == "SP":
+        globals()['setParams'](fStor)
+    else:
+        globals()['setParams'](fStor)
+
+
+def cgiFieldStorageToDict(fieldstorage):
+    """ Get a plain dictionary from cgi.FieldStorage """
+    params = {}
+    for key in fieldstorage.keys():
+        params[key] = fieldstorage.getvalue(key)
+    return params
 
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="LCQ", category="Political")
-    func = getFunc(form)
-    # eval(func)
-    locals()[func]()
+    form = formMockup(function="SUI", category="Political")
+    doFunc(form)
 
-if "REQUEST_METHOD" in os.environ: 
+if "REQUEST_METHOD" in os.environ:
     fs = cgi.FieldStorage()
     if 'function' in fs.keys():
-        # decide which function to run
-        func = getFunc(fs)
-        locals()[func]
+        # run function depending on given values
+        doFunc(fs)
 else:
     main()
