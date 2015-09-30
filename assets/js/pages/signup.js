@@ -1,7 +1,8 @@
 /*
 	Handles js interaction for the signup page
  */
-require(['jquery','app' , 'validate'], function($, app){
+require(['jquery','app' , 'validate','jqueryUI'], function($, app){
+	$("input[type=submit]").button();
 	/**
 	 *  Submits an ajax call to send signup info to the database
 	 *  

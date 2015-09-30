@@ -1,7 +1,8 @@
 /*
 	Handles js interaction for the login page
  */
-define(['jquery', 'validate'], function($, validate){
+define(['jquery', 'validate', 'app', 'jqueryUI'], function($, validate, app){
+	$("input[type=submit]").button();
 //form validations
 	var container = $("#errors")
 	$("#login").validate({

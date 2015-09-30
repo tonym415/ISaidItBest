@@ -7,8 +7,15 @@ import os
 from formMockup import formMockup
 import json
 import cgitb
+from app.User import User
+
 
 cgitb.enable()
+
+
+def testDep(data):
+    u = User(data)
+    returnValue(dir(u))
 
 
 def sendHeaders():
@@ -56,6 +63,8 @@ def doFunc(fStor):
         globals()['submitUserInfo'](fStor)
     elif funcName == "SP":
         globals()['setParams'](fStor)
+    elif funcName == "td":
+        globals()['testDep'](fStor)
     else:
         globals()['setParams'](fStor)
 
@@ -70,7 +79,7 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="SUI", category="Political")
+    form = formMockup(function="td", category="Political")
     doFunc(form)
 
 if "REQUEST_METHOD" in os.environ:

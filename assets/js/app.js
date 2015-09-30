@@ -4,6 +4,7 @@
  * @return {Object} object with specific initialization and data handling for game.html
  */
 define(['jquery'], function($){
+
 	/**
 	 * Capitalizes string
 	 * @return {String} capitalized string 

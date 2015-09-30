@@ -9,7 +9,6 @@ require([
 	'validate',
 	'jqueryUI'
 	], function($, app){
-
 		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
 
 		$("input[type=button]").button();	
@@ -32,7 +31,7 @@ require([
 		 * Handles load of the subcategory select box
 		 */
 		change: function(){
-			value = $(this).val();
+			value = $(this).val().capitlize();
 			$("#subCategory")
 				.selectmenu("enable")
 				.empty()
