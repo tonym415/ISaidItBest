@@ -1,4 +1,4 @@
-#!C:\Python34\python.exe -u
+#!C:\Python34\python.exe -m
 """
 This script handles all of the processing of the debate site
 """

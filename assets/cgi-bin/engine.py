@@ -3,10 +3,14 @@
 This script handles all of the processing of the debate site
 """
 import cgi
-import os
 from formMockup import formMockup
 import json
 import cgitb
+import os
+
+if "REQUEST_METHOD" not in os.environ:
+    import sys
+    sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 from app.User import User
 
 
