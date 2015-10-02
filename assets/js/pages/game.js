@@ -42,8 +42,7 @@ require([
 					type: "POST",
 					url: app.engine 
 				})
-				.done(function(result){
-				 	data = JSON.parse(result)[0];
+				.done(function(data){
 					if (data[value] === undefined){
 						$("#subCategory")
 							.empty()
@@ -56,7 +55,7 @@ require([
 						})
 					}
 				})
-				.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+				.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + jqXHR.responseText); })
 				.always(function() { /*console.log('getJSON request ended!');*/ });
 		}
 	});
