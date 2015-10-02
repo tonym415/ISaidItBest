@@ -1,1 +1,1 @@
-#!C:\Python34\python.exe -u
+#!C:\Python34\python.exe -m
