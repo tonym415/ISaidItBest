@@ -19,6 +19,11 @@ body {
     -moz-transform-origin: 0 0;
     -moz-transform: scale(.45);
 }
+
+.searching {
+    padding: 5px 10px 7px;
+    background: url(../css/images/loading.gif) left bottom repeat-x;
+}
 /*
 form  { display: table;      }
 p     { display: table-row;  }

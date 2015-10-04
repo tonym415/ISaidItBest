@@ -8,22 +8,17 @@ sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 import conn
 
 _connection = None
-def connStr():
-    """ Returns the connection parameters for the database """
-    return {
-        'user': 'webuser',
-        'password': 'webuser',
-        'host': '127.0.0.1',
-        'database': 'debate'
-    }
-
+_connector = None
 
 def get_connection():
     """ returns a connection to the database """
     global _connection
+    global _connector
+
+    _connector = mysql.connector
     try:
         if not _connection:
-            _connection = mysql.connector.connect(**conn.connStr())
+            _connection = _connector.connect(**conn.connStr())
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
@@ -37,5 +32,6 @@ def get_connection():
 __all__ = ['get_connection']
 
 if __name__ == "__main__":
-    print("type: %s" % type(get_connection()))
-    print("dir: %s" % dir(get_connection()))
+    pass
+    # print("type: %s" % type(get_connection()))
+    # print("dir: %s" % dir(get_connection()))
