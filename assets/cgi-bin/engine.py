@@ -38,13 +38,20 @@ def returnJson(data, toJSON=True):
     print(json.dumps(data))
 
 
-def setParams(fs):
-    returnJson("<p> %s </p>" % fs)
+def showParams(fs):
+    returnJson(fs)
 
 
 def submitUserInfo(fs):
     """ submit user info to database """
-    returnJson("<p> %s </p" % fs)
+    returnObj = {'error': ''}
+    uInfo = User(fs).submitUser()
+    print(uInfo)
+    if uInfo['user_id'] == 0:
+        returnObj['error'] = uInfo['message']
+    else:
+        returnObj = uInfo
+    returnJson(returnObj)
 
 
 def userAvailabilityCheck(fs):
@@ -55,8 +62,8 @@ def userAvailabilityCheck(fs):
         """ create a json object noting availability """
         availability["available"] = str(User(fs).isUser())
 
-    print(json.dumps(availability))
-    # returnJson(availability) 
+    # print(json.dumps(availability))
+    returnJson(availability)
 
 
 # this will eventually be a database call
@@ -86,13 +93,13 @@ def doFunc(fStor):
     elif funcName == "SUI":
         globals()['submitUserInfo'](fStor)
     elif funcName == "SP":
-        globals()['setParams'](fStor)
+        globals()['showParams'](fStor)
     elif funcName == "TD":
         globals()['testDep'](fStor)
     elif funcName == "UAC":
         globals()['userAvailabilityCheck'](fStor)
     else:
-        globals()['setParams'](fStor)
+        globals()['showParams'](fStor)
 
 
 def cgiFieldStorageToDict(fieldstorage):
@@ -105,8 +112,12 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="UAC", username="test_user1")
-    # form = formMockup(function="LCQ", category="test_user1")
+    # form = formMockup(function="SUI", username="test_user1")
+    """ valid user in db (DO NOT CHANGE: modify below)"""
+    form = formMockup(function="SUI", confirm_password="password",
+                      first_name="Antonio", paypal_account="tonym415",
+                      password="password", email="tonym415@gmail",
+                      last_name="Moses", username="tonym415")
     doFunc(form)
 
 if "REQUEST_METHOD" in os.environ:

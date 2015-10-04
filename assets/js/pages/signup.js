@@ -29,6 +29,7 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
         $('#username_availability_result').empty();  
     });
 
+// check username availability
 	$("input[name='username']").on('keyup', function(){
 		username = $(this).val()
 		minChars = 3
@@ -71,7 +72,8 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
         },
 		errorLabelContainer: $("signup_errors"),
 		rules: {
-			name: "required",
+			first_name: "required",
+			last_name: "required",
 			username: {
 				required: true,
 				minlength: 3
