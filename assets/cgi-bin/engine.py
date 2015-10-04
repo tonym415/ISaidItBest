@@ -51,7 +51,6 @@ def submitUserInfo(fs):
         returnObj['error'] = uInfo['message']
     else:
         returnObj = uInfo
-
     returnJson(returnObj)
 
 
