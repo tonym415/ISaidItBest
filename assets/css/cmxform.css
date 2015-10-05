@@ -30,7 +30,7 @@ form.cmxform fieldset fieldset {
 
 form.cmxform fieldset p, form.cmxform fieldset fieldset {
 	padding: 5px 10px 7px;
-	background: url(../css/images/cmxform-divider.gif) left bottom repeat-x;
+	/*background: url(../css/images/cmxform-divider.gif) left bottom repeat-x;*/
 }
 
 form.cmxform label.error, label.error {

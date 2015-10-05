@@ -7,8 +7,27 @@ require([
 	'app',
 	'flipclock',
 	'validate',
-	'jqueryUI'
+	'jqueryUI',
+	'cookie'
 	], function($, app){
+		// handle url spoofing
+		if (document.referrer.indexOf(app.pages.main) < 0){
+			if (document.referrer.indexOf(document.location.pathname) < 0){
+				window.location.assign(app.pages.main)
+			}
+		}
+
+		// handle page setup upon arrival
+		$.cookie.json = true
+		info = $.cookie('user')
+		userSpan = "<div>Welcome, " + info.USERNAME + "</div>"
+		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.WINS + "<br />"
+		losses = "<img src='../assets/css/images/unchecked.gif' width='16px' height='16px' />   Losses:  " + info.LOSSES + "<br />"
+		$("#userInfo").append(userSpan)
+		$(wins).appendTo("#userInfo div")
+		$(losses).appendTo("#userInfo div")
+		
+
 		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
 
 		$("input[type=button]").button();	

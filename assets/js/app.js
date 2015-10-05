@@ -3,7 +3,32 @@
  * @module app
  * @return {Object} object with specific initialization and data handling for game.html
  */
-define(['jquery'], function($){
+define(['jquery', 'cookie'], function($){
+	/**
+	 * sets cookies with info
+	 */
+	 function setCookie(name, data){
+	 	$.cookie.json = true
+	 	$.removeCookie(name)
+	 	$.cookie(name, data)
+	 };
+
+	/**
+	 * gets cookies info
+	 */
+	 function getCookie(name){
+	 	$.cookie.json = true
+	 	return $.cookie(name)
+	 };
+
+	/**
+	 * Determines of an object is empty
+	 * @return {Boolean} [description]
+	 */
+	function isEmpty(obj){
+	 	length = Object.getOwnPropertyNames(obj).length
+	 	return 	length > 0 ? false : true
+	 };
 
 	/**
 	 * Capitalizes string
@@ -36,11 +61,21 @@ define(['jquery'], function($){
 
 	/** return the app object with var/functions built in */
 	return {
+		// site pages referred here so no hard coding is necessary
+		pages: {
+			'main' : 'index.html',
+			'game' : 'game.html',
+			'signup': 'signup.html'
+		},
 		/**
 		 * CGI script that does all the work
 		 * @type {String}
 		 */
 		engine : "/assets/cgi-bin/engine.py",
+		// utility functions
+		isEmpty: isEmpty,
+		setCookie: setCookie,
+		getCookie: getCookie,
 		/**
 		 * @descriptions Gathers all parameters for the debate and puts them in given format 
 		 * @method

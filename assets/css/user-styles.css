@@ -24,8 +24,29 @@ body {
     padding: 5px 10px 7px;
     background: url(../css/images/loading.gif) left bottom repeat-x;
 }
-/*
-form  { display: table;      }
+
+.userInfo {
+    font-size: small;
+    position: absolute;
+    right: 0px;
+    padding: 5px;
+}
+
+.wins {
+    width: 16px;
+    height: 16px;
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png) 0 0; 
+    /*background-position: -32px -128px;*/
+}
+
+.losses {
+    width: 16px;
+    height: 16px;
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png) 0 0; 
+    /*background-position: -32px -128px;*/
+}
+/*form  { display: table;      }
 p     { display: table-row;  }
 label { display: table-cell; }
 input { display: table-cell; }
+*/

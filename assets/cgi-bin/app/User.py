@@ -45,19 +45,26 @@ class User(object):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         returnDict = {}
-        query = """SELECT  USER_ID ,  FIRST_NAME , LAST_NAME , EMAIL , USERNAME,
-             PASSWORD ,  CREDIT ,  WINS ,  LOSSES ,  PAYPAL_ACCOUNT ,
-             Created ,  Active  FROM  users  WHERE USERNAME = %s"""
+        query = """SELECT  USER_ID ,  FIRST_NAME , LAST_NAME , EMAIL ,
+                USERNAME, CREDIT ,  WINS ,  LOSSES ,  PAYPAL_ACCOUNT ,
+                PASSWORD, CREATED ,  ACTIVE  FROM  users  WHERE USERNAME = %s"""
         cursor = self._cnx.cursor(buffered=True, dictionary=True)
-        cursor.execute(query, (self.user_username,))
-        if cursor.rowcount > 0:
-            returnDict = cursor.fetchone()
+        try:
+            cursor.execute(query, (self.user_username,))
+            if cursor.rowcount > 0:
+                returnDict = cursor.fetchone()
+            else:
+                raise Exception("%s yields %s" %
+                               (cursor.statement.replace('\n', ' ')
+                                .replace('            ', ''), cursor.rowcount))
+        except Exception as e:
+            returnDict['error'] = "{}".format(e)
 
         return returnDict
 
     def submitUser(self):
         """ inserts user info into the database """
-        returnObj = {"user_id": 0}
+        returnObj = {"USER_ID": 0}
         query = ("INSERT INTO  users"
                  "(FIRST_NAME ,  LAST_NAME , EMAIL ,  USERNAME ,  PASSWORD ,"
                  "PAYPAL_ACCOUNT) VALUES (%(first_name)s, %(last_name)s,"
@@ -78,8 +85,7 @@ class User(object):
             uid = cursor.lastrowid
             # add user_id to current instance
             setattr(self, "user_user_id", uid)
-            returnObj['user_id'] = uid
-            returnObj['username'] = self.user_username
+            returnObj = self.getUser()
         except lib.db2._connector.IntegrityError as err:
             returnObj['message'] = "Error: {}".format(err)
 
@@ -88,16 +94,19 @@ class User(object):
     def isValidUser(self):
         """ determine if user is valid based on username/password """
         userInfo = self.getUser()
+        print(userInfo)
+        if 'error' not in userInfo:
+            print(userInfo)
+            # test given password against database password
+            hashed_pw = userInfo['PASSWORD']
+            # print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
+                                                # self.user_password, hashed_pw))
+            validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
+            # print("Valid: " + str(validUser))
+        else:
+            validUser = False
 
-        # test given password against database password
-        hashed_pw = userInfo['PASSWORD']
-        if self._context:  # if running as a standalone script
-            print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
-                                            self.user_password, hashed_pw))
-        validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
-        if self._context:  # if running as a standalone script
-            print("Valid: " + str(validUser))
-        return (0, 1)[validUser]
+        return validUser
 
     def isUser(self):
         """ checking for username availability """
@@ -112,14 +121,16 @@ class User(object):
         return (0, 1)[cursor.rowcount > 0]
 
 if __name__ == "__main__":
-    """ valid user in db (DO NOT CHANGE: modify below)"""
-    info = {"confirm_password": "password", "first_name":
-            "Antonio", "paypal_account": "tonym415", "password":
-            "password", "email": "tonym415@gmail.com", "last_name":
-            "Moses", "username": "tonym415"}
+    info = {}
+    # """ valid user in db (DO NOT CHANGE: modify below)"""
+    # info = {"confirm_password": "password", "first_name":
+    #         "Antonio", "paypal_account": "tonym415", "password":
+    #         "password", "email": "tonym415@gmail.com", "last_name":
+    #         "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
-    # info['username'] = "blaw"
+    info['username'] = "bob"
+    info['password'] = "userpass"
 
     """ remove  from data dict """
     u_info = {i: info[i]
@@ -127,7 +138,4 @@ if __name__ == "__main__":
     # print(u_info)
 
     u = User(u_info)
-    ureturn = u.submitUser()
-    print(ureturn)
-    if ureturn['user_id'] > 0:
-        print(u.isValidUser())
+    print(u.isValidUser())

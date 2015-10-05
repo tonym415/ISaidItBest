@@ -9,25 +9,22 @@
 <center>
 <h1>Welcome to the "I Said It Best" Debate Website</h1>
 		<form id="login" class='cmxform'>
-		<div> 
 		<fieldset>
 		<legend>Login:</legend>
 			<p>
 				<label for="username">Username:</label> 
-				<input type="text" id="username" value='user' title="Please enter your username (at least 3 characters" required>
+				<input type="text" id="username" name="username" required>
 			</p>
 			<p>
 				<label for="password">	Password:</label> 
-				<input type="password" id="password" value='password' required>
+				<input type="password" id="password" name="password" required>
 			</p>
-				<!-- onclick="submitCredentials()" -->
 				<input type="submit" value="Submit" >
 		</fieldset>
 		<div id="errors"></div>
-		</div>
 	</form>
-	<p> If you are not already a member...<a href="signup.html">Sign up!</a></p>
-</center>
+	</div>
+	</center>
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>

@@ -3,6 +3,7 @@
  */
 require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 	$("input[type=submit]").button();
+
 		/**
 	 *  Submits an ajax call to send signup info to the database
 	 *  
@@ -10,19 +11,29 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 	 */
 	 function submitUserInfo(data){
 	 	$.ajax({
-					contentType: "application/x-www-form-urlencoded",
-					data: data,
-					type: "POST",
-					url: app.engine 
-				})
-				.done(function(result){
-				 	data = JSON.parse(result)[0];
-					if (data[value] === undefined){
-						console.log(data)
-					}
-				})
-				.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
-				.always(function() { /*console.log('getJSON request ended!');*/ });
+			contentType: "application/x-www-form-urlencoded",
+			data: data,
+			type: "POST",
+			url: app.engine 
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+			 	data = JSON.parse(result)[0];
+			}
+
+			// internal error handling	
+			if (data['error'] !== undefined){
+				var validator = $("#signup").validate();
+				validator.showErrors({
+					"paypal_account": data['error']
+				});
+			}else{
+				app.setCookie('user', data)
+				window.location.assign(app.pages.main)
+			}
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+		.always(function() { /*console.log('getJSON request ended!');*/ });
 	 }
 //form validations
 	$("input[name='username']").on('blur', function(){
@@ -58,18 +69,16 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 		} 
 	});
 
-
+var valHandler = function(){
+	formData = $(this.currentForm).serializeForm() 
+	formData['function'] = "SUI"
+	submitUserInfo(formData)
+}
 	
 // validate signup form on keyup and submit
 	$("#signup").validate({
 		debug: true,
-		submitHandler: function() {
-			formData = $(this.currentForm).serializeForm() 
-			console.log(JSON.stringify(formData))
-			formData['function'] = "SUI"
-			console.log(JSON.stringify(formData))
-			submitUserInfo(formData)
-        },
+		submitHandler: valHandler,
 		errorLabelContainer: $("signup_errors"),
 		rules: {
 			first_name: "required",
@@ -97,7 +106,8 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 			}
 		},
 		messages: {
-			name: "Please enter your name",
+			first_name: "Please enter your first name",
+			last_name: "Please enter your last name",
 			username: {
 				required: "Please enter a username",
 				minlength: "Your username must consist of at least 3 characters"
@@ -111,7 +121,11 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 				minlength: "Your password must be at least 5 characters long",
 				equalTo: "Please enter the same password as above"
 			},
-			email: "Please enter a valid email address",
+			email: {
+				required: "Please enter a valid email address",
+				email: "Your email address must be in the format of name@domain.com"
+			}
 		}
 	});
+	$("<p> If you already have and account...<a href='" + app.pages.main + "''>Login!</a></p>").appendTo("center")
 });

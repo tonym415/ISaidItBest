@@ -25,6 +25,7 @@ requirejs.config({
 			// if the CDN location fails, load from this location
 			'lib/jquery.validate'	
 		],
+		cookie: 'lib/jquery-cookie', 
 		flipclock: 'lib/flipclock',
 		app: 'app'
 	}

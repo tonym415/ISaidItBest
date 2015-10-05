@@ -35,7 +35,7 @@ def returnJson(data, toJSON=True):
     else:
         sendHeaders("text/json")
 
-    print(json.dumps(data))
+    print(json.dumps(data, default=str))
 
 
 def showParams(fs):
@@ -46,16 +46,28 @@ def submitUserInfo(fs):
     """ submit user info to database """
     returnObj = {'error': ''}
     uInfo = User(fs).submitUser()
-    print(uInfo)
-    if uInfo['user_id'] == 0:
+    if uInfo['USER_ID'] == 0:
         returnObj['error'] = uInfo['message']
     else:
         returnObj = uInfo
-<<<<<<< HEAD
 
-=======
->>>>>>> 35d301698b7051a3c5e201664d7160c7c84df331
     returnJson(returnObj)
+
+
+def validateUser(fs):
+    """ test function for class functionality (not needed for production) """
+    user_info = {}
+    if "username" in fs:
+        """ create a json object noting user_info """
+        u = User(fs)
+        valid_user = u.isValidUser()
+        if valid_user:
+            user_info = u.getUser()
+
+            # prune unnecessary info
+            del user_info['PASSWORD']
+
+    returnJson(user_info)
 
 
 def userAvailabilityCheck(fs):
@@ -94,6 +106,8 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName == "VU":
+        globals()['validateUser'](fStor)
     elif funcName == "SUI":
         globals()['submitUserInfo'](fStor)
     elif funcName == "SP":
@@ -116,12 +130,12 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    # form = formMockup(function="SUI", username="test_user1")
+    form = formMockup(function="VU", username="tonym415", password="password")
     """ valid user in db (DO NOT CHANGE: modify below)"""
-    form = formMockup(function="SUI", confirm_password="password",
-                      first_name="Antonio", paypal_account="tonym415",
-                      password="password", email="tonym415@gmail",
-                      last_name="Moses", username="tonym415")
+    # form = formMockup(function="SUI", confirm_password="password",
+    #                   first_name="Antonio", paypal_account="tonym415",
+    #                   password="password", email="tonym415@gmail",
+    #                   last_name="Moses", username="tonym415")
     doFunc(form)
 
 if "REQUEST_METHOD" in os.environ:
