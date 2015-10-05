@@ -100,10 +100,12 @@ define(['jquery'], function($){
 				$("#successNotice").fadeIn(1000, function(){
 					// notify user of the search for a game
 					 $("#searchingNotice").fadeIn(1000,function(){
-						$("#game").append("<img id='searchImg' src='/assets/images/search1.gif' />");
+						$("#game").addClass("searching");
+						// $("#game").append("<img id='searchImg' src='/assets/images/search1.gif' />");
 						$("#successNotice").fadeOut(5000,function(){
 							// when the success notice fades 
 							$("#searchingNotice").hide()
+							$("#game").removeClass("searching");
 							$("#searchImg").remove()
 						 	$("#debate").show()
 						 	$(".countdown_timer").show()

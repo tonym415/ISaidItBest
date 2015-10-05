@@ -4,6 +4,7 @@ The User class is used to handle all functions related to the User
 """
 import os
 import sys
+from passlib.hash import pbkdf2_sha256
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
 import lib.db2
@@ -20,63 +21,102 @@ class User(object):
         self._cnx = lib.db2.get_connection()
         for dictionary in userInfo:
             for key in dictionary:
-                setattr(self, key, dictionary[key])
+                setattr(self, "user_" + key, dictionary[key])
 
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
     def getAllUsers(self):
         """ get user information by name """
-        query = """SELECT `USER_ID`, `NAME`, `EMAIL`, `USERNAME`,
-            `PASSWORD`, `CREDIT`, `WINS`, `LOSSES`, `PAYPAL_ACCOUNT`,
-            `Created`, `Active` FROM `users` WHERE 1
+        query = """SELECT USER_ID, FIRST_NAME,LAST_NAME, EMAIL
+                USERNAME ,  PASSWORD ,  CREDIT ,  WINS ,  LOSSES ,
+                 PAYPAL_ACCOUNT ,  Created ,  Active  FROM  users  WHERE 1
             """
         cursor = self._cnx.cursor(buffered=True)
         cursor.execute(query)
         if cursor.rowcount > 0:
             rows = cursor.fetchall()
             for row in rows:
-                print(row)
+                pass  # print(row)
         else:
-            print("No user by the name '%s'" % self.username)
+            pass  # print("No user by the name '%s'" % self.username)
 
     def getUser(self):
         """ get user information by name """
-        # query = """SELECT `USER_ID`, `NAME`, `EMAIL`, `USERNAME`,
-        #     `PASSWORD`, `CREDIT`, `WINS`, `LOSSES`, `PAYPAL_ACCOUNT`,
-        #     `Created`, `Active` FROM `users` WHERE 1
-        #     """
-        query = """SELECT  USER_ID ,  NAME ,  EMAIL ,  USERNAME ,
+        # if no user is found by the given name return empty dictionary
+        returnDict = {}
+        query = """SELECT  USER_ID ,  FIRST_NAME , LAST_NAME , EMAIL , USERNAME,
              PASSWORD ,  CREDIT ,  WINS ,  LOSSES ,  PAYPAL_ACCOUNT ,
              Created ,  Active  FROM  users  WHERE USERNAME = %s"""
-        cursor = self._cnx.cursor(buffered=True)
-        cursor.execute(query, (self.username,))
+        cursor = self._cnx.cursor(buffered=True, dictionary=True)
+        cursor.execute(query, (self.user_username,))
         if cursor.rowcount > 0:
-            rows = cursor.fetchall()
-            for row in rows:
-                print(row)
-        else:
-            print("No user by the name '%s'" % self.username)
+            returnDict = cursor.fetchone()
+
+        return returnDict
+
+    def submitUser(self):
+        """ inserts user info into the database """
+        returnObj = {"user_id": 0}
+        query = ("INSERT INTO  users"
+                 "(FIRST_NAME ,  LAST_NAME , EMAIL ,  USERNAME ,  PASSWORD ,"
+                 "PAYPAL_ACCOUNT) VALUES (%(first_name)s, %(last_name)s,"
+                 "%(email)s,%(username)s, %(password)s, %(paypal_account)s)")
+
+        # extract only user info from class __dict__
+        query_params = {k[5:]: v
+                        for k, v in self.__dict__.items()
+                        if k.startswith('user')}
+        # hash password
+        query_params['password'] = pbkdf2_sha256.encrypt(
+            query_params['password'], rounds=200000, salt_size=16)
+
+        try:
+            cursor = self._cnx.cursor(buffered=True)
+            cursor.execute(query, query_params)
+            self._cnx.commit()
+            uid = cursor.lastrowid
+            # add user_id to current instance
+            setattr(self, "user_user_id", uid)
+            returnObj['user_id'] = uid
+            returnObj['username'] = self.user_username
+        except lib.db2._connector.IntegrityError as err:
+            returnObj['message'] = "Error: {}".format(err)
+
+        return returnObj
+
+    def isValidUser(self):
+        """ determine if user is valid based on username/password """
+        userInfo = self.getUser()
+
+        # test given password against database password
+        hashed_pw = userInfo['PASSWORD']
+        if self._context:  # if running as a standalone script
+            print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
+                                            self.user_password, hashed_pw))
+        validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
+        if self._context:  # if running as a standalone script
+            print("Valid: " + str(validUser))
+        return (0, 1)[validUser]
 
     def isUser(self):
         """ checking for username availability """
         query = """SELECT  USERNAME  FROM  users  WHERE USERNAME = %s"""
         cursor = self._cnx.cursor(buffered=True)
-        cursor.execute(query, (self.username,))
+        cursor.execute(query, (self.user_username,))
         """ if number of rows fields is bigger them 0 that means it's NOT
          available returning 0, 1 otherwise
          """
-        if self._context: # if running as a standalone script
-            print("(%s : retured %d rows)\n" %
-                  (cursor.statement, cursor.rowcount))
+        # print("(%s : retured %d rows)\n" % (cursor.statement, cursor.rowcount))
 
         return (0, 1)[cursor.rowcount > 0]
 
 if __name__ == "__main__":
     """ valid user in db (DO NOT CHANGE: modify below)"""
-    info = {'username': 'test_user1', 'confirm_password': 'password', 'name':
-            'Test UserOne', 'function': 'SUI', 'email': 'test_user@domain.com',
-            'paypal_account': 'paypal_user1', 'password': 'password'}
+    info = {"confirm_password": "password", "first_name":
+            "Antonio", "paypal_account": "tonym415", "password":
+            "password", "email": "tonym415@gmail.com", "last_name":
+            "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
     # info['username'] = "blaw"
@@ -87,5 +127,7 @@ if __name__ == "__main__":
     # print(u_info)
 
     u = User(u_info)
-    u.getUser()
-    print("%s isUSER: %s" % (u.username, u.isUser()))
+    ureturn = u.submitUser()
+    print(ureturn)
+    if ureturn['user_id'] > 0:
+        print(u.isValidUser())
