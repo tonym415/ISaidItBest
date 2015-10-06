@@ -4,6 +4,24 @@
  * @return {Object} object with specific initialization and data handling for game.html
  */
 define(['jquery', 'cookie'], function($){
+
+	var navPages = {
+			'Home' : 'index.html',
+			'Game' : 'game.html',
+			'Registration': 'signup.html',
+			'Contact': 'contact.html',
+			'Admin': 'admin.html'
+		};
+
+	var navBar = function(){
+		$('body').prepend('<div id="navDiv">')
+		$('#navDiv').append('<ul id="navBar">')
+		for(key in navPages){
+			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>"
+			$('#navBar').append(listItem)
+		}
+
+	};
 	/**
 	 * sets cookies with info
 	 */
@@ -62,12 +80,7 @@ define(['jquery', 'cookie'], function($){
 	/** return the app object with var/functions built in */
 	return {
 		// site pages referred here so no hard coding is necessary
-		pages: {
-			'main' : 'index.html',
-			'game' : 'game.html',
-			'signup': 'signup.html'
-		},
-		/**
+		pages: navPages,		/**
 		 * CGI script that does all the work
 		 * @type {String}
 		 */
@@ -76,6 +89,7 @@ define(['jquery', 'cookie'], function($){
 		isEmpty: isEmpty,
 		setCookie: setCookie,
 		getCookie: getCookie,
+		createNavBar: navBar,
 		/**
 		 * @descriptions Gathers all parameters for the debate and puts them in given format 
 		 * @method

@@ -6,18 +6,21 @@
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-<center>
-<h1>Welcome to the "I Said It Best" Debate Website</h1>
-		<form id="login" class='cmxform'>
+	<center>
+		<h1>Contact Us</h1>
+		<form id="contact" class='cmxform'>
 		<fieldset>
-		<legend>Login:</legend>
 			<p>
-				<label for="username">Username:</label> 
-				<input type="text" id="username" name="username" required>
+				<label for="name">Name:</label> 
+				<input type="text" id="name" name="name" required>
 			</p>
 			<p>
-				<label for="password">	Password:</label> 
-				<input type="password" id="password" name="password" required>
+				<label for="email">Email:</label> 
+				<input type="email" id="email" name="email" required>
+			</p>
+			<p>
+				<label for="message">Message:</label> 
+				<textarea type="text" id="message" name="message" required rows="6" cols="50"></textarea>
 			</p>
 				<input type="submit" value="Submit" >
 		</fieldset>
@@ -28,7 +31,7 @@
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>
 		require(['common'], function(){
-			require(['pages/index']);
+			require(['pages/contact']);
 		});
 	</script>
 </html>

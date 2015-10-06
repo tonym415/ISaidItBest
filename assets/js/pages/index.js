@@ -3,6 +3,7 @@
  */
 define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate, app){
 	$("input[type=submit]").button();
+	app.createNavBar()
 	var user = app.getCookie('user')
 	if (user !== undefined){ 
 		// if same session USERNAME should be set	
@@ -12,7 +13,8 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			name = user.username
 			$("#password").val(user.password)	
 		}
-		$("#username").val(name)	}
+		$("#username").val(name)	
+	};
 
 	var valHandler = function(){
 		user = $("#username").val()
