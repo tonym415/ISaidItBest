@@ -32,7 +32,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			if (app.isEmpty(result)){
 				var validator = $("#login").validate();
 				validator.showErrors({
-					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.signup + "'>creating a user</a>" 
+					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.registration + "'>creating a user</a>" 
 				});
 			}else{
 				// create cookie using user info
@@ -75,5 +75,5 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			}
 		}
 	});
-	$("<p> If you are not already a member...<a href='" + app.pages.signup + "''>Sign up!</a></p>").appendTo("center")
+	$("<p> If you are not already a member...<a href='" + app.pages.registration + "''>Sign up!</a></p>").appendTo("center")
 });

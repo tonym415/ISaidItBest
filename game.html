@@ -2,11 +2,10 @@
 <html>
 <head>
 	<title>Game Page</title>
-	<link rel="stylesheet" href="assets/css/jquery-ui.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 	<link rel="stylesheet" href="assets/css/flipclock.css">
 </head>
-<body>
+<body class="ui-widget-content">
 <div id='userInfo' class='userInfo'></div>
 <center>
 	<h1>Game Selection</h1>
@@ -15,46 +14,42 @@
 		<div id="paramDiv">
 			<p>
 			<form action="/" id="gameParameters">
-			<table width="50%">
-				<tr>
-					<td>Category</td>
-					<td align="right"><select id="category" class="sel category" >
+			<fieldset>
+				<p>
+					<label for='category'>Category</label>
+					<select id="category" class="sel category" >
 						<option value="---">None</option>
 						<option value="baseball">Baseball</option>
 						<option value="nfl">NFL</option>
 						<option value="collegefootball">College Football</option>
 						<option value="soccer">Soccer</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Sub-Category</td>
-					<td align="right"><select id="subCategory" class="sel"> <option value="---">None</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Time Limit</td>
-					<td align="right"><select id="timeLimit" class="sel">
+					</select>
+				</p>
+				<p>
+					<label for="subCategory">Category questions</label>
+					<select id="subCategory" class="sel"> <option value="---">None</option> </select>
+				</p>
+				<p>
+					<label for='timeLimit'>Time Limit</label>
+					<select id="timeLimit" class="sel">
 						<option value="2">2:00</option>
 						<option value="5">5:00</option>
 						<option value="10">10:00</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Wager</td>
-					<td align="right"><select id="wager" class="sel">
+					</select>
+				</p>
+				<p>
+				<label for='wager'>Wager</label>
+					<select id="wager" class="sel">
 						<option value="1">1 credits</option>
 						<option value="5">5 credits</option>
 						<option value="10">10 credits</option>
-					</select></td>	
-				</tr>
-				<tr>
-					<td colspan="2" align="center">
-						<input type="button" value="Submit Parameters" id="btn_submitParameters">
-					</td>
-				</tr>
-			</table>
+					</select>
+				</p>
+				<input type="button" value="Submit Parameters" id="btn_submitParameters">
+			</fieldset>
 			</form>
 			</p>
+			<div id='game_messages'></div>
 		</div>
 		<h3>Debate Game</h3>
 		<div id="game">

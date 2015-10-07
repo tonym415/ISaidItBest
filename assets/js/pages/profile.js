@@ -5,12 +5,21 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 	app.createNavBar()
 	$("input[type=submit]").button();
 
+	current_theme = app.getTheme()
+	var selector = "#themes option[value='" + current_theme + "']"
+	if (current_theme !== undefined) {  $(selector).prop('selected', true);}
 
-var valHandler = function(){
-	formData = $(this.currentForm).serializeForm() 
-	formData['function'] = "SUI"
-	submitUserInfo(formData)
-}
+	$('#themes').selectmenu({
+		change: function(){
+			app.setTheme($(this).val())
+		}	
+	});
+
+	var valHandler = function(){
+		formData = $(this.currentForm).serializeForm() 
+		formData['function'] = "SUI"
+		submitUserInfo(formData)
+	}
 	
 // validate signup form on keyup and submit
 	$("#signup").validate({

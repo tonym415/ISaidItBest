@@ -15,8 +15,8 @@ define(['jquery', 'cookie'], function($){
 		};
 
 	var navBar = function(){
-		$('body').prepend('<div id="navDiv">')
-		$('#navDiv').append('<ul id="navBar">')
+		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header')
+		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default')
 		for(key in navPages){
 			if (key == 'profile') continue;
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>"
@@ -32,6 +32,19 @@ define(['jquery', 'cookie'], function($){
 	 	$.removeCookie(name)
 	 	$.cookie(name, data)
 	 };
+
+	 function setTheme(theme){
+	 	// if no theme sent set default
+	 	var cook_theme = $.cookie('theme')
+	 	if (theme === undefined){ 
+	 		theme = (cook_theme === undefined) ? 'sunny' : cook_theme
+ 		};	
+
+	 	$.cookie("theme", theme)
+	 	cook_theme = $.cookie('theme')
+		var theme_url = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/" + theme + "/jquery-ui.css"
+		$('head').append('<link href="'+ theme_url +'" rel="Stylesheet" type="text/css" />');
+	};
 
 	/**
 	 * gets cookies info
@@ -79,6 +92,9 @@ define(['jquery', 'cookie'], function($){
 		    return o;
 		};
 
+	//set theme
+	setTheme();
+
 	/** return the app object with var/functions built in */
 	return {
 		// site pages referred here so no hard coding is necessary
@@ -92,15 +108,19 @@ define(['jquery', 'cookie'], function($){
 		setCookie: setCookie,
 		getCookie: getCookie,
 		createNavBar: navBar,
+		setTheme: setTheme,
+		getTheme: function(){
+			return $.cookie('theme');
+		},
 		/**
 		 * @descriptions Gathers all parameters for the debate and puts them in given format 
 		 * @method
 		 * @return {Object} parameters in an object ready for cgi consumption
 		 */
 		submitParameters : function(){
-				errorMessage = "Invalid parameters: \n"
 				validParams = true
 				params = {"function": "LCQ"}
+				errorMessage = ""
 				$("select").each(function(){
 					selectedValue = $(this).val()
 					id = $(this).context.id
@@ -108,7 +128,7 @@ define(['jquery', 'cookie'], function($){
 					// test for valid parameter values
 					// TODO: Add jquery validator 
 					if (selectedValue == "---"){
-						errorMessage += "\n  " + id.capitlize() + ": "  + selectedText
+						errorMessage += "<br /> " + id.capitlize() + ": "  + selectedText
 						validParams = false
 						return 
 					}else{
@@ -121,7 +141,9 @@ define(['jquery', 'cookie'], function($){
 				if (!validParams){
 					// debug statment
 					console.log(params)
-					alert(errorMessage)
+					$('#game_messages').html(errorMessage)
+					errorTitle = "Invalid parameters: \n"
+					$('#game_messages').dialog({ title: errorTitle, autoOpen: true, modal: true})
 					return false
 				}
 
@@ -173,5 +195,4 @@ define(['jquery', 'cookie'], function($){
 
 			}
 	};
-
 });

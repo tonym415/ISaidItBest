@@ -5,9 +5,8 @@ body {
 	font-family: "Arial";
 }
 
-/* notification font size */
-.notice {
-	font-size: 30px;
+fieldset {
+    border: 0;	
 }
 
 .countdown_timer {
@@ -50,14 +49,21 @@ body {
 }
 
 /*
+Themeroller styles
+ */
+ #themes {padding-left: 20px; background: url(../css/images/icon_gallery.gif) no-repeat left 50%;}
+
+.ui-default-state {
+    padding: .5em 1em;
+    cursor: pointer;
+}
+#themes {padding-left: 20px; font-size: 1.2em; background: url(../css/images/icon_gallery.gif) no-repeat left 50%;}
+#set {border: 2px solid #ddd; padding: 2px; background: #444; float: left;}
+#set a {margin: 2px; border: 1px solid #444; float: left;}
+#set a:hover {border-color: #fff;}
+/*
     Styles for navigation bar
  */
- .contact {
-    left: 0px;
-    width: 350px;
-    background: url(../css/images/debate.png) 0 0;
-    background-repeat: no-repeat;
- }
 
 #navBar{
     list-style:none;
@@ -74,8 +80,8 @@ body {
     text-decoration: none;
     display:inline-block;
     padding:10px;
-    color: #4C3000;
-    background-color: #FFDC6B;
+    /*color: #4C3000;*/
+    /*background-color: #FFDC6B;*/
     text-transform: uppercase;
 }
 
@@ -84,81 +90,12 @@ body {
 }
 
  #navDiv {
-    background-color: #FFDC6B;
-    border-radius: 8px;
-}
-/*
-
-attempt 2
- #navDiv {
-    width: 700px;
-    height: 35px;
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    text-align: center;
-    background-color: #FFDC6B;
+    /*background-color: #FFDC6B;*/
     border-radius: 8px;
 }
 
-#navDiv ul {
-    height: auto;
-    padding: 8px 0px;
-    margin: 0px;
-}
-
-#navDiv li {
-    display: inline;
-    padding: 20px;
-}
-
-#navDiv a{
-    text-decoration: none;
-    color: #4C3000;
-    background-color: #FFDC6B;
-    text-transform: uppercase;
-}
-#navBar a:hover{
-    background-color: #FFDD57 !important;
-}*/
- /*
- 
-    attempt 1
-  #navDiv {
-    width: 600px;
-    display: inline-block;
-    white-space: nowrap;
-    margin: auto;
-}
-#navbar {
-    display: inline;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-li {
-    float: left;
-    list-style-type: none !important;
-}
-
-li a:link, li a:visited {
-    display: block;
-    width: 140px;
-    font-weight: bold;
-    color: #4C3000;
-    background-color: #FFDC6B;
-    text-align: center;
-    padding: 4px;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
-li a:hover, li a:active {
-    background-color: #FFDD57;
-}*/
-/*form  { display: table;      }
+form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }
 input { display: table-cell; }
-*/
+select { display: table-cell; }

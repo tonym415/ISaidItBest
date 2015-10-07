@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Member Profile</title>
+        <link rel="stylesheet" media="screen" href="assets/css/screen.css">
+        <link rel="stylesheet" href="assets/css/styles.css">
+    </head>
+    <body class='ui-widget-content'>
+    <center>
+        <h1>Member Profile</h1>
+        <p></p>
+        <form id="signup" class="cxmform"> 
+        <fieldset>
+        <p>
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" required  aria-required="true">
+        </p>
+        <p>
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" required  aria-required="true">
+            </p>
+            <p>
+            <label for="email">Email:</label>
+            <input type="email" name="email" required aria-required="true">
+        </p>
+        <p>
+            <label for="username">Username:</label>
+            <input type="text" name="username" required aria-required="true">
+            <br /><span id='username_availability_result'></span>
+        </p>
+        <p>
+            <label for="password">Password:</label>   <!--should this be in encrypted format.-->
+            <input type="password" name="password" required aria-required="true"> <!--it has input type password-->
+        </p>
+        <p>
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" required aria-required="true">  <!--this is just a way to confirm the password-->
+        </p>
+        <p>
+            <label for="paypal_account">Paypal Account Name:</label>
+            <input type="text" name="paypal_account" required aria-required="true">
+        </p>
+        <p>
+            <label for="themes">Change Theme:</label>
+            <select id="themes">
+                <option value='base'>Base</option>
+                <option value='black-tie'>Black Tie</option>
+                <option value='blitzer'>Blitzer</option>
+                <option value='cupertino'>Cupertino</option>           
+                <option value='dark-hive'>Dark Hive</option>           
+                <option value='dot-luv'>Dot Luv</option>           
+                <option value='eggplant'>Eggplant</option>           
+                <option value='excite-bike'>Excite Bike</option>           
+                <option value='flick'>Flick</option>           
+                <option value='hot-sneaks'>Hot Sneaks</option>           
+                <option value='humanity'>Humanity</option>           
+                <option value='le-frog'>Le Frog</option>           
+                <option value='mint-choc'>Mint Choc</option>           
+                <option value='overcast'>Overcast</option>           
+                <option value='pepper-grinder'>Pepper Grinder</option>           
+                <option value='redmond'>Redmond</option>           
+                <option value='smoothness'>Smoothness</option>           
+                <option value='south-street'>South Street</option>           
+                <option value='start'>Start</option>           
+                <option value='sunny'>Sunny</option>           
+                <option value='swanky-purse'>Swanky Purse</option>           
+                <option value='trontastic'>Trontastic</option>           
+                <option value='ui-darkness'>UI Darkness</option>           
+                <option value='ui-lightness'>UI Lightness</option>
+                <option value='vader'>Vader</option>
+            </select>
+        </p>
+        <input type="submit" value="Submit" />
+        </fieldset> 
+        <div id="signup_errors"></div>
+        </form>
+    </center></body>
+    <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
+    <script>
+        require(['common'], function(){ require(['pages/profile']); });
+    </script>
+</html>

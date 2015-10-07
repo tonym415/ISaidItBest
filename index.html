@@ -5,24 +5,23 @@
 	<link rel="stylesheet" media="screen" href="assets/css/screen.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class='ui-widget-content'>
 <center>
-<h1>Welcome to the "I Said It Best" Debate Website</h1>
-		<form id="login" class='cmxform'>
-		<fieldset>
-		<legend>Login:</legend>
-			<p>
-				<label for="username">Username:</label> 
-				<input type="text" id="username" name="username" required>
-			</p>
-			<p>
-				<label for="password">	Password:</label> 
-				<input type="password" id="password" name="password" required>
-			</p>
-				<input type="submit" value="Submit" >
-		</fieldset>
-		<div id="errors"></div>
-	</form>
+		<h1>Welcome to the "I Said It Best" Debate Website</h1>
+		<form id="login"><!-- class='cmxform'>
+-->			<fieldset>
+				<p>
+					<label for="username">Username:</label> 
+					<input type="text" id="username" name="username" required>
+				</p>
+				<p>
+					<label for="password">	Password:</label> 
+					<input type="password" id="password" name="password" required>
+				</p>
+					<input type="submit" value="Submit" >
+			</fieldset>
+			<div id="errors"></div>
+		</form>
 	</center>
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
