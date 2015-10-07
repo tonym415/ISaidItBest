@@ -6,17 +6,19 @@
 define(['jquery', 'cookie'], function($){
 
 	var navPages = {
-			'Home' : 'index.html',
-			'Game' : 'game.html',
-			'Registration': 'signup.html',
-			'Contact': 'contact.html',
-			'Admin': 'admin.html'
+			'home' : 'index.html',
+			'game' : 'game.html',
+			'registration': 'signup.html',
+			'contact': 'contact.html',
+			'profile': 'profile.html',
+			'admin': 'admin.html'
 		};
 
 	var navBar = function(){
 		$('body').prepend('<div id="navDiv">')
 		$('#navDiv').append('<ul id="navBar">')
 		for(key in navPages){
+			if (key == 'profile') continue;
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>"
 			$('#navBar').append(listItem)
 		}

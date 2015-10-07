@@ -17,20 +17,25 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 			type: "POST",
 			url: app.engine 
 		})
-		.done(function(result){
-			if (typeof(result) !== 'object'){
+		.done(function(data){
+			if (typeof(data) !== 'object'){
 			 	data = JSON.parse(result)[0];
 			}
 
 			// internal error handling	
 			if (data['error'] !== undefined){
-				var validator = $("#signup").validate();
+				var validator = $("#contact").validate();
 				validator.showErrors({
-					"paypal_account": data['error']
+					"message": data['error']
 				});
 			}else{
-				app.setCookie('user', data)
-				window.location.assign(app.pages.Home)
+				$("#errors").text(data.message.message)
+				$("#errors").dialog({
+					title: data.message.title,
+					autoOpen: true,
+					modal: true
+
+				})
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
@@ -68,5 +73,5 @@ var valHandler = function(){
 			}
 		}
 	});
-	$("<p> If you already have and account...<a href='" + app.pages.Home + "''>Login!</a></p>").appendTo("center")
+	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center")
 });

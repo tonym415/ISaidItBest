@@ -82,6 +82,40 @@ def userAvailabilityCheck(fs):
     returnJson(availability)
 
 
+def contactUs(fs):
+    """ send user responses to admin """
+    try:
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        fromaddr = fs.get('email')
+        toaddr = 'tonym415@gmail.com'
+        msg = MIMEMultipart()
+        msg['From'] = fromaddr
+        msg['To'] = toaddr
+        msg['Subject'] = "User Concerns from %s" % fs.get('name')
+
+        body = fs.get('message')
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP('localhost')
+        text = msg.as_string()
+        server.sendmail(fromaddr, toaddr, text)
+        server.quit()
+    except Exception as e:
+        returnJson({'error': "Server Error: %s" % e})
+        exit()
+    # if everything worked send data back for custom confirmation
+    fs['message'] = {
+        'title': "Success",
+        'message': """%s, your message has been sent.
+                Please expect a response soon""" % fs['name']
+    }
+    sys.stderr.write("{}".format(locals()))
+    returnJson(fs)
+
+
 # this will eventually be a database call
 def loadCategoryQuestions(category):
     """ Loads all questions for a specific category """
@@ -116,6 +150,8 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName == "UAC":
         globals()['userAvailabilityCheck'](fStor)
+    elif funcName == "CU":
+        globals()['contactUs'](fStor)
     else:
         globals()['showParams'](fStor)
 
@@ -130,7 +166,8 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="VU", username="tonym415", password="password")
+    form = formMockup(function="CU", name="tonym415", email="bob@bob.com",
+                      message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

@@ -38,20 +38,26 @@ body {
 .wins {
     width: 16px;
     height: 16px;
-    background: url(../css/images/ui-icons_cd0a0a_256x240.png) 0 0; 
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png); 
     /*background-position: -32px -128px;*/
 }
 
 .losses {
     width: 16px;
     height: 16px;
-    background: url(../css/images/ui-icons_cd0a0a_256x240.png) 0 0; 
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png); 
     /*background-position: -32px -128px;*/
 }
 
 /*
     Styles for navigation bar
  */
+ .contact {
+    left: 0px;
+    width: 350px;
+    background: url(../css/images/debate.png) 0 0;
+    background-repeat: no-repeat;
+ }
 
 #navBar{
     list-style:none;

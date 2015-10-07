@@ -11,9 +11,9 @@ require([
 	'cookie'
 	], function($, app){
 		// handle url spoofing
-		if (document.referrer.indexOf(app.pages.Home) < 0){
+		if (document.referrer.indexOf(app.pages.home) < 0){
 			if (document.referrer.indexOf(document.location.pathname) < 0){
-				window.location.assign(app.pages.Home)
+				window.location.assign(app.pages.home)
 			}
 		}
 

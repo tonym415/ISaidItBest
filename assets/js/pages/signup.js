@@ -30,7 +30,7 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 				});
 			}else{
 				app.setCookie('user', data)
-				window.location.assign(app.pages.Home)
+				window.location.assign(app.pages.home)
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
@@ -128,5 +128,5 @@ var valHandler = function(){
 			}
 		}
 	});
-	$("<p> If you already have and account...<a href='" + app.pages.Home + "''>Login!</a></p>").appendTo("center")
+	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center")
 });
