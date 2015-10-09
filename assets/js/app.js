@@ -18,7 +18,10 @@ define(['jquery', 'cookie'], function($){
 		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header')
 		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default')
 		for(key in navPages){
-			if (key == 'profile') continue;
+			// the following line is necessary for production 
+			// it is comment now for testing purposes only 
+			// TODO: uncomment line below
+			// if (key == 'profile') continue;
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>"
 			$('#navBar').append(listItem)
 		}

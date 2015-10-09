@@ -7,6 +7,8 @@
 requirejs.config({
 	baseURL: "assets/js",
 	paths: {
+		// global application object
+		app: 'app',
 		// The libraries to be used
 		jquery: [
 			'//jqueryvalidation.org/files/lib/jquery-1.11.1',
@@ -25,8 +27,9 @@ requirejs.config({
 			// if the CDN location fails, load from this location
 			'lib/jquery.validate'	
 		],
-		cookie: 'lib/jquery-cookie', 
+		// plugins
 		flipclock: 'lib/flipclock',
-		app: 'app'
+		cookie: 'lib/jquery-cookie', 
+		steps: 'lib/jquery.steps' 
 	}
 })

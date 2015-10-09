@@ -27,17 +27,11 @@ require([
 		$(wins).appendTo("#userInfo div")
 		
 
+		// Page Stylings
 		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
-
 		$("input[type=button]").button();	
-
-		$(".sel").selectmenu({ 
-			width: 200
-		});
-
-		$("#subCategory").selectmenu({ 
-			disabled: true
-		});
+		$(".sel").selectmenu({ width: 200 });
+		$("#subCategory").selectmenu({ disabled: true });
 
 		
 
@@ -46,7 +40,7 @@ require([
 	 */
 	$(".category").selectmenu({ 
 		/**
-		 * Handles load of the subcategory select box
+		 * Handles load of the category question select box
 		 */
 		change: function(){
 			value = $(this).val().capitlize();

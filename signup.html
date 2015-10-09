@@ -4,53 +4,46 @@
     <head>
         <meta charset="utf-8" />
         <title>Registration</title>
-        <link rel="stylesheet" media="screen" href="assets/css/screen.css">
+        <link rel="stylesheet" href="assets/css/plugins/jquery-steps.css">
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
-    <body class='ui-widget-content'>
-    <center>
-     <!--this page primarily consists of form data. All id names are lowercase
-        -->   
-        <p>To sign up for our debate website and to begin showing your skills </p>
+
+    <body>
+    <!-- <body class='ui-widget-header'> -->
+        <p>Register for our debate website and to begin showing your skills </p>
         <p></p>
-        <form id="signup" class="cmxform"> 
-        <fieldset>
-        <legend>fill out the sign up form below</legend>
-        <p>
-        <label for="first_name">First Name:</label>
-        <input type="text" name="first_name" required  aria-required="true">
-        </p>
-        <p>
-        <label for="last_name">Last Name:</label>
-        <input type="text" name="last_name" required  aria-required="true">
-        </p>
-        <p>
-        <label for="email">Email:</label>
-        <input type="email" name="email" required aria-required="true">
-        </p>
-        <p>
-        <label for="username">Username:</label>
-        <input type="text" name="username" required aria-required="true">
-        <br /><span id='username_availability_result'></span>
-        </p>
-        <p>
-        <label for="password">Password:</label>   <!--should this be in encrypted format.-->
-        <input type="password" name="password" required aria-required="true"> <!--it has input type password-->
-        </p>
-        <p>
-        <label for="confirm_password">Confirm Password:</label>
-        <input type="password" name="confirm_password" required aria-required="true">  <!--this is just a way to confirm the password-->
-        </p>
-        <p>
-        <label for="paypal_account">Paypal Account Name:</label>
-        <input type="text" name="paypal_account" required aria-required="true">
-        </p>
-        <div id="signup_errors"></div>
-        <p></p>
-        <input type="submit" value="Submit" />
-        </fieldset> 
+        <div>
+        <form id="signup"> 
+            <h1>Account Information</h1>
+            <fieldset>
+                <legend>Account</legend> 
+                <label for="username">Username:</label>
+                <input type="text" name="username" required aria-required="true"><span id='username_availability_result'></span><br />
+                <label for="password">Password:</label> 
+                <input type="password" name="password" required aria-required="true"><br /> 
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" name="confirm_password" required aria-required="true">
+            </fieldset>
+
+            <h1>About You</h1>
+            <fieldset>
+                <legend>Personal Information</legend>
+                <label for="first_name">First Name:</label>
+                <input type="text" name="first_name" required  aria-required="true">
+                <label for="last_name">Last Name:</label>
+                <input type="text" name="last_name" required  aria-required="true">
+                <label for="email">Email:</label>
+                <input type="email" name="email" required aria-required="true">
+            </fieldset>
+
+            <h1>Miscellaneous</h1>
+            <fieldset>
+                <legend>Additional Info</legend>
+                <label for="paypal_account">Paypal Account Name:</label>
+                <input type="text" name="paypal_account" required aria-required="true">
+            </fieldset> 
         </form>
-    </center></body>
+    </body>
     <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
     <script>
         require(['common'], function(){ require(['pages/signup']); });
