@@ -3,23 +3,23 @@
  */
 define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate, app){
 	$("input[type=submit]").button();
-	app.createNavBar()
+	app.createNavBar();
 	var user = app.getCookie('user')
 	if (user !== undefined){ 
 		// if same session USERNAME should be set	
-		name = user.USERNAME
+		name = user.USERNAME;
 		if (name === 'undefined') { 
 			// if coming from registration page
-			name = user.username
-			$("#password").val(user.password)	
+			name = user.username;
+			$("#password").val(user.password);
 		}
-		$("#username").val(name)	
+		$("#username").val(name);
 	};
 
 	var valHandler = function(){
-		user = $("#username").val()
-		pass = $("#password").val()
-		data = {'function': 'VU', 'username': user, 'password': pass}
+		user = $("#username").val();
+		pass = $("#password").val();
+		data = {'function': 'VU', 'username': user, 'password': pass};
 
 		// validate user	
 		$.ajax({
@@ -32,13 +32,13 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			if (app.isEmpty(result)){
 				var validator = $("#login").validate();
 				validator.showErrors({
-					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.registration + "'>creating a user</a>" 
+					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.registration + "'>creating a user</a>";
 				});
 			}else{
 				// create cookie using user info
 				// console.log(result)
-				app.setCookie('user', result)
-				window.location.assign(app.pages.game)
+				app.setCookie('user', result);
+				window.location.assign(app.pages.game);
 			}
         })
         .fail(function(jqXHR, textStatus, error){

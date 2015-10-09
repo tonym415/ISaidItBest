@@ -32,4 +32,4 @@ requirejs.config({
 		cookie: 'lib/jquery-cookie', 
 		steps: 'lib/jquery.steps' 
 	}
-})
+});
