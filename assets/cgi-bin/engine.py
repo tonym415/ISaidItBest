@@ -46,7 +46,7 @@ def submitUserInfo(fs):
     """ submit user info to database """
     returnObj = {'error': ''}
     uInfo = User(fs).submitUser()
-    if uInfo['USER_ID'] == 0:
+    if uInfo['user_id'] == 0:
         returnObj['error'] = uInfo['message']
     else:
         returnObj = uInfo

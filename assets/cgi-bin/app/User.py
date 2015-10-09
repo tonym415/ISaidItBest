@@ -28,9 +28,9 @@ class User(object):
 
     def getAllUsers(self):
         """ get user information by name """
-        query = """SELECT USER_ID, FIRST_NAME,LAST_NAME, EMAIL
-                USERNAME ,  PASSWORD ,  CREDIT ,  WINS ,  LOSSES ,
-                 PAYPAL_ACCOUNT ,  Created ,  Active  FROM  users  WHERE 1
+        query = """SELECT user_id, first_name,last_name, email
+                username ,  password ,  credit ,  wins ,  losses ,
+                 paypal_account ,  cREATED ,  aCTIVE  FROM  users  WHERE 1
             """
         cursor = self._cnx.cursor(buffered=True)
         cursor.execute(query)
@@ -45,9 +45,9 @@ class User(object):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         returnDict = {}
-        query = """SELECT  USER_ID ,  FIRST_NAME , LAST_NAME , EMAIL ,
-                USERNAME, CREDIT ,  WINS ,  LOSSES ,  PAYPAL_ACCOUNT ,
-                PASSWORD, CREATED ,  ACTIVE  FROM  users  WHERE USERNAME = %s"""
+        query = """SELECT  user_id ,  first_name , last_name , email ,
+                username, credit ,  wins ,  losses ,  paypal_account ,
+                password, created ,  active  FROM  users  WHERE username = %s"""
         cursor = self._cnx.cursor(buffered=True, dictionary=True)
         try:
             cursor.execute(query, (self.user_username,))
@@ -66,8 +66,8 @@ class User(object):
         """ inserts user info into the database """
         returnObj = {"USER_ID": 0}
         query = ("INSERT INTO  users"
-                 "(FIRST_NAME ,  LAST_NAME , EMAIL ,  USERNAME ,  PASSWORD ,"
-                 "PAYPAL_ACCOUNT) VALUES (%(first_name)s, %(last_name)s,"
+                 "(first_name ,  last_name , email ,  username ,  password ,"
+                 "paypal_account) VALUES (%(first_name)s, %(last_name)s,"
                  "%(email)s,%(username)s, %(password)s, %(paypal_account)s)")
 
         # extract only user info from class __dict__

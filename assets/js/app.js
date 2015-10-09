@@ -15,15 +15,15 @@ define(['jquery', 'cookie'], function($){
 		};
 
 	var navBar = function(){
-		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header')
-		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default')
-		for(key in navPages){
+		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header');
+		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default');
+		for(var key in navPages){
 			// the following line is necessary for production 
 			// it is comment now for testing purposes only 
 			// TODO: uncomment line below
 			// if (key == 'profile') continue;
-			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>"
-			$('#navBar').append(listItem)
+			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
+			$('#navBar').append(listItem);
 		}
 
 	};
@@ -31,40 +31,40 @@ define(['jquery', 'cookie'], function($){
 	 * sets cookies with info
 	 */
 	 function setCookie(name, data){
-	 	$.cookie.json = true
-	 	$.removeCookie(name)
-	 	$.cookie(name, data)
-	 };
+	 	$.cookie.json = true;
+	 	$.removeCookie(name);
+	 	$.cookie(name, data);
+	 }
 
 	 function setTheme(theme){
 	 	// if no theme sent set default
-	 	var cook_theme = $.cookie('theme')
+	 	var cook_theme = $.cookie('theme');
 	 	if (theme === undefined){ 
 	 		theme = (cook_theme === undefined) ? 'sunny' : cook_theme
  		};	
 
 	 	$.cookie("theme", theme)
 	 	cook_theme = $.cookie('theme')
-		var theme_url = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/" + theme + "/jquery-ui.css"
+		var theme_url = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/" + theme + "/jquery-ui.css";
 		$('head').append('<link href="'+ theme_url +'" rel="Stylesheet" type="text/css" />');
-	};
+	}
 
 	/**
 	 * gets cookies info
 	 */
 	 function getCookie(name){
-	 	$.cookie.json = true
-	 	return $.cookie(name)
-	 };
+	 	$.cookie.json = true;
+	 	return $.cookie(name);
+	 }
 
 	/**
 	 * Determines of an object is empty
 	 * @return {Boolean} [description]
 	 */
 	function isEmpty(obj){
-	 	length = Object.getOwnPropertyNames(obj).length
-	 	return 	length > 0 ? false : true
-	 };
+	 	length = Object.getOwnPropertyNames(obj).length;
+	 	return 	length > 0 ? false : true;
+	 }
 
 	/**
 	 * Capitalizes string
@@ -74,7 +74,7 @@ define(['jquery', 'cookie'], function($){
 		return this.toLowerCase().replace( /\b\w/g, function(m){
 			return m.toUpperCase();
 		});
-	};
+	}
 /**
 		 * Converts form data to js object
 		 * @return {[type]} object
@@ -121,33 +121,33 @@ define(['jquery', 'cookie'], function($){
 		 * @return {Object} parameters in an object ready for cgi consumption
 		 */
 		submitParameters : function(){
-				validParams = true
-				params = {"function": "LCQ"}
-				errorMessage = ""
+				validParams = true;
+				params = {"function": "LCQ"};
+				errorMessage = "";
 				$("select").each(function(){
-					selectedValue = $(this).val()
-					id = $(this).context.id
-					selectedText = $(this).find(":selected").text()
+					selectedValue = $(this).val();
+					id = $(this).context.id;
+					selectedText = $(this).find(":selected").text();
 					// test for valid parameter values
 					// TODO: Add jquery validator 
 					if (selectedValue == "---"){
-						errorMessage += "<br /> " + id.capitlize() + ": "  + selectedText
-						validParams = false
-						return 
+						errorMessage += "<br /> " + id.capitlize() + ": "  + selectedText;
+						validParams = false;
+						return;
 					}else{
-						id = $(this).context.id
-						params[id] = selectedValue 
-						params[id + "_text"] = selectedText 
+						id = $(this).context.id;
+						params[id] = selectedValue;
+						params[id + "_text"] = selectedText;
 					}
-				})
+				});
 
 				if (!validParams){
 					// debug statment
-					console.log(params)
-					$('#game_messages').html(errorMessage)
-					errorTitle = "Invalid parameters: \n"
-					$('#game_messages').dialog({ title: errorTitle, autoOpen: true, modal: true})
-					return false
+					console.log(params);
+					$('#game_messages').html(errorMessage);
+					errorTitle = "Invalid parameters: \n";
+					$('#game_messages').dialog({ title: errorTitle, autoOpen: true, modal: true});
+					return false;
 				}
 
 				// send data to serverside script
@@ -157,19 +157,19 @@ define(['jquery', 'cookie'], function($){
 					type: "POST",
 					url: this.engine
 				})
-				.done( function(result) { /*console.log("success"); console.log(result)*/})
+				.done( function(result) { /*console.log("success"); console.log(result)*/});
 				.fail( function(request, error) { console.log("Error"); console.log(request)});
 
-				return params
+				return params;
 			},
 		/**
 		 * loads the debate parameters, generates time clock, disables parameter selection and starts the debate 
 		 * @param  {object} data Parameters for the debate 
 		 */
 		loadDebate : function(data){
-				if (!data) return data;
-			 	$(".countdown_timer").hide()
-			 	$("#debate").hide()
+				if (!data) { return data; }
+			 	$(".countdown_timer").hide();
+			 	$("#debate").hide();
 				$("#ui-id-1").addClass('ui-state-disabled');
 				$("#ui-id-2").click();
 				// TODO: notify user of submission status (success/fail)
@@ -180,18 +180,18 @@ define(['jquery', 'cookie'], function($){
 						// $("#game").append("<img id='searchImg' src='/assets/images/search1.gif' />");
 						$("#successNotice").fadeOut(5000,function(){
 							// when the success notice fades 
-							$("#searchingNotice").hide()
+							$("#searchingNotice").hide();
 							$("#game").removeClass("searching");
-							$("#searchImg").remove()
-						 	$("#debate").show()
-						 	$(".countdown_timer").show()
+							$("#searchImg").remove();
+						 	$("#debate").show();
+						 	$(".countdown_timer").show();
 						 	//set game criteria
-						 	var q_text = params.subCategory_text + "\n (Wager: " + params.wager_text + ")"
-						 	$("#question").html(q_text).wrap('<pre />')
+						 	var q_text = params.subCategory_text + "\n (Wager: " + params.wager_text + ")";
+						 	$("#question").html(q_text).wrap('<pre />');
 						 	// set clock based on time limit parameter
-						 	min = params.timeLimit * 60
-						 	clock.setTime(min)
-						 	clock.start()
+						 	min = params.timeLimit * 60;
+						 	clock.setTime(min);
+						 	clock.start();
 						})
 					});
 				});
