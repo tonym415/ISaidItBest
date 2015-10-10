@@ -27,6 +27,21 @@ define(['jquery', 'cookie'], function($){
 		}
 
 	};
+
+	var loginNavBar = function(){
+		
+		for(var key in navPages){
+			// the following line is necessary for production 
+			// it is comment now for testing purposes only 
+			// TODO: uncomment line below
+			// if (key == 'profile') continue;
+			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
+			$('.main-nav ul').append($(listItem));
+		}
+		
+		$('.main-nav ul').append('<li><a class="cd-signin" href="#0">Sign in</a></li>')
+		$('.main-nav ul').append('<li><a class="cd-signup" href="#0">Sign up</a></li>')
+	};
 	/**
 	 * sets cookies with info
 	 */
@@ -111,6 +126,7 @@ define(['jquery', 'cookie'], function($){
 		setCookie: setCookie,
 		getCookie: getCookie,
 		createNavBar: navBar,
+		createLoginNavBar: loginNavBar,
 		setTheme: setTheme,
 		getTheme: function(){
 			return $.cookie('theme');
