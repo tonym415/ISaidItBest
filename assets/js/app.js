@@ -157,7 +157,7 @@ define(['jquery', 'cookie'], function($){
 					type: "POST",
 					url: this.engine
 				})
-				.done( function(result) { /*console.log("success"); console.log(result)*/});
+				.done( function(result) { /*console.log("success"); console.log(result)*/})
 				.fail( function(request, error) { console.log("Error"); console.log(request)});
 
 				return params;

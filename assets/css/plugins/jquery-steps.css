@@ -139,7 +139,15 @@
 
 .wizard > .content
 {
-    background: #eee;
+    /* Fallback for web browsers that doesn't support RGBa */
+    background: rgb(238, 238, 238);
+    /* RGBa with 0.6 opacity */
+    background: rgba(238, 238, 238, 0.6);
+    /*
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+    */    
+    /*background: #eee;*/
     display: block;
     margin: 0.5em;
     min-height: 35em;

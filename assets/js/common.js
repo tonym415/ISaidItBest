@@ -30,6 +30,7 @@ requirejs.config({
 		// plugins
 		flipclock: 'lib/flipclock',
 		cookie: 'lib/jquery-cookie', 
-		steps: 'lib/jquery.steps' 
+		steps: 'lib/jquery.steps',
+		avatar: 'lib/avatar'	
 	}
 });

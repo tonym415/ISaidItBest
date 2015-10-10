@@ -65,7 +65,7 @@ def validateUser(fs):
             user_info = u.getUser()
 
             # prune unnecessary info
-            del user_info['PASSWORD']
+            del user_info['password']
 
     returnJson(user_info)
 

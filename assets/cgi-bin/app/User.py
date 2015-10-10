@@ -98,7 +98,7 @@ class User(object):
         if 'error' not in userInfo:
             print(userInfo)
             # test given password against database password
-            hashed_pw = userInfo['PASSWORD']
+            hashed_pw = userInfo['password']
             # print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
                                                 # self.user_password, hashed_pw))
             validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
@@ -110,7 +110,7 @@ class User(object):
 
     def isUser(self):
         """ checking for username availability """
-        query = """SELECT  USERNAME  FROM  users  WHERE USERNAME = %s"""
+        query = """SELECT  username  FROM  users  WHERE username = %s"""
         cursor = self._cnx.cursor(buffered=True)
         cursor.execute(query, (self.user_username,))
         """ if number of rows fields is bigger them 0 that means it's NOT

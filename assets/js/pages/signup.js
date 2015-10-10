@@ -2,7 +2,7 @@
 /*
 	Handles js interaction for the signup page
  */
-require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app, steps){
+require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
 	app.createNavBar()
 	$("input[type=submit]").button();
 
@@ -23,23 +23,23 @@ require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app, ste
 			}
 
 			// internal error handling	
-			if (data['error'] !== undefined){
+			if (data.error !== undefined){
 				var validator = $("#signup").validate();
 				validator.showErrors({
-					"paypal_account": data['error']
+					"paypal_account": data.error
 				});
 			}else{
-				app.setCookie('user', data)
-				window.location.assign(app.pages.home)
+				app.setCookie('user', data);
+				window.location.assign(app.pages.home);
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
 		.always(function() { /*console.log('getJSON request ended!');*/ });
 	 }
 var valHandler = function(){
-	formData = $(this.currentForm).serializeForm() 
-	formData['function'] = "SUI"
-	submitUserInfo(formData)
+	formData = $(this.currentForm).serializeForm();
+	formData['function'] = "SUI";
+	submitUserInfo(formData);
 }
 	
 	// wizardify form and set up validation

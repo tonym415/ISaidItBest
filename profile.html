@@ -8,11 +8,32 @@
         <!-- <link rel="stylesheet" media="screen" href="assets/css/screen.css"> -->
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
-    <body class='ui-widget'>
-    <center>
-        <h1>Member Profile</h1>
+    <body class='ui-widget-header'>
+        <center><h1>Member Profile</h1></center> 
+        
         <p></p>
-        <form id="signup"> 
+        <form id="profile">  
+            <h1>Account Infomation</h1>
+            <fieldset>
+                <p>
+                    <label for="created">Member Since:</label>
+                    <input type="text" name="created" required aria-required="true">
+                </p>
+                <p>
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" required aria-required="true">
+                    <br /><span id='username_availability_result'></span>
+                </p>
+                <p>
+                    <label for="password">Password:</label>   <!--should this be in encrypted format.-->
+                    <input type="password" name="password" required aria-required="true"> <!--it has input type password-->
+                </p>
+                <!-- <p>
+                    <label for="confirm_password">confirm password:</label>
+                    <input type="password" name="confirm_password" required aria-required="true">
+                </p> -->
+            </fieldset>
+
             <h1>Personal Information</h1>
             <fieldset>
             <p>
@@ -29,32 +50,18 @@
             </p>
             </fieldset>
 
-            <h1>Account Infomation</h1>
-            <fieldset>
-                <p>
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" required aria-required="true">
-                    <br /><span id='username_availability_result'></span>
-                </p>
-                <p>
-                    <label for="password">Password:</label>   <!--should this be in encrypted format.-->
-                    <input type="password" name="password" required aria-required="true"> <!--it has input type password-->
-                </p>
-                <p>
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" name="confirm_password" required aria-required="true">  <!--this is just a way to confirm the password-->
-                </p>
-            </fieldset>
-
-            <h1>Miscellaneous Information</h1>
+            <h1>Additional Information</h1>
             <fieldset>
                 <p>
                     <label for="paypal_account">Paypal Account Name:</label>
                     <input type="text" name="paypal_account" required aria-required="true">
                 </p>
                 <p>
-                    <label for="avatar">Paypal Account Name:</label>
-                    <img src="" type="text" name="avatar" >
+                    <label for="profile-avatar">Avatar:</label>
+                    <div class='profile-avatar-wrap'>
+                        <img src="assets/css/images/anon_user.png" class="profile-avatar" id="profile-avatar" alt='Image for profile'>
+                        <input type="file" id='uploader' />
+                    </div>
                 <p>
                     <label id="themes_label" for="themes">Change Theme:</label>
                     <select id="themes">
@@ -90,6 +97,10 @@
     </center></body>
     <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
     <script>
-        require(['common'], function(){ require(['pages/profile']); });
+        require(['common'], function(){ 
+            require(['pages/profile'], function(){
+                require(['avatar']); 
+            }); 
+        });
     </script>
 </html>

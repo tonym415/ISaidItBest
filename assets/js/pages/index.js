@@ -32,7 +32,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			if (app.isEmpty(result)){
 				var validator = $("#login").validate();
 				validator.showErrors({
-					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.registration + "'>creating a user</a>";
+					"username": "Invalid User/Password combination<br /> Try <a href='" + app.pages.registration + "'>creating a user</a>"
 				});
 			}else{
 				// create cookie using user info
