@@ -47,7 +47,7 @@ Main components
 header[role=banner] {
   position: relative;
   height: 50px;
-  background: #343642;
+  /*background: #343642;*/
 }
 header[role=banner] #cd-logo {
   float: left;
@@ -167,7 +167,9 @@ header[role=banner]::after {
     border-radius: 50em;
   }
   .main-nav a.cd-signup {
-    background: #2f889a;
+    border-radius: 50em;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    /*background: #2f889a;*/
     border: none;
   }
 }
@@ -348,8 +350,8 @@ xsigin/signup popup
 .cd-form input[type=submit] {
   padding: 16px 0;
   cursor: pointer;
-  background: #2f889a;
-  color: #FFF;
+  /*background: #2f889a;*/
+  /*color: #FFF;*/
   font-weight: bold;
   border: none;
   -webkit-appearance: none;
@@ -359,7 +361,7 @@ xsigin/signup popup
   appearance: none;
 }
 .no-touch .cd-form input[type=submit]:hover, .no-touch .cd-form input[type=submit]:focus {
-  background: #3599ae;
+  /*background: #3599ae;*/
   outline: none;
 }
 .cd-form .hide-password {

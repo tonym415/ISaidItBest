@@ -29,8 +29,8 @@ class User(object):
     def getAllUsers(self):
         """ get user information by name """
         query = """SELECT user_id, first_name,last_name, email
-                username ,  password ,  credit ,  wins ,  losses ,
-                 paypal_account ,  cREATED ,  aCTIVE  FROM  users  WHERE 1
+                username, password , credit , wins, losses,
+                 paypal_account, role, created, active  FROM  users  WHERE 1
             """
         cursor = self._cnx.cursor(buffered=True)
         cursor.execute(query)
@@ -46,8 +46,8 @@ class User(object):
         # if no user is found by the given name return empty dictionary
         returnDict = {}
         query = """SELECT  user_id ,  first_name , last_name , email ,
-                username, credit ,  wins ,  losses ,  paypal_account ,
-                password, created ,  active  FROM  users  WHERE username = %s"""
+                username, credit, wins, losses, paypal_account , password,
+                created, role,  active  FROM  users  WHERE username = %s"""
         cursor = self._cnx.cursor(buffered=True, dictionary=True)
         try:
             cursor.execute(query, (self.user_username,))

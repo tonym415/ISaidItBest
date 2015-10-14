@@ -5,13 +5,16 @@
  */
 define(['jquery', 'cookie'], function($){
 
+	var defaultTheme = 'excite-bike';
+
 	var navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
 			'registration': 'signup.html',
 			'contact': 'contact.html',
 			'profile': 'profile.html',
-			'admin': 'admin.html'
+			'admin': 'admin.html',
+			'main': 'main.html'
 		};
 
 	var navBar = function(){
@@ -39,8 +42,8 @@ define(['jquery', 'cookie'], function($){
 			$('.main-nav ul').append($(listItem));
 		}
 		
-		$('.main-nav ul').append('<li><a class="cd-signin" href="#0">Sign in</a></li>')
-		$('.main-nav ul').append('<li><a class="cd-signup" href="#0">Sign up</a></li>')
+		$('.main-nav ul').append('<li><a class="cd-signin" href="#0">Sign in</a></li>').addClass('ui-state.default')
+		$('.main-nav ul').append('<li><a class="cd-signup" href="#0">Sign up</a></li>').addClass('ui-state.default')
 	};
 	/**
 	 * sets cookies with info
@@ -55,10 +58,14 @@ define(['jquery', 'cookie'], function($){
 	 	// if no theme sent set default
 	 	var cook_theme = $.cookie('theme');
 	 	if (theme === undefined){ 
-	 		theme = (cook_theme === undefined) ? 'sunny' : cook_theme
+	 		theme = (cook_theme === undefined) ? defaultTheme : cook_theme
  		};	
 
+ 		theme = theme.replace(/['"]+/g,'');
+ 		// refresh cookie
+ 		$.removeCookie("theme")
 	 	$.cookie("theme", theme)
+
 	 	cook_theme = $.cookie('theme')
 		var theme_url = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/" + theme + "/jquery-ui.css";
 		$('head').append('<link href="'+ theme_url +'" rel="Stylesheet" type="text/css" />');
@@ -115,6 +122,7 @@ define(['jquery', 'cookie'], function($){
 
 	/** return the app object with var/functions built in */
 	return {
+		defaultTheme: defaultTheme,
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,		/**
 		 * CGI script that does all the work
@@ -126,10 +134,13 @@ define(['jquery', 'cookie'], function($){
 		setCookie: setCookie,
 		getCookie: getCookie,
 		createNavBar: navBar,
+		// createNavBar: loginNavBar,
 		createLoginNavBar: loginNavBar,
 		setTheme: setTheme,
 		getTheme: function(){
-			return $.cookie('theme');
+			$.cookie.json = true;
+			current_theme =  $.cookie('theme');
+			return current_theme;
 		},
 		/**
 		 * @descriptions Gathers all parameters for the debate and puts them in given format 

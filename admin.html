@@ -2,13 +2,116 @@
 <html>
 <head>
 	<title>Administration Page</title>
-	<link rel="stylesheet" media="screen" href="assets/css/screen.css">
+	<link rel="stylesheet" href="assets/css/screen.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
 	<center>
 		<h1>"I Said It Best" Administration</h1>
-	</form>
+			<div id="tabs"><!-- Begin Tab Container -->
+				<ul>
+					<li><a href="#categories">Categories</a></li>
+					<li><a href="#questions">Questions</a></li>
+					<li><a href="#users">Users</a></li>
+				</ul>
+				<div id="categories"> <!-- Begin Category Tab --> 
+					<h3>C.R.U.D Category</h3>
+			    	<div id='catAccordion'>
+						<h3>Create Category</h3>
+						<form id='createCategory'>
+							<p>
+							<label for='c_Category'>Category Name:</label>
+							<input id='c_Category' type='text' />
+							</p>
+							<input class='full-width' type='submit' value="New Category" />
+						</form>
+						<h3>Rename/Update Category</h3>
+						<form id='renameCategory'>
+							<p>
+								<label for='r_currentCategory'>Category to Change:</label>
+								<select id='r_currentCategory'>
+									<option value="---">None</option>
+								</select><br />
+							</p>
+							<p>
+								<label for='r_newCategory'>New Name:</label>
+								<input id='r_newCategory' type='text' /><br />
+							</p>
+							<p>
+								<input type='submit' value="Rename Category" />
+							</p>
+						</form>
+						<h3>Delete Category</h3>
+						<form id='deleteCategory'>
+							<p>
+								<label for='r_Category'>Category to Change:</label>
+								<select id='r_Category'>
+									<option value="---">None</option>
+								</select><br />
+							</p>
+							<p>
+								<input type='submit' value="Rename Category" />
+							</p>
+						</form>
+						
+				    </div> <!-- end of category CRUD Accordion -->
+
+			    	
+				</div> <!-- End Category Tab -->
+				<div id="questions"> <!-- Begin Question Tab -->
+					<h2>Question Management</h2>
+			    	<div id='questionAccordion'> <!-- begin subcategory CRUD Accordion -->
+						<h3>Create Question</h3>
+						<form id='createQuestion'>
+							<p>
+								<label for='q_Category'>Category:</label>
+								<select id='q_Category'>
+									<option value="---">None</option>
+								</select><br />
+							</p>
+							<p>
+								<label for='q_text'>Question text:</label>
+								<input id='q_text' type='text' />
+							</p>
+
+							<input class='full-width' type='submit' value="New Question" />
+						</form>
+						<h3>Rename/Update Sub-Category</h3>
+						<form id='srenameCategory'>
+							<p>
+								<label for='sr_currentCategory'>Category to Change:</label>
+								<select id='sr_currentCategory'>
+									<option value="---">None</option>
+								</select><br />
+							</p>
+							<p>
+								<label for='sr_newCategory'>New Name:</label>
+								<input id='sr_newCategory' type='text' /><br />
+							</p>
+							<p>
+								<input type='submit' value="Rename Sub-Category" />
+							</p>
+						</form>
+						<h3>Delete Sub-Category</h3>
+						<form id='deleteCategory'>
+							<p>
+								<label for='sd_Category'>Sub-Category to Delete:</label>
+								<select id='sd_Category'>
+									<option value="---">None</option>
+								</select><br />
+							</p>
+							<p>
+								<input type='submit' value="Delete Sub-Category" />
+							</p>
+						</form>
+				    </div> <!-- End SubCat Accordion -->
+				</div> <!-- End of Question Tab -->
+				<div id="users"> <!-- Begin User Tab -->
+					<h2>User Management</h2>
+					<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+					<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+				</div> <!-- End Users Tab -->
+		</div> <!-- End Tab Container -->
 	</center>
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>

@@ -4,5 +4,5 @@ Use: Main Screen Import
 
 ***********************************/
 
-@import "jquery-ui.sunny.css";
+@import "plugins/jquery-ui.css";
 @import "user-styles.css";
