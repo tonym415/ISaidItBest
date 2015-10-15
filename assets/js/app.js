@@ -124,10 +124,8 @@ define(['jquery', 'cookie'], function($){
 	return {
 		defaultTheme: defaultTheme,
 		// site pages referred here so no hard coding is necessary
-		pages: navPages,		/**
-		 * CGI script that does all the work
-		 * @type {String}
-		 */
+		pages: navPages,		
+		// CGI script that does all the work
 		engine : "/assets/cgi-bin/engine.py",
 		// utility functions
 		isEmpty: isEmpty,

@@ -115,7 +115,7 @@ Themeroller styles
     width: 88px;
     height: 33px;
 }*/
-
+.no-close .ui-dialog-titlebar-close {display: none }
 form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }

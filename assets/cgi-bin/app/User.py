@@ -28,19 +28,27 @@ class User(object):
 
     def getAllUsers(self):
         """ get user information by name """
-        query = """SELECT user_id, first_name,last_name, email
+        returnDict = {}
+        query = """SELECT user_id, first_name,last_name, email,
                 username, password , credit , wins, losses,
-                 paypal_account, role, created, active  FROM  users  WHERE 1
+                 paypal_account, roles.role, created, active  FROM  users
+                 INNER JOIN roles USING(role_id) WHERE 1
             """
-        cursor = self._cnx.cursor(buffered=True)
-        cursor.execute(query)
-        if cursor.rowcount > 0:
-            rows = cursor.fetchall()
-            for row in rows:
-                pass  # print(row)
-        else:
-            pass  # print("No user by the name '%s'" % self.username)
+        cursor = self._cnx.cursor(buffered=True, dictionary=True)
+        try:
+            cursor.execute(query)
+            if cursor.rowcount > 0:
+                returnDict = cursor.fetchall()
 
+            else:
+                raise Exception("%s yields %s" %
+                               (cursor.statement.replace('\n', ' ')
+                                .replace('            ', ''), cursor.rowcount))
+
+        except Exception as e:
+            returnDict['error'] = "{}".format(e)
+
+        return returnDict
     def getUser(self):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
@@ -137,5 +145,6 @@ if __name__ == "__main__":
               for i in info if i != 'function' and '_password' not in i}
     # print(u_info)
 
-    u = User(u_info)
-    print(u.isValidUser())
+    print(User().getAllUsers())
+    # u = User(u_info)
+    # print(u.isValidUser())

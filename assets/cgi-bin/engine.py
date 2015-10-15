@@ -33,13 +33,18 @@ def returnJson(data, toJSON=True):
     if not toJSON:
         sendHeaders()
     else:
-        sendHeaders("text/json")
+        sendHeaders("application/json")
 
     print(json.dumps(data, default=str))
 
 
 def showParams(fs):
     returnJson(fs)
+
+
+def getAllUsers():
+    users = {"records" : User().getAllUsers()}
+    returnJson(users)
 
 
 def submitUserInfo(fs):
@@ -140,6 +145,8 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName == "GAU":
+        globals()['getAllUsers']()
     elif funcName == "VU":
         globals()['validateUser'](fStor)
     elif funcName == "SUI":

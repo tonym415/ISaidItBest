@@ -2,12 +2,11 @@
 <html>
 <head>
 	<title>Administration Page</title>
-	<link rel="stylesheet" href="assets/css/screen.css">
+	<link rel="stylesheet" href="assets/css/plugins/ui.jqgrid.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-	<center>
-		<h1>"I Said It Best" Administration</h1>
+	<center> <h1>"I Said It Best" Administration</h1> </center>
 			<div id="tabs"><!-- Begin Tab Container -->
 				<ul>
 					<li><a href="#categories">Categories</a></li>
@@ -108,11 +107,47 @@
 				</div> <!-- End of Question Tab -->
 				<div id="users"> <!-- Begin User Tab -->
 					<h2>User Management</h2>
-					<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-					<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-				</div> <!-- End Users Tab -->
+					<table id='jqGrid'></table>
+					<div id="jqGridPager"></div>
+ 				</div> <!-- End Users Tab -->
 		</div> <!-- End Tab Container -->
-	</center>
+	<!-- </center> -->
+	<div id="editor">
+		<p class='validateTips'>All form fields are required</p>
+		<form id='update'>
+			<fieldset>
+				<p>
+					<label for='first_name'>First Name:</label>
+					<input id='first_name' />
+				</p>
+				<p>
+					<label for='last_name'>Last Name:</label>
+					<input id='last_name' />
+				</p>
+				<p>
+					<label for='username'>User Name:</label>
+					<input id='username' />
+				</p>
+				<p>
+					<label for='email'>Email:</label>
+					<input id='email' />
+				</p>
+				<p>
+					<label for='role'>Role:</label>
+					<select id='role'>
+						<option value='2'>User</option>
+						<option value='1'>Admin</option>
+					</select>
+				</p>
+				<p>
+					<label for='active'>Active:</label>
+					<input id='active' type='checkbox' />
+				</p>
+
+			</fieldset>
+			<input type='submit' tabindex="-1" style="position:absolute; top:-1000px">
+		</form>
+	</div>
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>
