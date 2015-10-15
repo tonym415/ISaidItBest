@@ -3,9 +3,10 @@
  * @module app
  * @return {Object} object with specific initialization and data handling for game.html
  */
-define(['jquery', 'cookie'], function($){
+define(['jquery', 'cookie', 'blockUI'], function($){
 
 	var defaultTheme = 'excite-bike';
+	var app_engine = "/assets/cgi-bin/engine.py"
 
 	var navPages = {
 			'home' : 'index.html',
@@ -44,6 +45,26 @@ define(['jquery', 'cookie'], function($){
 		
 		$('.main-nav ul').append('<li><a class="cd-signin" href="#0">Sign in</a></li>').addClass('ui-state.default')
 		$('.main-nav ul').append('<li><a class="cd-signup" href="#0">Sign up</a></li>').addClass('ui-state.default')
+	};
+
+	var loading = function(msg){
+		loadingImg = '<img src="assets/css/images/loading.gif" />';
+		loadingHtml = ' <h1>We are processing your request.  Please be patient.</h1>';
+		if (msg == undefined){ msg = loadingImg + loadingHtml }
+		$.blockUI({message: msg})
+	}
+
+	var unloading = $.unblockUI;
+
+	var ajxBody =  $("body")
+	if (ajxBody != undefined){
+		ajxBody.bind("ajaxStart", function() {
+	    	loading();    
+	    }).bind("ajaxStop", function() {
+	    	unloading();
+	    }).bind("ajaxError", function() {
+	    	unloading();
+	    });
 	};
 	/**
 	 * sets cookies with info
@@ -117,7 +138,9 @@ define(['jquery', 'cookie'], function($){
 		    return o;
 		};
 
-	//set theme
+	/**
+	 * Initalize app setup functions
+	 */
 	setTheme();
 
 	/** return the app object with var/functions built in */
@@ -126,7 +149,7 @@ define(['jquery', 'cookie'], function($){
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,		
 		// CGI script that does all the work
-		engine : "/assets/cgi-bin/engine.py",
+		engine : app_engine,
 		// utility functions
 		isEmpty: isEmpty,
 		setCookie: setCookie,
@@ -134,6 +157,8 @@ define(['jquery', 'cookie'], function($){
 		createNavBar: navBar,
 		// createNavBar: loginNavBar,
 		createLoginNavBar: loginNavBar,
+		showLoading: loading,
+		hideLoading: unloading,
 		setTheme: setTheme,
 		getTheme: function(){
 			$.cookie.json = true;

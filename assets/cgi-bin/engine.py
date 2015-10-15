@@ -12,6 +12,7 @@ if "REQUEST_METHOD" not in os.environ:
     import sys
     sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 from app.User import *
+from app.Category import *
 
 
 cgitb.enable()
@@ -121,6 +122,12 @@ def contactUs(fs):
     returnJson(fs)
 
 
+def getCategories():
+    """ gathers all categories """
+    returnObj = {"categories": Category().getAllCategories()}
+    returnJson(returnObj)
+
+
 # this will eventually be a database call
 def loadCategoryQuestions(category):
     """ Loads all questions for a specific category """
@@ -145,6 +152,8 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName == "GC":
+        globals()['getCategories']()
     elif funcName == "GAU":
         globals()['getAllUsers']()
     elif funcName == "VU":

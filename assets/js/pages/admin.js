@@ -2,8 +2,17 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGrid){
+	var objCategories,
+		loadCategories,
+		editor,
+		userGrid,
+		valHandler
+
+	// page setup
 	app.createNavBar()
+
 	$("input[type=submit]").button();
+	$("select").selectmenu({width: 200});
 
 	$( "[id$=tabs]" ).tabs()//.addClass( "ui-tabs-vertical ui-helper-clearfix" );
 	$( "[id$=Accordion]" ).accordion({
@@ -13,7 +22,63 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		active: false
 	});
 
-	var editor = $('#editor').dialog({
+	getCategories = function(){
+	 	$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			data: {'function' : 'GC'},
+			type: "POST",
+			url: app.engine 
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+			 	result = JSON.parse(result)[0];
+			}
+			// internal error handling	
+			if (result.error !== undefined){
+				console.log(result.error)
+				return result;
+			}else{
+				objCategories = result['categories'];
+				// console.log("Get: " + JSON.stringify(objCategories))
+				loadCategories()	
+			}
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+		.always(function() { app.hideLoading(); });
+	};
+	getCategories()
+
+	/**
+	 * loads categories into appropriate selectmenu 
+	 * @param  {object} categories object containing all category data 
+	 * @return none 
+	 */
+	function loadCategories(){
+		if (objCategories === undefined) { 
+			objCategories = getCategories()
+		} 
+		// get all "Category" select menus
+		menus = $('#tabs select[id$=Category]');
+		$.each(menus, function(){
+			$(this)
+				.empty()
+				.append(new Option("None", "---"))
+			element = $(this);
+			$.each(objCategories, function(idx, objCat){
+				parent = objCat.parent_category;
+				cat = objCat.category;
+				id = objCat.category_id;
+				// get top level categories
+				if (parent == null){
+					element.append(new Option(cat, id))
+				}
+			});
+			$(this).selectmenu("refresh")
+		})
+		
+	}
+
+	editor = $('#editor').dialog({
 		dialogClass: "no-close",
 		height: 500,
 		minWidth: 450,
@@ -33,8 +98,8 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	    		primary: "ui-icon-disk"
 	    	},
 	    	click: function(){
-	    		$(this).find('form').validate()
-	    		$(this).dialog("close")
+	    		app.showLoading();
+	    		$(this).find('form').submit()
 	    	}
 	    },{
 			text: "Cancel",
@@ -64,7 +129,7 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;
 
-	var userGrid = $("#jqGrid").jqGrid({
+	userGrid = $("#jqGrid").jqGrid({
 		url: app.engine + "?function=GAU", 
 		contentType: "application/json",
 		datatype: "json",
@@ -118,15 +183,44 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	//.addClass( "ui-tabs-vertical ui-helper-clearfix" );
     // $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-    function submitInfo(data){
-    	console.log("Submitting: " + data)
-    }
+   function submitInfo(data){
+	 	$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			data: data,
+			type: "POST",
+			url: app.engine 
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+			 	result = JSON.parse(result)[0];
+			}
+
+			// internal error handling	
+			if (result.error !== undefined){
+				console.log(result.error)
+				// var validator = $("#signup").validate();
+				// validator.showErrors({
+				// 	"paypal_account": result.error
+				// });
+			}else{
+				switch (data.function){
+					case "GAU":
+					case "UU":
+						userGrid.trigger('reloadGrid');
+						editor.dialog("close")
+				}
+			}
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+		.always(function() { app.hideLoading(); });
+	 }
 
     /* Validation of forms */
-	var valHandler = function(){
+	valHandler = function(){
 		funcName = "";
-		formData = $(this.currentForm).serializeForm() 
-		switch ($(this.currentForm)){
+		formData = $(this.currentForm).serializeForm(); 
+		formID = $(this.currentForm).prop('id');
+		switch (formID){
 			case 'update':
 				funcName = "UU"
 				break;
@@ -165,5 +259,5 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		}
 	});
 
-
+	loadCategories()
 });

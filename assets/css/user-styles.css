@@ -115,7 +115,11 @@ Themeroller styles
     width: 88px;
     height: 33px;
 }*/
+
+/* Hide close button on dialog buttons */
 .no-close .ui-dialog-titlebar-close {display: none }
+
+
 form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }
