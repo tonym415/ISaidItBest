@@ -51,8 +51,8 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	};
 
 	// bind select menus
-	$('p').on("change","select[id$=Category]:not([id*=temp])", setSelectEvents);
-	$('p').on("change","input[id$=CategoryChk]", setChkEvents);
+	$('form').on("change","select[id$=Category]:not([id*=temp])", setSelectEvents);
+	$('form').on("change","input[id$=CategoryChk]", setChkEvents);
 
 	function setSelectEvents(event){
 		// get all selectmenus except template
