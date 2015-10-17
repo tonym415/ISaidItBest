@@ -23,7 +23,10 @@
 								<label for='c_parentCategory'>Parent Category Name:</label>
 								<select id='c_parentCategory'>
 									<option value="---">None</option>
-								</select><br />
+								</select>
+								<label for='c_parentCategoryChk'>Sub?</label>	
+								<input id='c_parentCategoryChk' type='checkbox' />
+								<br />
 							</p>
 							<p>
 								<label for='c_Category'>Category Name:</label>
@@ -37,7 +40,10 @@
 								<label for='r_currentCategory'>Category to Change:</label>
 								<select id='r_currentCategory'>
 									<option value="---">None</option>
-								</select><br />
+								</select>
+								<label for='r_parentCategoryChk'>Sub?</label>	
+								<input id='r_parentCategoryChk' type='checkbox' />
+								<br />
 							</p>
 							<p>
 								<label for='r_newCategory'>New Name:</label>
@@ -53,7 +59,10 @@
 								<label for='d_Category'>Category to Change:</label>
 								<select id='d_Category'>
 									<option value="---">None</option>
-								</select><br />
+								</select>
+								<label for='r_parentCategoryChk'>Sub?</label>	
+								<input id='r_parentCategoryChk' type='checkbox' />
+								<br />
 							</p>
 							<p>
 								<input type='submit' value="Rename Category" />
@@ -124,6 +133,12 @@
 	<!-- </center> -->
 	
 
+
+
+
+<!-- BEGIN PAGE UTILITY STRUCTURES --> 
+
+	<!-- Editor dialog form for editing user information -->
 	<div id="editor">
 		<p class='validateTips'>All form fields are required</p>
 		<form id='update'>
@@ -161,6 +176,24 @@
 		</form>
 	</div>
 
+	<!-- message dialog -->
+	<div id='dialog-message' title=''>
+		<p id='message'></p>
+	</div>
+
+<div id='subCatTemplate'>
+	<p>
+		<label for='temp_subCategory'>Sub-Category Name:</label>
+		<select id='temp_subCategory'>
+			<option value="---">None</option>
+		</select>
+		<label for='temp_CategoryChk'>Sub?</label>	
+		<input id='temp_CategoryChk' type='checkbox' />
+		<br />
+	</p>
+</div>
+
+<!-- END PAGE UTILITY STRUCTURES --> 
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>

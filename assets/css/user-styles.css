@@ -116,6 +116,10 @@ Themeroller styles
     height: 33px;
 }*/
 
+.templ {
+    display: none;
+}
+
 /* Hide close button on dialog buttons */
 .no-close .ui-dialog-titlebar-close {display: none }
 

@@ -27,7 +27,7 @@ class Category(object):
 
     def getAllCategories(self):
         """ get user information by name """
-        query = """SELECT category_id, category, parent_category
+        query = """SELECT category_id, category, parent_id
                 FROM  question_categories
             """
         return self.executeQuery(query)
