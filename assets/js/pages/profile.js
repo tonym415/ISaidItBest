@@ -11,11 +11,21 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	});
 
 	
+	var dialog = $('#paypal_transaction').dialog({
+		autoOpen: false,
+		modal: true
+	});
+
+	
+
+	function updateUserInfo(data){
+		console.log(data)
+	}
 
 	var valHandler = function(){
 		formData = $(this.currentForm).serializeForm();
-		formData['function'] = "SUI";
-		submitUserInfo(formData);
+		formData['function'] = "UUI";
+		updateUserInfo(formData);
 	}
 
 // validate signup form on keyup and submit
@@ -88,7 +98,7 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 			confirm_password: {
 				required: true,
 				minlength: 5,
-				equalTo: $("input[name='password'")
+				equalTo: $("input[name='password']")
 			},
 			email: {
 				required: true,
@@ -125,12 +135,14 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 // ...more page set up
 // load form 
 	data = app.getCookie("user")
-	$.each(data, function(key, value){
-		element = $("input[name='" + key + "']")
-		if (element.length > 0){ element.val(value) } 
-	});
+	if (data !== undefined){
+		$.each(data, function(key, value){
+			element = $("input[name='" + key + "']")
+			if (element.length > 0){ element.val(value) } 
+		});
+	}
 
-	current_theme = app.getTheme()
+	current_theme = (app.getTheme() === undefined) ? app.defaultTheme : app.getTheme()
 	var selector = "#themes option[value='" + current_theme + "']"
 	if (current_theme !== undefined) {  $(selector).prop('selected', true);}
 
@@ -141,5 +153,22 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		}	
 	});
 
+// paypal handler
+	$('body').on('click', 'input[name=submit_paypal]', function(event){
+		event.preventDefault();
+
+		data = $('.paypal').serializeForm()
+		$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			data: data,
+			type: "POST",
+			"Access-Control-Allow-Origin" :"https://www.paypal.com/cgi-bin/webscr",
+			"Access-Control-Allow-Methods" : "GET,POST",
+			"Access-Control-Allow-Headers" : "Content-Type",
+			url: "https://www.paypal.com/cgi-bin/webscr",
+		});
+		console.log(data);
+	});
+	// run avatar setup 
 	require(['avatar']);
 });

@@ -31,6 +31,8 @@ requirejs.config({
 		flipclock: 'lib/flipclock',
 		cookie: 'lib/jquery-cookie', 
 		steps: 'lib/jquery.steps',
+		jqGrid: 'lib/jquery.jqGrid',
+		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar'	
 	}
 });

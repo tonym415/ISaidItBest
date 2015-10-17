@@ -22,7 +22,7 @@ require([
 		$.cookie.json = true
 		info = $.cookie('user')
 		userSpan = "<div>Welcome, <a href='" + app.pages.profile + "'> " + info.username + "</a></div>"
-		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.WINS + "<br />"
+		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />"
 		$("#userInfo").append(userSpan)
 		$(wins).appendTo("#userInfo div")
 		

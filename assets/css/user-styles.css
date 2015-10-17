@@ -97,6 +97,33 @@ Themeroller styles
     border-radius: 8px;
 }
 
+/*
+    login modal
+ */
+.full-width {
+    width: 100%;
+}
+
+#reset-password {
+    visibility: false;
+}
+/*
+.paypal {
+    background: url(../css/images/paypal_logo3.gif) no-repeat;
+    cursor: pointer;
+    border: none !important;
+    width: 88px;
+    height: 33px;
+}*/
+
+.templ {
+    display: none;
+}
+
+/* Hide close button on dialog buttons */
+.no-close .ui-dialog-titlebar-close {display: none }
+
+
 form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }
