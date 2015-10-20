@@ -364,6 +364,9 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 			}else{
 				switch (data.function){
 					case "GAU":
+					case "CC":
+						getCategories();
+						break;
 					case "UU":
 						userGrid.trigger('reloadGrid');
 					editor.dialog("close");

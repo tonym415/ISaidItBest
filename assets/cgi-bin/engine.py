@@ -125,7 +125,7 @@ def contactUs(fs):
 def createCategory(fs):
     """ Creates new Category """
     c = Category(fs).newCategory()
-    returnJson(c)
+    returnJson(c, False)
 
 
 def getCategories():
