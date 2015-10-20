@@ -14,65 +14,107 @@
 					<li><a href="#users">Users</a></li>
 					<li><a href="#games">Games</a></li>
 				</ul>
-				<div id="categories"> <!-- Begin Category Tab --> 
-					<h3>C.R.U.D Category</h3>
-			    	<div id='catAccordion'>
-						<h3>Create Category</h3>
-						<form id='createCategory'>
-							<p>
-								<label for='c_parentCategory'>Parent Category Name:</label>
-								<select id='c_parentCategory'>
-									<option value="---">None</option>
-								</select>
-								<label for='c_parentCategoryChk'>Sub?</label>	
-								<input id='c_parentCategoryChk' type='checkbox' />
-								<br />
-							</p>
-							<p>
-								<label for='c_Category'>Category Name:</label>
-								<input id='c_Category' type='text' />
-							</p>
-							<input class='full-width' type='submit' value="New Category" />
-						</form>
-						<h3>Rename/Update Category</h3>
-						<form id='renameCategory'>
-							<p>
-								<label for='r_currentCategory'>Category to Change:</label>
-								<select id='r_currentCategory'>
-									<option value="---">None</option>
-								</select>
-								<label for='r_parentCategoryChk'>Sub?</label>	
-								<input id='r_parentCategoryChk' type='checkbox' />
-								<br />
-							</p>
-							<p>
-								<label for='r_newCategory'>New Name:</label>
-								<input id='r_newCategory' type='text' /><br />
-							</p>
-							<p>
-								<input type='submit' value="Rename Category" />
-							</p>
-						</form>
-						<h3>Delete Category</h3>
-						<form id='deleteCategory'>
-							<p>
-								<label for='d_Category'>Category to Change:</label>
-								<select id='d_Category'>
-									<option value="---">None</option>
-								</select>
-								<label for='r_parentCategoryChk'>Sub?</label>	
-								<input id='r_parentCategoryChk' type='checkbox' />
-								<br />
-							</p>
-							<p>
-								<input type='submit' value="Rename Category" />
-							</p>
-						</form>
-						
+				<div id="categories"> <!-- Begin Category Tab -->
+					<div id='cat-tabs'>
+						<ul>
+							<li><a href="#category">Category</a></li>
+							<li><a href="#subcategory">Sub-Category</a></li>
+						</ul>
+						<div id='category'>
+							<h3>C.R.U.D Category</h3>
+					    	<div id='catAccordion'>
+								<h3>Create Category</h3>
+								<form id='createCategory'>
+									<p>
+										<label for='c_Category'>Category Name:</label>
+										<input id='c_Category' name='c_Category' type='text' required/>
+									</p>
+									<input type='submit' value="New Category" />
+								</form>
+								<h3>Rename/Update Category</h3>
+								<form id='renameCategory'>
+									<p>
+										<label for='r_currentCategory'>Category to Change:</label>
+										<select id='r_currentCategory' name='r_currentCategory'>
+											<option value="---">None</option>
+										</select>
+										<br />
+									</p>
+									<p>
+										<label for='r_newCategory'>New Name:</label>
+										<input id='r_newCategory' name='r_newCategory' type='text' /><br />
+									</p>
+									<p>
+										<input type='submit' value="Rename Category" />
+									</p>
+								</form>
+								<h3>Delete Category</h3>
+								<form id='deleteCategory'>
+									<p>
+										<label for='d_Category'>Category to Change:</label>
+										<select id='d_Category' name='d_Category'>
+											<option value="---">None</option>
+										</select>
+										<label for='r_parentCategoryChk'>Sub?</label>
+										<input id='r_parentCategoryChk' type='checkbox' />
+										<br />
+									</p>
+									<p>
+										<input type='submit' value="Rename Category" />
+									</p>
+								</form>
+						    </div> <!-- end of category CRUD Accordion -->
+						</div>
+						<div id='subcategory'>
+							<h3>C.R.U.D Sub-Category</h3>
+					    	<div id='subcatAccordion'>
+								<h3>Create Sub-Category</h3>
+								<form id='createsubCategory'>
+									<p>
+										<label for='c_Category'>Category Name:</label>
+										<input id='c_Category' name='c_Category' type='text' />
+									</p>
+									<input type='submit' value="New Category" />
+								</form>
+								<h3>Rename/Update Category</h3>
+								<form id='renameCategory'>
+									<p>
+										<label for='r_currentCategory'>Category to Change:</label>
+										<select id='r_currentCategory' name='r_currentCategory'>
+											<option value="---">None</option>
+										</select>
+										<label for='r_parentCategoryChk'>Sub?</label>
+										<input id='r_parentCategoryChk' type='checkbox' />
+										<br />
+									</p>
+									<p>
+										<label for='r_newCategory'>New Name:</label>
+										<input id='r_newCategory' name='r_newCategory' type='text' /><br />
+									</p>
+									<p>
+										<input type='submit' value="Rename Category" />
+									</p>
+								</form>
+								<h3>Delete Category</h3>
+								<form id='deleteCategory'>
+									<p>
+										<label for='d_Category'>Category to Change:</label>
+										<select id='d_Category' name='d_Category'>
+											<option value="---">None</option>
+										</select>
+										<label for='r_parentCategoryChk'>Sub?</label>
+										<input id='r_parentCategoryChk' type='checkbox' />
+										<br />
+									</p>
+									<p>
+										<input type='submit' value="Rename Category" />
+									</p>
+								</form>
+							</div>
+						</div>
 				    </div> <!-- end of category CRUD Accordion -->
-
-			    	
 				</div> <!-- End Category Tab -->
+
 				<div id="questions"> <!-- Begin Question Tab -->
 					<h2>Question Management</h2>
 			    	<div id='questionAccordion'> <!-- begin subcategory CRUD Accordion -->
@@ -131,12 +173,12 @@
  				</div>
 		</div> <!-- End Tab Container -->
 	<!-- </center> -->
-	
 
 
 
 
-<!-- BEGIN PAGE UTILITY STRUCTURES --> 
+
+<!-- BEGIN PAGE UTILITY STRUCTURES -->
 
 	<!-- Editor dialog form for editing user information -->
 	<div id="editor">
@@ -145,30 +187,30 @@
 			<fieldset>
 				<p>
 					<label for='first_name'>First Name:</label>
-					<input id='first_name' />
+					<input id='first_name' name="first_name" required/>
 				</p>
 				<p>
 					<label for='last_name'>Last Name:</label>
-					<input id='last_name' />
+					<input id='last_name' name='last_name' required/>
 				</p>
 				<p>
 					<label for='username'>User Name:</label>
-					<input id='username' />
+					<input id='username' name='username' required/>
 				</p>
 				<p>
 					<label for='email'>Email:</label>
-					<input id='email' />
+					<input id='email' name='email' required/>
 				</p>
 				<p>
 					<label for='role'>Role:</label>
-					<select id='role'>
+					<select id='role' name='role' required>
 						<option value='2'>User</option>
 						<option value='1'>Admin</option>
 					</select>
 				</p>
 				<p>
 					<label for='active'>Active:</label>
-					<input id='active' type='checkbox' />
+					<input id='active' name='active' type='checkbox' />
 				</p>
 
 			</fieldset>
@@ -181,19 +223,19 @@
 		<p id='message'></p>
 	</div>
 
-<div id='subCatTemplate'>
+<div id='subCatTemplate' style='display:none'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category Name:</label>
 		<select id='temp_subCategory'>
 			<option value="---">None</option>
 		</select>
-		<label for='temp_CategoryChk'>Sub?</label>	
+		<label for='temp_CategoryChk'>Sub?</label>
 		<input id='temp_CategoryChk' type='checkbox' />
 		<br />
 	</p>
 </div>
 
-<!-- END PAGE UTILITY STRUCTURES --> 
+<!-- END PAGE UTILITY STRUCTURES -->
 </body>
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>

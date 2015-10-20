@@ -135,10 +135,10 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 
 /**
 		 * Converts form data to js object
-		 * @return {[type]} object
+		 * @return {formdata} object
 		 */
 		$.fn.serializeForm = function() {
-		    var o = {};
+		    var o = {"form_id": this.prop('id')};
 		    var a = this.serializeArray();
 		    $.each(a, function() {
 		        if (o[this.name] !== undefined) {

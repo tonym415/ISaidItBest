@@ -44,7 +44,7 @@ def showParams(fs):
 
 
 def getAllUsers():
-    users = {"records" : User().getAllUsers()}
+    users = {"records": User().getAllUsers()}
     returnJson(users)
 
 
@@ -122,6 +122,12 @@ def contactUs(fs):
     returnJson(fs)
 
 
+def createCategory(fs):
+    """ Creates new Category """
+    c = Category(fs).newCategory()
+    returnJson(c)
+
+
 def getCategories():
     """ gathers all categories """
     returnObj = {"categories": Category().getAllCategories()}
@@ -152,6 +158,8 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName == "CC":
+        globals()['createCategories']()
     elif funcName == "GC":
         globals()['getCategories']()
     elif funcName == "GAU":

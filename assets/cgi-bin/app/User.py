@@ -1,4 +1,4 @@
-#!C:\Python34\python.exe -m
+#!C:\Python34\python.exe
 """
 The User class is used to handle all functions related to the User
 """
@@ -42,20 +42,21 @@ class User(object):
 
             else:
                 raise Exception("%s yields %s" %
-                               (cursor.statement.replace('\n', ' ')
-                                .replace('            ', ''), cursor.rowcount))
+                                (cursor.statement.replace('\n', ' ')
+                                 .replace('            ', ''), cursor.rowcount))
 
         except Exception as e:
             returnDict['error'] = "{}".format(e)
 
         return returnDict
+
     def getUser(self):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         returnDict = {}
         query = """SELECT  user_id ,  first_name , last_name , email ,
                 username, credit, wins, losses, paypal_account , password,
-                created, role,  active  FROM  users  WHERE username = %s"""
+                created, role,  active  FROM  users JOIN roles USING(role_id) WHERE username = %s"""
         cursor = self._cnx.cursor(buffered=True, dictionary=True)
         try:
             cursor.execute(query, (self.user_username,))
@@ -63,8 +64,8 @@ class User(object):
                 returnDict = cursor.fetchone()
             else:
                 raise Exception("%s yields %s" %
-                               (cursor.statement.replace('\n', ' ')
-                                .replace('            ', ''), cursor.rowcount))
+                                (cursor.statement.replace('\n', ' ')
+                                 .replace('            ', ''), cursor.rowcount))
         except Exception as e:
             returnDict['error'] = "{}".format(e)
 
@@ -108,7 +109,7 @@ class User(object):
             # test given password against database password
             hashed_pw = userInfo['password']
             # print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
-                                                # self.user_password, hashed_pw))
+            # self.user_password, hashed_pw))
             validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
             # print("Valid: " + str(validUser))
         else:
@@ -131,20 +132,20 @@ class User(object):
 if __name__ == "__main__":
     info = {}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
-    # info = {"confirm_password": "password", "first_name":
-    #         "Antonio", "paypal_account": "tonym415", "password":
-    #         "password", "email": "tonym415@gmail.com", "last_name":
-    #         "Moses", "username": "tonym415"}
+    info = {"confirm_password": "password", "first_name":
+            "Antonio", "paypal_account": "tonym415", "password":
+            "password", "email": "tonym415@gmail.com", "last_name":
+            "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
-    info['username'] = "bob"
-    info['password'] = "userpass"
+    # info['username'] = "bob"
+    # info['password'] = "userpass"
 
     """ remove  from data dict """
     u_info = {i: info[i]
               for i in info if i != 'function' and '_password' not in i}
     # print(u_info)
 
-    print(User().getAllUsers())
-    # u = User(u_info)
-    # print(u.isValidUser())
+    # print(User().getAllUsers())
+    u = User(u_info)
+    print(u.getUser())

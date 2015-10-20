@@ -25,6 +25,13 @@ class Category(object):
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
+    def newCategory(self):
+        """ insert new category """
+        query = """INSERT INTO question_categories (category, parent_id) VALUES
+                (%(c_Category)s, %(parent_id))"""
+        self.executeQuery(query)
+        return self.getAllCategories()
+
     def getAllCategories(self):
         """ get user information by name """
         query = """SELECT category_id, category, parent_id
@@ -41,8 +48,8 @@ class Category(object):
                 returnDict = cursor.fetchall()
             else:
                 raise Exception("%s yields %s" %
-                               (cursor.statement.replace('\n', ' ')
-                                .replace('            ', ''), cursor.rowcount))
+                                (cursor.statement.replace('\n', ' ')
+                                 .replace('            ', ''), cursor.rowcount))
         except Exception as e:
             returnDict['error'] = "{}".format(e)
 

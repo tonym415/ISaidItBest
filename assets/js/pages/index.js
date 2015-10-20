@@ -4,31 +4,31 @@
 define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate, app){
 	$("input[type=submit]").button();
 	app.createNavBar();
-	var user = app.getCookie('user')
-	if (user !== undefined){ 
-		// if same session USERNAME should be set	
+	var user = app.getCookie('user');
+	if (user !== undefined){
+		// if same session USERNAME should be set
 		name = user.USERNAME;
-		if (name === 'undefined') { 
+		if (name === 'undefined') {
 			// if coming from registration page
 			name = user.username;
 			$("#password").val(user.password);
 		}
 		$("#username").val(name);
-	};
+	}
 
 	var valHandler = function(){
 		user = $("#username").val();
 		pass = $("#password").val();
 		data = {'function': 'VU', 'username': user, 'password': pass};
 
-		// validate user	
+		// validate user
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
-			data: data, 
+			data: data,
 			type: "POST",
-			url: app.engine 
+			url: app.engine
 		})
-		.done(function(result){  
+		.done(function(result){
 			if (app.isEmpty(result)){
 				var validator = $("#login").validate();
 				validator.showErrors({
@@ -45,13 +45,13 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
         	var err = textStatus + ", " + error;
         	console.log("Response: " + jqXHR.responseText);
         	console.log("Request Failed: " + err);
-        });  
+        });
 	};
 
 //form validations
 	$("#login").validate({
 		dubug: true,
-		submitHandler: valHandler, 
+		submitHandler: valHandler,
 		rules: {
 			username: {
 				required: true,
@@ -75,5 +75,5 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			}
 		}
 	});
-	$("<p> If you are not already a member...<a href='" + app.pages.registration + "''>Sign up!</a></p>").appendTo("center")
+	$("<p> If you are not already a member...<a href='" + app.pages.registration + "''>Sign up!</a></p>").appendTo("center");
 });

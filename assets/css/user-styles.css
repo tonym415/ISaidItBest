@@ -6,17 +6,17 @@ body {
 }
 
 fieldset {
-    border: 0;	
+    border: 0;
 }
 
 .profile-avatar {
     height: 100px;
-    width: 100px; 
+    width: 100px;
 }
 
 .profile-avatar-icon {
     height: 16px;
-    width: 16px; 
+    width: 16px;
 }
 
 .countdown_timer {
@@ -47,14 +47,14 @@ fieldset {
 .wins {
     width: 16px;
     height: 16px;
-    background: url(../css/images/ui-icons_cd0a0a_256x240.png); 
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png);
     /*background-position: -32px -128px;*/
 }
 
 .losses {
     width: 16px;
     height: 16px;
-    background: url(../css/images/ui-icons_cd0a0a_256x240.png); 
+    background: url(../css/images/ui-icons_cd0a0a_256x240.png);
     /*background-position: -32px -128px;*/
 }
 
@@ -123,7 +123,10 @@ Themeroller styles
 /* Hide close button on dialog buttons */
 .no-close .ui-dialog-titlebar-close {display: none }
 
-
+.right {
+    right: 0;
+    position: absolute;
+}
 form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }

@@ -10,13 +10,13 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		$("input[name='" + value + "']").attr("disabled", true);
 	});
 
-	
+
 	var dialog = $('#paypal_transaction').dialog({
 		autoOpen: false,
 		modal: true
 	});
 
-	
+
 
 	function updateUserInfo(data){
 		console.log(data)
@@ -40,9 +40,9 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	        {
 	            return true;
 	        }
-	 
+
 	        var form = $(this);
-	 
+
 	        // Clean up if user went backward before
 	        if (currentIndex < newIndex)
 	        {
@@ -54,11 +54,11 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	        // if (newIndex == 2) { Avatar.init(); return true; }
 
 	        // bypass validation (DEBUG)
-			return true; 
+			return true;
 
 	        // Disable validation on fields that are disabled or hidden.
 	        form.validate().settings.ignore = ":disabled,:hidden";
-	 
+
 	        // Start validation; Prevent going forward if false
 	        return form.valid();
 	    },
@@ -66,20 +66,20 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	    onFinishing: function (event, currentIndex)
 	    {
 	        var form = $(this);
-	 
+
 	        // Disable validation on fields that are disabled.
 	        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
 	        form.validate().settings.ignore = ":disabled";
-	 
+
 	        // Start validation; Prevent form submission if false
 	        return form.valid();
 	    },
 	    onFinished: function (event, currentIndex) {
 		        var form = $(this);
-		         
+
 		        // Submit form input
 		        form.submit();
-		    }	
+		    }
 	 }).validate({
 		debug: true,
 		submitHandler: valHandler,
@@ -133,31 +133,31 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	});
 
 // ...more page set up
-// load form 
-	data = app.getCookie("user")
+// load form
+	data = app.getCookie("user");
 	if (data !== undefined){
 		$.each(data, function(key, value){
-			element = $("input[name='" + key + "']")
-			if (element.length > 0){ element.val(value) } 
+			element = $("input[name='" + key + "']");
+			if (element.length > 0){ element.val(value); }
 		});
 	}
 
-	current_theme = (app.getTheme() === undefined) ? app.defaultTheme : app.getTheme()
-	var selector = "#themes option[value='" + current_theme + "']"
+	current_theme = (app.getTheme() === undefined) ? app.defaultTheme : app.getTheme();
+	var selector = "#themes option[value='" + current_theme + "']";
 	if (current_theme !== undefined) {  $(selector).prop('selected', true);}
 
 	$('#themes').selectmenu({
 		width: 200,
 		change: function(){
-			app.setTheme($(this).val())
-		}	
+			app.setTheme($(this).val());
+		}
 	});
 
 // paypal handler
 	$('body').on('click', 'input[name=submit_paypal]', function(event){
 		event.preventDefault();
 
-		data = $('.paypal').serializeForm()
+		data = $('.paypal').serializeForm();
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
 			data: data,
@@ -169,6 +169,6 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		});
 		console.log(data);
 	});
-	// run avatar setup 
+	// run avatar setup
 	require(['avatar']);
 });

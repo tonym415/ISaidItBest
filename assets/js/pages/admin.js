@@ -11,19 +11,12 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		dMessage,
 		msgBox;
 
-	// page setup
-	app.createNavBar();
-	$("input[type=submit]").button();
-	$( "[id$=tabs]" ).tabs(); //.addClass( "ui-tabs-vertical ui-helper-clearfix" );
-	$( "[id$=Accordion]" ).accordion({
-		animate: "easeInOutQuint",
-		heightStyle: 'content',
-		collapsible: true,
-		active: false
-	});
 	// create counter for sub-category templates
 	$('#subCatTemplate').data("tempCount",0);
 
+	// page setup
+	app.createNavBar();
+	$("input[type=submit], input[type=button]").button();
 	msgBox = $( "#dialog-message" ).dialog({
 		minHeight: 350,
 		maxHeight: 500,
@@ -42,6 +35,15 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
     });
 
 
+	$( "[id$=tabs]" ).tabs({ width: 650});
+	$( "[id$=Accordion]" ).accordion({
+		width: 550,
+		animate: "easeInOutQuint",
+		heightStyle: 'content',
+		collapsible: true,
+		active: false
+	});
+
 	dMessage = function(title, message){
 		title = (title === undefined) ? "Error" : title;
 		message = (message === undefined) ? "Sub-category not found" : message;
@@ -50,13 +52,10 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		msgBox.dialog('open');
 	};
 
-	// bind select menus
-	$('p').on("change","select[id$=Category]:not([id*=temp])", setSelectEvents);
-	$('p').on("change","input[id$=CategoryChk]", setChkEvents);
 
-	function setSelectEvents(event){
+	setSelectEvents = function(event){
 		// get all selectmenus except template
-		$("select[id$=Category]:not([id*=temp])").selectmenu({
+		$("select[id*=Category]:not([id*=temp])").selectmenu({
 			width: 200,
 			change: function(){
 				//  bind change event to all select menus to enable subcategory menu selection
@@ -65,19 +64,24 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 				if (boolSubs){ subCheck($(this)); }
 			}
 		});
-	}
-	setSelectEvents();
+	}();
+	// setSelectEvents();
 
 	// bind chkboxes
 	function setChkEvents(){
-		$("input[id$=CategoryChk]").change(function(){
+		$("input[id*=CategoryChk]:not([id*=temp])").change(function(){
 			if($(this).is(':checked')){
 				var select = $(this).siblings('select');
 				subCheck(select);
 			}
 		});
 	}
-	setChkEvents();
+	// setChkEvents();
+
+
+// bind select menus
+	$('body').on("load change","select[id*=Category]:not([id*=temp])", setSelectEvents);
+	$('body').on("load change","input[id*=CategoryChk]", setChkEvents);
 
 	function subCheck(element){
 		if (element === undefined) return false;
@@ -159,13 +163,13 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
         	element.parent().after(clone);
 
         	// add events
-        	setSelectEvents();
-        	setChkEvents();
+        	// setSelectEvents();
+        	// setChkEvents();
         }else{
         	// category is top-level
         	msg = "No Sub-category found for: " + current_selection;
-        	title = (element_is_top) ? " is a top-level category!" : " has no sub-categories";
-        	title += current_selection + title;
+        	title = "Selection Error: " + current_selection;
+        	msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
         	dMessage(title, msg);
         }
 	}
@@ -223,10 +227,12 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 					element.append(new Option(cat, id));
 				}
 			});
-			$(this).selectmenu("refresh");
+			$(this).selectmenu().selectmenu("refresh", true);
 		});
 
 	};
+
+
 
 	editor = $('#editor').dialog({
 		dialogClass: "no-close",
@@ -234,6 +240,9 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		minWidth: 450,
 		autoOpen: false,
 		modal: true,
+		open: function(){
+			$('form', this).trigger('focus');
+		},
 		show: {
 	        effect: "blind",
 	        duration: 500
@@ -248,8 +257,8 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	    		primary: "ui-icon-disk"
 	    	},
 	    	click: function(){
-	    		app.showLoading();
-	    		$(this).find('form').submit();
+	    		// app.showLoading();
+	    		$(this).find('form').trigger('submit');
 	    	}
 	    },{
 			text: "Cancel",
@@ -367,47 +376,70 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 
     /* Validation of forms */
 	valHandler = function(){
-		funcName = "";
 		formData = $(this.currentForm).serializeForm();
-		formID = $(this.currentForm).prop('id');
-		switch (formID){
-			case 'update':
-				funcName = "UU";
-				break;
-			default:
-				funcName = "GAU";
-		}
-		formData['function'] = funcName;
+		formID = formData.form_id;
+		formData['function'] = formManager[formID].abbr;
 		submitInfo(formData);
 	};
 
-	$('#update').validate({
-		submitHandler: valHandler,
-		rules: {
-			first_name: "required",
-			last_name: "required",
-			username: {
-				required: true,
-				minlength: 3
-			},
-			email: {
-				required: true,
-				email: true
-			},
-			messages: {
-				first_name: "Please enter your first name",
-				last_name: "Please enter your last name",
-				username: {
-					required: "Please enter a username",
-					minlength: "Your username must consist of at least 3 characters"
-				},
-				email: {
-					required: "Please enter a valid email address",
-					email: "Your email address must be in the format of name@domain.com"
+
+	// submit handling
+	$('form').on("submit focus", function(event){
+		event.preventDefault();
+		form = event.target; // get current form jquery object
+		formName = form.id;
+		formValidator = formManager[formName].validator;
+		if (formValidator !== undefined){
+			// create validator
+			$("#" + formName).validate(formValidator);
+		}
+		return true;
+	});
+
+
+	/*
+	* multi-form managment object
+	*/
+	formManager = {
+		"createCategory" :{
+			abbr: "CC",
+			validator: {
+				submitHandler: valHandler,
+				rules: { c_category: 'required' },
+				messages: { c_category: "Please enter your new category name"}
+			}
+		},
+		"update" :{
+			abbr: "UU",
+			validator: {
+				submitHandler: valHandler,
+				rules: {
+					first_name: "required",
+					last_name: "required",
+					username: {
+						required: true,
+						minlength: 3
+					},
+					email: {
+						required: true,
+						email: true
+					},
+					messages: {
+						first_name: "Please enter your first name",
+						last_name: "Please enter your last name",
+						username: {
+							required: "Please enter a username",
+							minlength: "Your username must consist of at least 3 characters"
+						},
+						email: {
+							required: "Please enter a valid email address",
+							email: "Your email address must be in the format of name@domain.com"
+						}
+					}
 				}
 			}
 		}
-	});
+	};
 
-	loadCategories();
+	// loadCategories();
 });
