@@ -15,6 +15,7 @@
 					<li><a href="#games">Games</a></li>
 				</ul>
 				<div id="categories"> <!-- Begin Category Tab -->
+<<<<<<< HEAD
 					<div id='cat-tabs'>
 						<ul>
 							<li><a href="#category">Category</a></li>
@@ -113,6 +114,65 @@
 							</div>
 						</div>
 				    </div> <!-- end of category CRUD Accordion -->
+=======
+					<h3>C.R.U.D Category</h3>
+			    	<div id='catAccordion'>
+						<h3>Create Category</h3>
+						<form id='createCategory'>
+							<p>
+								<label for='c_parentCategory'>Parent Category Name:</label>
+								<select id='c_parentCategory'>
+									<option value="---">None</option>
+								</select>
+								<label for='c_parentCategoryChk'>Sub?</label>
+								<input id='c_parentCategoryChk' type='checkbox' />
+								<br />
+							</p>
+							<p>
+								<label for='c_Category'>Category Name:</label>
+								<input id='c_Category' type='text' />
+							</p>
+							<input class='full-width' type='submit' value="New Category" />
+						</form>
+						<h3>Rename/Update Category</h3>
+						<form id='renameCategory'>
+							<p>
+								<label for='r_currentCategory'>Category to Change:</label>
+								<select id='r_currentCategory'>
+									<option value="---">None</option>
+								</select>
+								<label for='r_parentCategoryChk'>Sub?</label>
+								<input id='r_parentCategoryChk' type='checkbox' />
+								<br />
+							</p>
+							<p>
+								<label for='r_newCategory'>New Name:</label>
+								<input id='r_newCategory' type='text' /><br />
+							</p>
+							<p>
+								<input type='submit' value="Rename Category" />
+							</p>
+						</form>
+						<h3>Delete Category</h3>
+						<form id='deleteCategory'>
+							<p>
+								<label for='d_Category'>Category to Change:</label>
+								<select id='d_Category'>
+									<option value="---">None</option>
+								</select>
+								<label for='r_parentCategoryChk'>Sub?</label>
+								<input id='r_parentCategoryChk' type='checkbox' />
+								<br />
+							</p>
+							<p>
+								<input type='submit' value="Rename Category" />
+							</p>
+						</form>
+
+				    </div> <!-- end of category CRUD Accordion -->
+
+
+>>>>>>> b2077970f5677c48758c2674b6021154324ef6a4
 				</div> <!-- End Category Tab -->
 
 				<div id="questions"> <!-- Begin Question Tab -->

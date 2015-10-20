@@ -52,6 +52,9 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		msgBox.dialog('open');
 	};
 
+	// bind select menus
+	$('form').on("change","select[id*=Category]:not([id*=temp])", setSelectEvents);
+	$('form').on("change","input[id*=CategoryChk]", setChkEvents);
 
 	setSelectEvents = function(event){
 		// get all selectmenus except template
