@@ -84,7 +84,6 @@ def userAvailabilityCheck(fs):
         """ create a json object noting availability """
         availability["available"] = str(User(fs).isUser())
 
-    # print(json.dumps(availability))
     returnJson(availability)
 
 
@@ -122,9 +121,16 @@ def contactUs(fs):
     returnJson(fs)
 
 
-def createCategory(fs):
-    """ Creates new Category """
-    c = Category(fs).newCategory()
+def modifyCategory(fs):
+    """ modify fs to be properly consumed by Category() """
+    # check for the existence of subcategory
+    c = None
+    if fs['id'] in ["deleteCategory", 'renameCategory', 'adoptCategory']:
+        """ deactivates Category """
+        c = Category(fs).updateCategory()
+    elif fs['id'] == "createCategory":
+        """ Creates new Category """
+        c = Category(fs).newCategory()
     returnJson(c)
 
 
@@ -150,7 +156,6 @@ def doFunc(fStor):
         Excutes the desired function with appropriate parameters
     """
     fStor = cgiFieldStorageToDict(fStor)
-    print(fStor)
     funcName = fStor['function']
 
     """ sanitize store for use in classes """
@@ -159,8 +164,8 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
-    elif funcName == "CC":
-        globals()['createCategory'](fStor)
+    elif funcName in ["CC", "RC", "DC", "AC"]:
+        globals()['modifyCategory'](fStor)
     elif funcName == "GC":
         globals()['getCategories']()
     elif funcName == "GAU":
@@ -191,8 +196,9 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    info = {'form_id': 'createCategory', 'c_Category': "",
-            'function': 'CC'}
+    info = {'id': 'deleteCategory', 'd_Category': 3,
+            'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
+
     form = formMockup(function="CC", form_id="createCategory", c_Category=None)
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",

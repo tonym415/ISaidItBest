@@ -138,7 +138,7 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 		 * @return {formdata} object
 		 */
 		$.fn.serializeForm = function() {
-		    var o = {"form_id": this.prop('id')};
+		    var o = {"id": this.prop('id')};
 		    var a = this.serializeArray();
 		    $.each(a, function() {
 		        if (o[this.name] !== undefined) {

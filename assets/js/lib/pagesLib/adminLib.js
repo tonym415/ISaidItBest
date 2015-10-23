@@ -19,7 +19,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
             }
         },
         "renameCategory" :{
-            abbr: "UC",
+            abbr: "RC",
             validator: {
                 rules: {
                     r_currentCategory: { selectNotEqual: "" },
@@ -37,7 +37,20 @@ define(['jquery', 'app', 'validate'], function($, app) {
                 rules: {
                     d_Category: { selectNotEqual: "" }
                 },
-                messages: { d_Category: "Select a category to delete"}
+                messages: { selectNotEqual: "Select a category to delete"}
+            }
+        },
+        "adoptCategory" :{
+            abbr: "AC",
+            validator: {
+                rules: {
+                    a_Category: { selectNotEqual: "" },
+                    a_parentCategory: { selectNotEqual: "" }
+                },
+                messages: {
+                    a_Category: "Select a category to be adopted", 
+                    a_parentCategory: "Select a parent category"
+                }
             }
         },
         "update" :{

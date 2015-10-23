@@ -35,13 +35,50 @@ class Category(object):
 
     def updateCategory(self):
         """ update category with parameters """
-        # get current record for category to compare
-        query = "SELECT "
-
+        # get query params for this Category instance
         params = self.sanitizeParams()
-        # query = "UPDATE question_categories SET parent_id = %(parent_id)s WHERE"
-        #     "category_id = %(c);"
-        return {"success": params}
+
+        # check for the existence of subcategory
+        hasSubs = [value for key, value in params.items() if "CategoryChk" in key]
+
+        # get function to determine query
+        if params['id'] == 'deleteCategory':
+            """ if we are 'deleting' a category we unset active in db """
+            query = ("UPDATE question_categories SET active = 0 "
+                     "WHERE category_id = %(category_id)s")
+
+            if hasSubs:
+                """ if the category is not a top level category """
+                params = {"category_id": int(params['d_subCategory[]'][-1])}
+            else:
+                params = {"category_id": int(params['d_Category'])}
+
+        elif params['id'] == 'adoptCategory':
+            query = ("UPDATE question_categories SET parent_id = %(parent_id)s "
+                     "WHERE category_id = %(category_id)s")
+
+            if hasSubs:
+                """ if the category is not a top level category """
+                params = {"parent_id": int(params['a_subCategory[]'][-1]),
+                          "category_id": params['a_Category']}
+            else:
+                params = {"parent_id": int(params['a_parentCategory']),
+                          "category_id": params['a_Category']}
+
+        elif params['id'] == 'renameCategory':
+            query = ("UPDATE question_categories SET category = %(category)s "
+                     "WHERE category_id = %(category_id)s")
+
+            if hasSubs:
+                """ if the category is not a top level category """
+                params = {"category_id": int(params['r_subCategory[]'][-1]),
+                          "category": params['r_newCategory']}
+            else:
+                params = {"category_id": int(params['r_currentCategory']),
+                          "category": params['r_newCategory']}
+
+        returnVal = self.executeModifyQuery(query, params)
+        return {'success': self.cursor.lastrowid} if 'error' not in returnVal else {'error': returnVal}
 
     def newCategory(self):
         """ insert new category with/without parent_id """
@@ -55,8 +92,8 @@ class Category(object):
                 return {'error': "missing new category name"}
             else:
                 if 'parent_id' not in params.keys():
-                    params['parent_id'] = None
-                returnVal = self.executeInsertQuery(query, params)
+                    params['parent_id'] = 0
+                returnVal = self.executeModifyQuery(query, params)
                 return {'success': self.cursor.lastrowid} if 'error' not in returnVal else {'error': returnVal}
 
     def getAllCategories(self):
@@ -66,7 +103,7 @@ class Category(object):
             """
         return self.executeQuery(query, ())
 
-    def executeInsertQuery(self, query, params):
+    def executeModifyQuery(self, query, params):
         returnDict = {}
         try:
             self.cursor.execute(query, params)
@@ -94,8 +131,8 @@ class Category(object):
         return returnDict
 
 if __name__ == "__main__":
-    info = {'form_id': 'renameCategory', 'r_currentCategory': 17,
-            'r_newCategory': 'TV', 'function': 'UC'}
+    info = {'id': 'deleteCategory', 'd_Category': 3,
+            'd_parentCategoryChk': 'on', 'd_subCategory[]': ["4", "19"]}
 
     """ modify user information for testing """
     # info['stuff'] = "stuff"

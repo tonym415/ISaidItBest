@@ -46,22 +46,41 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 					try {
 						result = JSON.parse(result)[0];
 					}catch(err){
+						msg = "<h2>Stack Trace:</h2><p>" + err.stack + "</p><h2>Ajax Result:</h2><p>" + result + "</p>";
+						dMessage("Error: " + err, msg);
 						console.log(err);
 					}
 				}
 				// internal error handling
 				if (result.hasOwnProperty('error')){
+					msg = "<h2>Error:</h2><p>" + result.error.error + "</p><h2>Message:</h2><p>" + result.error.stm + "</p>";
+					dMessage("Error", msg);
 					console.log(result.error);
-					// var validator = $("#signup").validate();
-					// validator.showErrors({
-					// 	"paypal_account": result.error
-					// });
 				}else{
 					switch (data.function){
+						case "AC":
+							dMessage("Success", "Category Adopted");
+							objCategories = result.categories;
+							loadCategories();
+							resetForm($('#adoptCategory'));
+							break;
+						case "DC":
+							dMessage("Success", "Category Removed");
+							objCategories = result.categories;
+							loadCategories();
+							resetForm($('#deleteCategory'));
+							break;
+						case "RC":
+							dMessage("Success", "Category Renamed");
+							objCategories = result.categories;
+							loadCategories();
+							resetForm($('#renameCategory'));
+							break;
 						case "CC":
 							dMessage("Success", "Category Added");
 							objCategories = result.categories;
 							loadCategories();
+							resetForm($('#createCategory'));
 							break;
 						case "GAU":
 						case "UU":
@@ -74,10 +93,18 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 			.always(function() { return false; });
 		}
 
+	function resetForm(form){
+		form.children('.orig')
+			.find(':checkbox').trigger('click')
+			.find('select').selectmenu('value', '')
+			.find('input[type=text]').val('');
+		attachValidator(form.prop('id'));
+	}
+
 	/* Validation of forms */
 	valHandler = function(){
 		formData = $(this.currentForm).serializeForm();
-		formID = formData.form_id;
+		formID = formData.id;
 		formData['function'] = lib.formManager[formID].abbr;
 		submitInfo(formData);
 		return false;
@@ -99,22 +126,26 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		available_forms = panel.children().find('form');
 		$.each(available_forms, function(){
 			formName = $(this).prop('id');
-			// add validators for forms in manager
-			mgrObj = lib.formManager[formName];
-			// if a manager object exists for the current form
-			if (mgrObj){
-				formValidator = mgrObj.validator;
-				if (formValidator !== undefined){
-					// create validator
-					$("#" + formName).validate(formValidator);
-					// add submitHandler to form validator
-					$("#" + formName).data('validator').settings.submitHandler = valHandler;
-				}
+			attachValidator(formName);
+		});
+	}
+
+	function attachValidator(formName){
+		// add validators for forms in manager
+		mgrObj = lib.formManager[formName];
+		// if a manager object exists for the current form
+		if (mgrObj){
+			formValidator = mgrObj.validator;
+			if (formValidator !== undefined){
+				// create validator
+				$("#" + formName).validate(formValidator);
+				// add submitHandler to form validator
+				$("#" + formName).data('validator').settings.submitHandler = valHandler;
 			}
-			$(this).on('submit', function(){
-				event.preventDefault();
-				return false;
-			});
+		}
+		$(this).on('submit', function(){
+			event.preventDefault();
+			return false;
 		});
 	}
 
@@ -233,6 +264,8 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
         	// loop through all child elements to modify before appending to the dom
         	clone.children().each(function(){
         		changeID = true;
+				elName = null;
+				elID = null;
         		// get the id ov the current element
         		var templateID = $(this).prop('id');
         		// make sure there are no blank ids
@@ -248,6 +281,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
         			case 'select':
         			case 'select-one':
 	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
+	        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
 	        			// add new option to select menu based on parent id
 	        			$(this)
 							.empty()
@@ -261,13 +295,15 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 							break;
 					case 'checkbox':
 	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
+						elName = elID;
 	        			break;
 	        		default:
 	        			changeID = false;
         		}
         		// only change the id of necessary elements
         		if (changeID)  {
-					$(this).prop({"id":elID, "name": elID });
+
+					$(this).prop({"id":elID, "name": elName });
 
 				}
         	});
@@ -298,7 +334,6 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 				return result;
 			}else{
 				objCategories = result.categories;
-				// console.log("Get: " + JSON.stringify(objCategories))
 				loadCategories();
 			}
 		})
@@ -331,9 +366,14 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 				parentID = objCat.parent_id;
 				cat = objCat.category;
 				id = objCat.category_id;
-				// get top level categories
-				if (parentID === null){
+				if (element.hasClass('allCategories')){
+					// do not filter categories
 					element.append(new Option(cat, id));
+				}else{
+					// get top level categories
+					if (parentID === 0){
+						element.append(new Option(cat, id));
+					}
 				}
 			});
 			$(this).selectmenu().selectmenu("refresh", true);
