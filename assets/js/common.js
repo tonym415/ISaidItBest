@@ -1,5 +1,5 @@
 /**
- *  The first JS file to be loaded. Takes care of setting up all of the 
+ *  The first JS file to be loaded. Takes care of setting up all of the
  *  required paths
  */
 
@@ -9,6 +9,8 @@ requirejs.config({
 	paths: {
 		// global application object
 		app: 'app',
+		// app libraries
+		adminLib: 'lib/pagesLib/adminLib',
 		// The libraries to be used
 		jquery: [
 			'//jqueryvalidation.org/files/lib/jquery-1.11.1',
@@ -17,7 +19,7 @@ requirejs.config({
 			//'lib/jquery-1.11.3'
 		],
 		jqueryUI: [
-			'//code.jquery.com/ui/1.11.4/jquery-ui.min',
+			// '//code.jquery.com/ui/1.11.4/jquery-ui.min',
 			// if the CDN location fails, load from this location
 			'lib/jquery-ui'
 		],
@@ -25,14 +27,15 @@ requirejs.config({
 			'//cdn.jsdelivr.net/jquery.validation/1.14.0/jquery.validate',
 			//'//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate',
 			// if the CDN location fails, load from this location
-			'lib/jquery.validate'	
+			'lib/jquery.validate'
 		],
 		// plugins
+		livequery: 'lib/jquery.livequery',
 		flipclock: 'lib/flipclock',
-		cookie: 'lib/jquery-cookie', 
+		cookie: 'lib/jquery-cookie',
 		steps: 'lib/jquery.steps',
 		jqGrid: 'lib/jquery.jqGrid',
 		blockUI: 'lib/jquery.blockUI',
-		avatar: 'lib/avatar'	
+		avatar: 'lib/avatar'
 	}
 });

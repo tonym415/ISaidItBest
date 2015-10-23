@@ -127,6 +127,11 @@ Themeroller styles
     right: 0;
     position: absolute;
 }
+
+.errors {
+    border-spacing: 0px 0px !important;
+}
+
 form  { display: table; border-spacing: 10px 20px; width: 90%;   }
 p     { display: table-row;  }
 label { display: table-cell; }

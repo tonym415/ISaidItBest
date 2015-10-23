@@ -125,7 +125,7 @@ def contactUs(fs):
 def createCategory(fs):
     """ Creates new Category """
     c = Category(fs).newCategory()
-    returnJson(c, False)
+    returnJson(c)
 
 
 def getCategories():
@@ -150,6 +150,7 @@ def doFunc(fStor):
         Excutes the desired function with appropriate parameters
     """
     fStor = cgiFieldStorageToDict(fStor)
+    print(fStor)
     funcName = fStor['function']
 
     """ sanitize store for use in classes """
@@ -159,7 +160,7 @@ def doFunc(fStor):
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
     elif funcName == "CC":
-        globals()['createCategories']()
+        globals()['createCategory'](fStor)
     elif funcName == "GC":
         globals()['getCategories']()
     elif funcName == "GAU":
@@ -190,8 +191,9 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(function="CU", name="tonym415", email="bob@bob.com",
-                      message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+    info = {'form_id': 'createCategory', 'c_Category': "",
+            'function': 'CC'}
+    form = formMockup(function="CC", form_id="createCategory", c_Category=None)
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

@@ -1,7 +1,7 @@
 /*
 	Handles js interaction for the signup page
  */
-require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGrid){
+require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'], function($, app, jqGrid, lib){
 	var objCategories,
 		loadCategories,
 		editor,
@@ -34,8 +34,96 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		}
     });
 
+	function submitInfo(data){
+		$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			data: data,
+			type: "POST",
+			url: app.engine
+			})
+			.done(function(result){
+				if (typeof(result) !== 'object'){
+					try {
+						result = JSON.parse(result)[0];
+					}catch(err){
+						console.log(err);
+					}
+				}
+				// internal error handling
+				if (result.hasOwnProperty('error')){
+					console.log(result.error);
+					// var validator = $("#signup").validate();
+					// validator.showErrors({
+					// 	"paypal_account": result.error
+					// });
+				}else{
+					switch (data.function){
+						case "CC":
+							dMessage("Success", "Category Added");
+							objCategories = result.categories;
+							loadCategories();
+							break;
+						case "GAU":
+						case "UU":
+							userGrid.trigger('reloadGrid');
+							editor.dialog("close");
+					}
+				}
+			})
+			.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+			.always(function() { return false; });
+		}
 
-	$( "[id$=tabs]" ).tabs({ width: 650});
+	/* Validation of forms */
+	valHandler = function(){
+		formData = $(this.currentForm).serializeForm();
+		formID = formData.form_id;
+		formData['function'] = lib.formManager[formID].abbr;
+		submitInfo(formData);
+		return false;
+	};
+
+	// validator defaults
+	$.validator.setDefaults({
+		debug: true,
+		wrapper: 'li',
+		ignore: "",
+        errorPlacement: function(error, element){
+            error.appendTo(element.closest('form').children('.errors'));
+        }
+	});
+
+	function formLoad(e, ui){
+		panel = (ui.newPanel === undefined) ? ui.panel : ui.newPanel;
+		// find forms for tab
+		available_forms = panel.children().find('form');
+		$.each(available_forms, function(){
+			formName = $(this).prop('id');
+			// add validators for forms in manager
+			mgrObj = lib.formManager[formName];
+			// if a manager object exists for the current form
+			if (mgrObj){
+				formValidator = mgrObj.validator;
+				if (formValidator !== undefined){
+					// create validator
+					$("#" + formName).validate(formValidator);
+					// add submitHandler to form validator
+					$("#" + formName).data('validator').settings.submitHandler = valHandler;
+				}
+			}
+			$(this).on('submit', function(){
+				event.preventDefault();
+				return false;
+			});
+		});
+	}
+
+	$( "[id$=tabs]" ).tabs({
+		width: 650,
+		create: formLoad,
+		activate: formLoad
+	});
+
 	$( "[id$=Accordion]" ).accordion({
 		width: 550,
 		animate: "easeInOutQuint",
@@ -52,39 +140,56 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		msgBox.dialog('open');
 	};
 
-	// bind select menus
-	$('form').on("change","select[id*=Category]:not([id*=temp])", setSelectEvents);
-	$('form').on("change","input[id*=CategoryChk]", setChkEvents);
+	// set a watch for additions/removal on the dom for select boxes (not including template)
+	$("select[id*=Category]:not([id*=temp])")
+		.livequery(function(){
+			// add validation
+			$(this).closest('form').validate();
+			$(this).rules("add", {
+				selectNotEqual : "",
+				messages: {
+					selectNotEqual: "Please choose a subcategory"
+				}
+			});
 
-	setSelectEvents = function(event){
-		// get all selectmenus except template
-		$("select[id*=Category]:not([id*=temp])").selectmenu({
-			width: 200,
-			change: function(){
-				//  bind change event to all select menus to enable subcategory menu selection
-		        boolSubs = $(this).siblings('input').prop("checked");
-				// if sub-categories are requested
-				if (boolSubs){ subCheck($(this)); }
-			}
+			// initialize selectmenu
+			$(this).selectmenu({
+				width: 200,
+				change: function(){
+					// validate select
+					$(this).closest('form').validate().element(this);
+					//  bind change event to all select menus to enable subcategory menu selection
+			        boolSubs = $(this).siblings('input').prop("checked");
+					// if sub-categories are requested
+					if (boolSubs){ subCheck($(this)); }
+				}
+			});
 		});
-	}();
-	// setSelectEvents();
 
-	// bind chkboxes
-	function setChkEvents(){
-		$("input[id*=CategoryChk]:not([id*=temp])").change(function(){
-			if($(this).is(':checked')){
-				var select = $(this).siblings('select');
-				subCheck(select);
-			}
+	// set watch for additions/removal on the dom for checkboxes (not including template)
+	$("input[id*=CategoryChk]:not([id*=temp])")
+		.livequery(function(){
+			$(this)
+				.change(function(event){
+					event.stopPropagation();
+					if($(this).is(':checked')){
+						var select = $(this).siblings('select');
+						subCheck(select);
+					}else{
+						// check the id of the checkbox to see if it is a clone
+						chkID = $(this).prop('id');
+						tempIter = chkID.match(/\d+$/);
+
+						// get all p tags that are not the original and do not contain the submit button
+						cloneP = $(this).parent().siblings().not('p:has("input[type=submit]")').not('.orig');
+						// kill all clones below current check
+						$.each(cloneP, function(){
+							$(this).remove();
+						});
+					}
+				}
+			);
 		});
-	}
-	// setChkEvents();
-
-
-// bind select menus
-	$('body').on("load change","select[id*=Category]:not([id*=temp])", setSelectEvents);
-	$('body').on("load change","input[id*=CategoryChk]", setChkEvents);
 
 	function subCheck(element){
 		if (element === undefined) return false;
@@ -114,7 +219,7 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
         if (catCollection.length > 0){
         	/* create subcategory select, fill and new subs checkbox */
 
-        	// get the parent paragraph element
+        	// get the template paragraph element
         	parentP = $('#subCatTemplate');
         	// clone it
         	var clone = parentP.children().clone();
@@ -129,7 +234,7 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
         	clone.children().each(function(){
         		changeID = true;
         		// get the id ov the current element
-        		var elID = $(this).prop('id');
+        		var templateID = $(this).prop('id');
         		// make sure there are no blank ids
         		switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
         			case 'label':
@@ -142,11 +247,11 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	        			break;
         			case 'select':
         			case 'select-one':
-	        			elID = elID.replace(elID.prefix(), element_id_prefix) + index;
+	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
 	        			// add new option to select menu based on parent id
 	        			$(this)
 							.empty()
-							.append(new Option("None", "---"));
+							.append(new Option("None", ""));
 							tmpSelect = $(this);
 							$.each(catCollection, function(idx, objCat){
 								cat = objCat.category;
@@ -155,19 +260,18 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 							});
 							break;
 					case 'checkbox':
-	        			elID = elID.replace(elID.prefix(), element_id_prefix) + index;
+	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
 	        			break;
 	        		default:
 	        			changeID = false;
         		}
         		// only change the id of necessary elements
-        		if (changeID)  $(this).prop("id", elID);
+        		if (changeID)  {
+					$(this).prop({"id":elID, "name": elID });
+
+				}
         	});
         	element.parent().after(clone);
-
-        	// add events
-        	// setSelectEvents();
-        	// setChkEvents();
         }else{
         	// category is top-level
         	msg = "No Sub-category found for: " + current_selection;
@@ -198,7 +302,9 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 				loadCategories();
 			}
 		})
-		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			console.log(textStatus + ': getJSON request failed! ' + errorThrown);
+		})
 		.always(function() { app.hideLoading(); });
 	};
 	getCategories();
@@ -219,7 +325,7 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 		$.each(menus, function(){
 			$(this)
 				.empty()
-				.append(new Option("None", "---"));
+				.append(new Option("None", ""));
 			element = $(this);
 			$.each(objCategories, function(idx, objCat){
 				parentID = objCat.parent_id;
@@ -260,7 +366,6 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	    		primary: "ui-icon-disk"
 	    	},
 	    	click: function(){
-	    		// app.showLoading();
 	    		$(this).find('form').trigger('submit');
 	    	}
 	    },{
@@ -272,180 +377,26 @@ require(['jquery','app', 'jqGrid', 'validate','jqueryUI'], function($, app, jqGr
 	    }]
 	});
 
-	function loadEditor(data){
-		console.log(data);
-		editor.dialog("option","title", "Editing Details for: " + data.first_name + " " + data.last_name);
-		$.each(data, function(key, value){
-			element = $("input[id='" + key + "']");
-			if (element.length > 0){
-				if (element.prop('type') == 'checkbox'){
-					element.prop('checked', (value == '1'));
-				}else{
-					element.val(value);
-				}
-			}
-		});
-		editor.dialog("open");
-	}
 	// Grid options
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;
 
-	userGrid = $("#jqGrid").jqGrid({
-		url: app.engine + "?function=GAU",
-		contentType: "application/json",
-		datatype: "json",
-		jsonReader: {
-			root: "records",
-			id: "user_id",
-			repeatitems: false
-		},
-		 colModel: [
-			{ label: 'User ID', name: 'user_id', width: 50, formatter: "integer", align: "center"},
-			{ label: 'First Name', name: 'first_name', width: 75, align: "center" },
-			{ label: 'Last Name', name: 'last_name', width: 90, align: "center" },
-			{ label: 'User Name', name: 'username', width: 90, align: "center" },
-			{ label: 'Email', name: 'email', width: 90, formatter: "email", align: "center" },
-			{ label: 'Credit', name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center"},
-			{ label: 'Role', name: 'role', width: 50, align: "center" },
-			{ label: 'Created', name: 'created', width: 100, formatter: "date", formatoptions: { srcformat: 'Y-m-d H:i:s', newformat: 'd-M-Y'}, align: "center"},
-			{ label: 'Wins', name: 'wins', width: 30, formatter: "integer", align: "center"},
-			{ label: 'Losses', name: 'losses', width: 30, formatter: "integer", align: "center"},
-			{ label: 'Active', name: 'active', width: 30, formatter: "checkbox", align: "center"},
-			{ label: 'Active', name: 'active', width: 3, hidden: true}
-		],
-		loadError:function(xhr,status, err){
-			try {
-				$.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
-				{buttonalign:'right'});
-			} catch(e) {
-				alert(xhr.responseText);}
-		},
-		loadonce: true,
-		height: "auto",
-		width: "auto",
-		viewrecords: true, // show the current page, data rang and total records on the toolbar
-		rowNum: 30,
-		rownumbers: true,
-		autoencode: true,
-		ignoreCase: true,
-		shrinkToFit: false,
-		// pager: "#jqGridPager"
-		defaults : {
-			recordtext: "View {0} - {1} of {2}",
-		        emptyrecords: "No records to view",
-			loadtext: "Loading...",
-			pgtext : "Page {0} of {1}"
-		},
+	userGrid = lib.getGrid("#jqGrid");
+	userGrid.jqGrid('setGridParam', {
 		onSelectRow: function(id, status, e){
-			rowData = $(this).getRowData(id);
-			loadEditor(rowData);
-		}
-	});
-	//.addClass( "ui-tabs-vertical ui-helper-clearfix" );
-    // $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
-
-   function submitInfo(data){
-	 	$.ajax({
-			contentType: "application/x-www-form-urlencoded",
-			data: data,
-			type: "POST",
-			url: app.engine
-		})
-		.done(function(result){
-			if (typeof(result) !== 'object'){
-			 	result = JSON.parse(result)[0];
-			}
-
-			// internal error handling
-			if (result.error !== undefined){
-				console.log(result.error);
-				// var validator = $("#signup").validate();
-				// validator.showErrors({
-				// 	"paypal_account": result.error
-				// });
-			}else{
-				switch (data.function){
-					case "GAU":
-					case "CC":
-						getCategories();
-						break;
-					case "UU":
-						userGrid.trigger('reloadGrid');
-					editor.dialog("close");
-				}
-			}
-		})
-		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
-		.always(function() { app.hideLoading(); });
-	 }
-
-    /* Validation of forms */
-	valHandler = function(){
-		formData = $(this.currentForm).serializeForm();
-		formID = formData.form_id;
-		formData['function'] = formManager[formID].abbr;
-		submitInfo(formData);
-	};
-
-
-	// submit handling
-	$('form').on("submit focus", function(event){
-		event.preventDefault();
-		form = event.target; // get current form jquery object
-		formName = form.id;
-		formValidator = formManager[formName].validator;
-		if (formValidator !== undefined){
-			// create validator
-			$("#" + formName).validate(formValidator);
-		}
-		return true;
-	});
-
-
-	/*
-	* multi-form managment object
-	*/
-	formManager = {
-		"createCategory" :{
-			abbr: "CC",
-			validator: {
-				submitHandler: valHandler,
-				rules: { c_category: 'required' },
-				messages: { c_category: "Please enter your new category name"}
-			}
-		},
-		"update" :{
-			abbr: "UU",
-			validator: {
-				submitHandler: valHandler,
-				rules: {
-					first_name: "required",
-					last_name: "required",
-					username: {
-						required: true,
-						minlength: 3
-					},
-					email: {
-						required: true,
-						email: true
-					},
-					messages: {
-						first_name: "Please enter your first name",
-						last_name: "Please enter your last name",
-						username: {
-							required: "Please enter a username",
-							minlength: "Your username must consist of at least 3 characters"
-						},
-						email: {
-							required: "Please enter a valid email address",
-							email: "Your email address must be in the format of name@domain.com"
-						}
+			data = $(this).getRowData(id);
+			editor.dialog("option","title", "Editing Details for: " + data.first_name + " " + data.last_name);
+			$.each(data, function(key, value){
+				element = $("input[id='" + key + "']");
+				if (element.length > 0){
+					if (element.prop('type') == 'checkbox'){
+						element.prop('checked', (value == '1'));
+					}else{
+						element.val(value);
 					}
 				}
-			}
+			});
+			editor.dialog("open");
 		}
-	};
-
-	// loadCategories();
+	});
 });

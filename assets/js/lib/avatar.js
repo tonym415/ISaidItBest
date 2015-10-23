@@ -17,7 +17,7 @@ jQuery.event.props.push('dataTransfer');
 
   // if string, a new Image is needed
   if (load) {
-   i = new Image;
+   i = new Image();
    i.onload = onload;
    i.onerror = onerror;
   }

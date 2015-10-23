@@ -26,6 +26,11 @@ class User(object):
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
+    def sanitizeParams(self):
+        return {k[5:]: v
+                for k, v in self.__dict__.items()
+                if k.startswith('user')}
+
     def getAllUsers(self):
         """ get user information by name """
         returnDict = {}
@@ -80,9 +85,7 @@ class User(object):
                  "%(email)s,%(username)s, %(password)s, %(paypal_account)s)")
 
         # extract only user info from class __dict__
-        query_params = {k[5:]: v
-                        for k, v in self.__dict__.items()
-                        if k.startswith('user')}
+        query_params = self.sanitizeParams()
         # hash password
         query_params['password'] = pbkdf2_sha256.encrypt(
             query_params['password'], rounds=200000, salt_size=16)

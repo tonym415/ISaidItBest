@@ -3,6 +3,7 @@
 <head>
 	<title>Administration Page</title>
 	<link rel="stylesheet" href="assets/css/plugins/ui.jqgrid.css">
+	<link rel="stylesheet" href="assets/css/screen.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -26,24 +27,29 @@
 					    	<div id='catAccordion'>
 								<h3>Create Category</h3>
 								<form id='createCategory'>
-									<p>
+									<div class='errors'></div>
+									<p class='orig'>
 										<label for='c_Category'>Category Name:</label>
-										<input id='c_Category' name='c_Category' type='text' required/>
+										<input id='c_Category' name='c_Category' type='text' class="required" />
 									</p>
 									<input type='submit' value="New Category" />
 								</form>
 								<h3>Rename/Update Category</h3>
 								<form id='renameCategory'>
-									<p>
+									<div class='errors'></div>
+									<p class="orig">
 										<label for='r_currentCategory'>Category to Change:</label>
-										<select id='r_currentCategory' name='r_currentCategory'>
-											<option value="---">None</option>
+										<select id='r_currentCategory' name='r_currentCategory' required>
+											<option value="">None</option>
 										</select>
+										<label for='r_parentCategoryChk'>Sub?</label>
+										<input id='r_parentCategoryChk' name='r_parentCategoryChk' type='checkbox' />
 										<br />
 									</p>
-									<p>
+									<p class="orig">
 										<label for='r_newCategory'>New Name:</label>
-										<input id='r_newCategory' name='r_newCategory' type='text' /><br />
+										<input id='r_newCategory' name='r_newCategory' type='text' required />
+										<br />
 									</p>
 									<p>
 										<input type='submit' value="Rename Category" />
@@ -51,17 +57,18 @@
 								</form>
 								<h3>Delete Category</h3>
 								<form id='deleteCategory'>
-									<p>
-										<label for='d_Category'>Category to Change:</label>
-										<select id='d_Category' name='d_Category'>
-											<option value="---">None</option>
+									<div class='errors'></div>
+									<p class="orig">
+										<label for='d_Category'>Category to Remove:</label>
+										<select id='d_Category' name='d_Category' class="required">
+											<option value="">None</option>
 										</select>
-										<label for='r_parentCategoryChk'>Sub?</label>
-										<input id='r_parentCategoryChk' type='checkbox' />
+										<label for='d_parentCategoryChk'>Sub?</label>
+										<input id='d_parentCategoryChk' name='d_parentCategoryChk' type='checkbox' />
 										<br />
 									</p>
 									<p>
-										<input type='submit' value="Rename Category" />
+										<input type='submit' value="Delete Category" />
 									</p>
 								</form>
 						    </div> <!-- end of category CRUD Accordion -->
@@ -228,7 +235,7 @@
 <div id='subCatTemplate' style='display:none'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category Name:</label>
-		<select id='temp_subCategory'>
+		<select id='temp_subCategory' name='temp_subCategory' >
 			<option value="---">None</option>
 		</select>
 		<label for='temp_CategoryChk'>Sub?</label>
