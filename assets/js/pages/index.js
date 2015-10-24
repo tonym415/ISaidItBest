@@ -24,6 +24,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 		// validate user
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
+			desc: 'Login',
 			data: data,
 			type: "POST",
 			url: app.engine

@@ -13,6 +13,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
     formManager = {
         "createCategory" :{
             abbr: "CC",
+            desc: "Create Category",
             validator: {
                 rules: { c_Category: 'required' },
                 messages: { c_Category: "Please enter your new category name"}
@@ -20,6 +21,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
         },
         "renameCategory" :{
             abbr: "RC",
+            desc: "Rename Category",
             validator: {
                 rules: {
                     r_currentCategory: { selectNotEqual: "" },
@@ -33,6 +35,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
         },
         "deleteCategory" :{
             abbr: "DC",
+            desc: "Delete Category",
             validator: {
                 rules: {
                     d_Category: { selectNotEqual: "" }
@@ -42,19 +45,35 @@ define(['jquery', 'app', 'validate'], function($, app) {
         },
         "adoptCategory" :{
             abbr: "AC",
+            desc: "Category Association",
             validator: {
                 rules: {
                     a_Category: { selectNotEqual: "" },
                     a_parentCategory: { selectNotEqual: "" }
                 },
                 messages: {
-                    a_Category: "Select a category to be adopted", 
+                    a_Category: "Select a category to be associated",
                     a_parentCategory: "Select a parent category"
+                }
+            }
+        },
+        "createQuestion" :{
+            abbr: "CQ",
+            desc: "Create Question",
+            validator: {
+                rules: {
+                    q_Category: { selectNotEqual: "" },
+                    q_parentCategory: { selectNotEqual: "" }
+                },
+                messages: {
+                    q_Category: "Select a category to be adopted",
+                    q_parentCategory: "Select a parent category"
                 }
             }
         },
         "update" :{
             abbr: "UU",
+            desc: "Update User information",
             validator: {
                 rules: {
                     first_name: "required",
@@ -88,6 +107,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
         var grid = $(element).jqGrid({
             mtype: "POST",
             url: app.engine + "?function=GAU",
+            function: 'utility',
             contentType: "application/json",
             datatype: "json",
             jsonReader: {

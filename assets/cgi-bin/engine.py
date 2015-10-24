@@ -11,11 +11,16 @@ import os
 if "REQUEST_METHOD" not in os.environ:
     import sys
     sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+from app.Log import *
 from app.User import *
 from app.Category import *
 
 
 cgitb.enable()
+
+
+def logAction(fs):
+    returnJson(Log(fs).newLog())
 
 
 def testDep(data):
@@ -44,8 +49,7 @@ def showParams(fs):
 
 
 def getAllUsers():
-    users = {"records": User().getAllUsers()}
-    returnJson(users)
+    returnJson({"records": User().getAllUsers()})
 
 
 def submitUserInfo(fs):
@@ -136,8 +140,7 @@ def modifyCategory(fs):
 
 def getCategories():
     """ gathers all categories """
-    returnObj = {"categories": Category().getAllCategories()}
-    returnJson(returnObj)
+    returnJson({"categories": Category().getAllCategories()})
 
 
 # this will eventually be a database call
@@ -182,6 +185,8 @@ def doFunc(fStor):
         globals()['userAvailabilityCheck'](fStor)
     elif funcName == "CU":
         globals()['contactUs'](fStor)
+    elif funcName == "LOG":
+        globals()['logAction'](fStor)
     else:
         globals()['showParams'](fStor)
 

@@ -34,9 +34,10 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		}
     });
 
-	function submitInfo(data){
+	function submitInfo(data, desc){
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
+			desc: desc,
 			data: data,
 			type: "POST",
 			url: app.engine
@@ -106,7 +107,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		formData = $(this.currentForm).serializeForm();
 		formID = formData.id;
 		formData['function'] = lib.formManager[formID].abbr;
-		submitInfo(formData);
+		submitInfo(formData, lib.formManager[formID].desc);
 		return false;
 	};
 
@@ -209,7 +210,6 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 					}else{
 						// check the id of the checkbox to see if it is a clone
 						chkID = $(this).prop('id');
-						tempIter = chkID.match(/\d+$/);
 
 						// get all p tags that are not the original and do not contain the submit button
 						cloneP = $(this).parent().siblings().not('p:has("input[type=submit]")').not('.orig');
@@ -320,6 +320,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 	getCategories = function(){
 	 	$.ajax({
 			contentType: "application/x-www-form-urlencoded",
+			function: 'utility',
 			data: {'function' : 'GC'},
 			type: "POST",
 			url: app.engine

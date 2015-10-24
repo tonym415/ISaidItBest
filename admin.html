@@ -97,26 +97,30 @@
 			    	<div id='questionAccordion'> <!-- begin subcategory CRUD Accordion -->
 						<h3>Create Question</h3>
 						<form id='createQuestion'>
-							<p>
+							<p class='orig'>
 								<label for='q_Category'>Category:</label>
-								<select id='q_Category'>
-									<option value="---">None</option>
-								</select><br />
+								<select id='q_Category' name='q_category' required>
+									<option value="">None</option>
+								</select>
+								<label for='q_parentCategoryChk'>Sub?</label>
+								<input id='q_parentCategoryChk' name='q_parentCategoryChk' type='checkbox' />
 							</p>
-							<p>
+							<p class='orig'>
 								<label for='q_text'>Question text:</label>
-								<input id='q_text' type='text' />
+								<input id='q_text' name='q_text' type='text' required/>
 							</p>
 
 							<input class='full-width' type='submit' value="New Question" />
 						</form>
-						<h3>Rename/Update Sub-Category</h3>
-						<form id='srenameCategory'>
-							<p>
-								<label for='sr_currentCategory'>Category to Change:</label>
-								<select id='sr_currentCategory'>
+						<h3>Edit Question</h3>
+						<form id='editQuestion'>
+							<p class='orig'>
+								<label for='q_currentCategory'>Category to Change:</label>
+								<select  id='q_currentCategory' name='q_currentCategory' required>
 									<option value="---">None</option>
-								</select><br />
+								</select>
+								<label for='q_currentCategoryChk'>Sub?</label>
+								<input id='q_currentCategoryChk' name='q_currentCategoryChk' type='checkbox' />
 							</p>
 							<p>
 								<label for='sr_newCategory'>New Name:</label>

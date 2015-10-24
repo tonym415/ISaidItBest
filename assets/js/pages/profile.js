@@ -160,6 +160,7 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		data = $('.paypal').serializeForm();
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
+			desc: "Paypal Request",
 			data: data,
 			type: "POST",
 			"Access-Control-Allow-Origin" :"https://www.paypal.com/cgi-bin/webscr",

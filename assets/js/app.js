@@ -50,22 +50,45 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 	var loading = function(msg){
 		loadingImg = '<img src="assets/css/images/loading.gif" />';
 		loadingHtml = ' <h1>We are processing your request.  Please be patient.</h1>';
-		if (msg === undefined){ msg = loadingImg + loadingHtml; }
+		msg =  (msg === undefined) ?  loadingImg + loadingHtml : loadingImg + msg;
 		$.blockUI({message: msg});
 	};
 
 	var unloading = $.unblockUI;
 
-	var ajxBody =  $("body");
-	if (ajxBody !== undefined){
-		ajxBody.bind("ajaxStart", function() {
+	$(document)
+		.ajaxStart(function(event, xhr, options) {
 	    	loading();
-	    }).bind("ajaxStop", function() {
+	    })
+		.ajaxComplete(function(event, xhr, options) {
+			// if options.function == logger or utility...don't log
+			if (options.function === undefined){
+				user = getCookie("user");
+				data = {
+					'function': 'LOG',
+					'user_id': user.user_id,
+					'description': options.desc || 'utility function',
+					'action' : options.data,
+					'result' : xhr.responseText,
+					'detail' : options.url + " | " + xhr.status + " | " + xhr.statusText
+				};
+				// log event
+				$.ajax({
+					contentType: "application/x-www-form-urlencoded",
+					function: 'logger',
+					data: data,
+					type: "POST",
+					url: app_engine
+					})
+					.done(function(data, textStatus, jqXHR){ console.log("Logged data: " + data); })
+					.fail(function(jqXHR, textStatus, errorThrown) { console.log('log request failed! ' + textStatus); })
+					.always(function() { return false; });
+			}
 	    	unloading();
-	    }).bind("ajaxError", function() {
+	    })
+		.ajaxError(function(event, xhr, options) {
 	    	unloading();
 	    });
-	}
 
 	/**
 	 * sets cookies with info

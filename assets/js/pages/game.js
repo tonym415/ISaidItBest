@@ -1,6 +1,6 @@
 /**
  *  Handles all functions for the game page
- *  @module  
+ *  @module
  */
 require([
 	'jquery',
@@ -13,32 +13,29 @@ require([
 		// handle url spoofing
 		if (document.referrer.indexOf(app.pages.home) < 0){
 			if (document.referrer.indexOf(document.location.pathname) < 0){
-				window.location.assign(app.pages.home)
+				window.location.assign(app.pages.home);
 			}
 		}
 
 		// handle page setup upon arrival
-		app.createNavBar()
-		$.cookie.json = true
-		info = $.cookie('user')
-		userSpan = "<div>Welcome, <a href='" + app.pages.profile + "'> " + info.username + "</a></div>"
-		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />"
-		$("#userInfo").append(userSpan)
-		$(wins).appendTo("#userInfo div")
-		
+		app.createNavBar();
+		$.cookie.json = true;
+		info = app.getCookie('user');
+		userSpan = "<div>Welcome, <a href='" + app.pages.profile + "'> " + info.username + "</a></div>";
+		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />";
+		$("#userInfo").append(userSpan);
+		$(wins).appendTo("#userInfo div");
 
 		// Page Stylings
 		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
-		$("input[type=button]").button();	
+		$("input[type=button]").button();
 		$(".sel").selectmenu({ width: 200 });
 		$("#subCategory").selectmenu({ disabled: true });
-
-		
 
 	/**
 	 * Category selection box
 	 */
-	$(".category").selectmenu({ 
+	$(".category").selectmenu({
 		/**
 		 * Handles load of the category question select box
 		 */
@@ -46,25 +43,26 @@ require([
 			value = $(this).val().capitlize();
 			$("#subCategory")
 				.selectmenu("enable")
-				.empty()
+				.empty();
 
 				$.ajax({
 					contentType: "application/x-www-form-urlencoded",
 					data: {"function": "LCQ", "category" : value},
+					desc: 'Load subcategories select box',
 					type: "POST",
-					url: app.engine 
+					url: app.engine
 				})
 				.done(function(data){
 					if (data[value] === undefined){
 						$("#subCategory")
 							.empty()
 							.append(new Option("None", "---"))
-							.selectmenu("disable")
+							.selectmenu("disable");
 					}else{
 						$.each(data[value], function(val, text){
-							$("#subCategory").append(new Option(text, val))
-							$("#subCategory").selectmenu("refresh")
-						})
+							$("#subCategory").append(new Option(text, val));
+							$("#subCategory").selectmenu("refresh");
+						});
 					}
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + jqXHR.responseText); })

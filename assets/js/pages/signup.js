@@ -13,16 +13,17 @@ require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
 	 function submitUserInfo(data){
 	 	$.ajax({
 			contentType: "application/x-www-form-urlencoded",
+			desc: "Submit User information for registration",
 			data: data,
 			type: "POST",
-			url: app.engine 
+			url: app.engine
 		})
 		.done(function(result){
 			if (typeof(result) !== 'object'){
 			 	data = JSON.parse(result)[0];
 			}
 
-			// internal error handling	
+			// internal error handling
 			if (data.error !== undefined){
 				var validator = $("#signup").validate();
 				validator.showErrors({
@@ -41,7 +42,7 @@ var valHandler = function(){
 	formData['function'] = "SUI";
 	submitUserInfo(formData);
 }
-	
+
 	// wizardify form and set up validation
 	$('form').steps({
 		headerTag: 'h1',
@@ -54,9 +55,9 @@ var valHandler = function(){
 	        {
 	            return true;
 	        }
-	 
+
 	        var form = $(this);
-	 
+
 	        // Clean up if user went backward before
 	        if (currentIndex < newIndex)
 	        {
@@ -64,10 +65,10 @@ var valHandler = function(){
 	            $(".body:eq(" + newIndex + ") label.error", form).remove();
 	            $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
 	        }
-	 
+
 	        // Disable validation on fields that are disabled or hidden.
 	        form.validate().settings.ignore = ":disabled,:hidden";
-	 
+
 	        // Start validation; Prevent going forward if false
 	        return form.valid();
 	    },
@@ -75,17 +76,17 @@ var valHandler = function(){
 	    onFinishing: function (event, currentIndex)
 	    {
 	        var form = $(this);
-	 
+
 	        // Disable validation on fields that are disabled.
 	        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
 	        form.validate().settings.ignore = ":disabled";
-	 
+
 	        // Start validation; Prevent form submission if false
 	        return form.valid();
 	    },
 	    onFinished: function (event, currentIndex) {
 		        var form = $(this);
-		         
+
 		        // Submit form input
 		        form.submit();
 		    }
@@ -145,36 +146,37 @@ var valHandler = function(){
 
 	//clear availibility validations
 	$("input[name='username']").on('blur', function(){
-        $('#username_availability_result').empty();  
+        $('#username_availability_result').empty();
     });
 
 	// check username availability
 	$("input[name='username']").on('keyup', function(){
-		username = $(this).val()
-		minChars = 3
+		username = $(this).val();
+		minChars = 3;
 		// if the input is the correct length check for availability
 		if (username.length >= minChars){
-			$("#username_availability_result").html('Checking availability...')
-			data = { "function": "UAC", "username" : username }
-			 //use ajax to run the check  
+			$("#username_availability_result").html('Checking availability...');
+			data = { "function": "UAC", "username" : username };
+			 //use ajax to run the check
 	        $.ajax({
 					contentType: "application/x-www-form-urlencoded",
-					data: data, 
+					desc: "UserName availability",
+					data: data,
 					type: "POST",
-					url: app.engine 
+					url: app.engine
 				})
-        	.done(function(result){  
-            	availability = (result.available == "0") ? " is Available" : " is not Available"
-                $('#username_availability_result').html(username + availability);  
+        	.done(function(result){
+            	availability = (result.available == "0") ? " is Available" : " is not Available";
+                $('#username_availability_result').html(username + availability);
             })
             .fail(function(jqXHR, textStatus, error){
             	var err = textStatus + ", " + error;
             	console.log("Response: " + jqXHR.responseText);
             	console.log("Request Failed: " + err);
-	        });  
-		  
-		} 
+	        });
+
+		}
 	});
 
-	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center")
+	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center");
 });
