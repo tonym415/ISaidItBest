@@ -14,13 +14,18 @@ if "REQUEST_METHOD" not in os.environ:
 from app.Log import *
 from app.User import *
 from app.Category import *
+from app.Question import *
 
 
 cgitb.enable()
 
 
 def logAction(fs):
-    returnJson(Log(fs).newLog())
+    if 'page' in fs.keys():
+        l = Log(fs).getAllLogs()
+    elif 'user_id' in fs.keys():
+        l = Log(fs).newLog()
+    returnJson(l)
 
 
 def testDep(data):
@@ -135,6 +140,7 @@ def modifyCategory(fs):
     elif fs['id'] == "createCategory":
         """ Creates new Category """
         c = Category(fs).newCategory()
+
     returnJson(c)
 
 
@@ -143,7 +149,32 @@ def getCategories():
     returnJson({"categories": Category().getAllCategories()})
 
 
+def modifyQuestion(fs):
+    """ modify fs to be properly consumed by Category() """
+    # check for the existence of subcategory
+    q = None
+    if fs['id'] in ["deleteQuestion", 'editQuestion']:
+        """ deactivates Category """
+        q = Question(fs).updateQuestion()
+    elif fs['id'] == "createQuestion":
+        """ Creates new Category """
+        q = Question(fs).newQuestion()
+
+    returnJson(q)
+
+
+def getCategoryQuestionsByID(fs):
+    returnObj = {}
+    q = Question(fs).getQuestionsByCat()
+    if 'error' not in q[0].keys():
+        returnObj['questions'] = q
+    else:
+        returnObj = q
+    returnJson(returnObj)
+
 # this will eventually be a database call
+
+
 def loadCategoryQuestions(category):
     """ Loads all questions for a specific category """
     returnObj = {}
@@ -167,8 +198,12 @@ def doFunc(fStor):
 
     if funcName == "LCQ":
         globals()['loadCategoryQuestions'](fStor['category']),
+    elif funcName in ["CQ", "EQ", "DQ"]:
+        globals()['modifyQuestion'](fStor)
     elif funcName in ["CC", "RC", "DC", "AC"]:
         globals()['modifyCategory'](fStor)
+    elif funcName == "GQ":
+        globals()['getCategoryQuestionsByID'](fStor)
     elif funcName == "GC":
         globals()['getCategories']()
     elif funcName == "GAU":
@@ -185,7 +220,7 @@ def doFunc(fStor):
         globals()['userAvailabilityCheck'](fStor)
     elif funcName == "CU":
         globals()['contactUs'](fStor)
-    elif funcName == "LOG":
+    elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)
     else:
         globals()['showParams'](fStor)
@@ -204,7 +239,7 @@ def main():
     info = {'id': 'deleteCategory', 'd_Category': 3,
             'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
 
-    form = formMockup(function="CC", form_id="createCategory", c_Category=None)
+    form = formMockup(function="GQ", category_id=1)
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

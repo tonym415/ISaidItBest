@@ -4,7 +4,8 @@
 require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 	app.createNavBar()
 	$("input[type=submit]").button();
-
+	var msgBox = app.msgBox($('#dialog-message'));
+	var dMessage = app.dMessage;
 		/**
 	 *  Submits an ajax call to send signup info to the database
 	 *
@@ -30,13 +31,14 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 					"message": data.error
 				});
 			}else{
-				$("#errors").text(data.message.message);
-				$("#errors").dialog({
-					title: data.message.title,
-					autoOpen: true,
-					modal: true
-
-				});
+				dMessage(app, data.message.title, data.message.message);
+				// $("#errors").text(data.message.message);
+				// $("#errors").dialog({
+				// 	title: data.message.title,
+				// 	autoOpen: true,
+				// 	modal: true
+				//
+				// });
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })

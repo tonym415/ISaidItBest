@@ -63,11 +63,11 @@ define(['jquery', 'app', 'validate'], function($, app) {
             validator: {
                 rules: {
                     q_Category: { selectNotEqual: "" },
-                    q_parentCategory: { selectNotEqual: "" }
+                    q_text: 'required'
                 },
                 messages: {
-                    q_Category: "Select a category to be adopted",
-                    q_parentCategory: "Select a parent category"
+                    q_Category: "Select a category to assign question",
+                    q_text: "Enter question"
                 }
             }
         },
@@ -103,7 +103,7 @@ define(['jquery', 'app', 'validate'], function($, app) {
         }
     };
 
-    function getGrid(element){
+    function getUserGrid(element){
         var grid = $(element).jqGrid({
             mtype: "POST",
             url: app.engine + "?function=GAU",
@@ -137,15 +137,11 @@ define(['jquery', 'app', 'validate'], function($, app) {
                    alert(xhr.responseText);}
            },
            loadonce: true,
-           height: "auto",
-           width: "auto",
+           height: "100%",
            viewrecords: true, // show the current page, data rang and total records on the toolbar
            rowNum: 30,
            rownumbers: true,
-           autoencode: true,
-           ignoreCase: true,
-           shrinkToFit: false,
-           // pager: "#jqGridPager"
+           pager: $("#userPager"),
            defaults : {
                recordtext: "View {0} - {1} of {2}",
                    emptyrecords: "No records to view",
@@ -156,8 +152,59 @@ define(['jquery', 'app', 'validate'], function($, app) {
        return grid;
    }
 
+    function getLogGrid(element){
+        var grid = $(element).jqGrid({
+            mtype: "POST",
+            url: app.engine + "?function=GL",
+            function: 'utility',
+            contentType: "application/json",
+            datatype: "json",
+            jsonReader: {
+                root: "records",
+                id: "log_id",
+                repeatitems: false
+            },
+            colModel: [
+               { label: 'ID', name: 'log_id', width: 30, formatter: "integer", align: "center"},
+               { label: 'User', name: 'username', width: 75, align: "center" },
+               { label: 'Description', name: 'description', width: 150, align: "center" },
+               { label: 'Action', name: 'action', width: 150, align: "center" },
+               { label: 'Result', name: 'result', width: 150,  align: "center" },
+               { label: 'Detail', name: 'detail', width: 150, align: "center"},
+               { label: 'Created', name: 'datetime', width: 100, sortable: true, align: "center"},
+           ],
+           loadError:function(xhr,status, err){
+               try {
+                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
+                   {buttonalign:'right'});
+               } catch(e) {
+                   alert(xhr.responseText);}
+           },
+           loadonce: true,
+           rowList: [10,20,40],
+           height: "100%",
+           width: "auto",
+           sortname: 'datetime',
+           sortorder: 'desc',
+           viewrecords: true, // show the current page, data rang and total records on the toolbar
+           rowNum: 30,
+           rownumbers: true,
+           autoencode: true,
+           gridview: true,
+           shrinkToFit: false,
+           pager: $("#logPager"),
+           defaults : {
+               recordtext: "View {0} - {1} of {2}",
+                   emptyrecords: "No records to view",
+               loadtext: "Loading...",
+               pgtext : "Page {0} of {1}"
+           }
+       });
+       return grid;
+   }
     return {
         formManager: formManager,
-        getGrid: getGrid
+        getLogGrid: getLogGrid,
+        getUserGrid: getUserGrid
     };
 });

@@ -36,7 +36,7 @@ class Log(object):
     def newLog(self):
         """ insert new category with/without parent_id """
         query = ("INSERT INTO log(user_id, description, action, result, detail)"
-                 "VALUES (%(user_id)s, %(description)s, %(action)s, %(result)s,"
+                 " VALUES (%(user_id)s, %(description)s, %(action)s, %(result)s,"
                  " %(detail)s) ")
         params = self.sanitizeParams()
 
@@ -45,8 +45,8 @@ class Log(object):
 
     def getAllLogs(self):
         """ get user information by name """
-        query = ("SELECT log_id, user_id, action, result, detail, datetime "
-                 "FROM log WHERE 1")
+        query = ("SELECT log_id, username, description, action, result, detail, "
+                 "datetime FROM log join users using(user_id) WHERE 1")
         return self.executeQuery(query, ())
 
     def executeModifyQuery(self, query, params):
@@ -77,10 +77,15 @@ class Log(object):
         return returnDict
 
 if __name__ == "__main__":
-    info = {'id': 'deleteCategory', 'd_Category': 3,
-            'd_parentCategoryChk': 'on', 'd_subCategory[]': ["4", "19"]}
+    info = {
+        "_search": "false",
+        "rows": "30",
+        "page": "1",
+        "sord": "asc",
+        "nd": "1445665594991"
+    }
 
     """ modify user information for testing """
     # info['stuff'] = "stuff"
 
-    print(Category(info).updateCategory())
+    print(Log(info).getAllLogs())

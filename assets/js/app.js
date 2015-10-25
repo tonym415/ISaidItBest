@@ -3,7 +3,7 @@
  * @module app
  * @return {Object} object with specific initialization and data handling for game.html
  */
-define(['jquery', 'cookie', 'blockUI'], function($){
+define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 
 	var defaultTheme = 'excite-bike';
 	var app_engine = "/assets/cgi-bin/engine.py";
@@ -29,8 +29,33 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
 			$('#navBar').append(listItem);
 		}
-
+		// universal messagbox
+		$('body').after('<div id="dialog-message" title=""></div>');
+		$('#dialog-message').append("<p id='message-content'></p>");
 	};
+
+	function msgBox(element){
+		var mbox = element.dialog({
+			minHeight: 350,
+			maxHeight: 500,
+			minWidth: 450,
+			maxWidth: 600,
+			autoOpen: false,
+			dialogClass: 'no-close',
+			modal: true,
+			open: function(){
+				icon = '<span class="ui-icon ui-icon-circle-zoomout" style="float:left; margin:0 7px 5px 0;"></span>';
+				$(this).parent().find("span.ui-dialog-title").prepend(icon);
+			},
+			buttons: {
+				Ok: function(){ $(this).dialog("close"); }
+			}
+	    });
+		this.mBox = mbox;
+	}
+
+
+
 
 	var loginNavBar = function(){
 
@@ -63,6 +88,7 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 		.ajaxComplete(function(event, xhr, options) {
 			// if options.function == logger or utility...don't log
 			if (options.function === undefined){
+				// if (options.desc === undefined) return false;
 				user = getCookie("user");
 				data = {
 					'function': 'LOG',
@@ -199,6 +225,14 @@ define(['jquery', 'cookie', 'blockUI'], function($){
 		hideLoading: unloading,
 		setTheme: setTheme,
 		prettyPrint: pprint,
+		msgBox : msgBox,
+		dMessage : function(lib, title, message){
+			title = (title === undefined) ? "Error" : title;
+			message = (message === undefined) ? "Sub-category not found" : message;
+			lib.mBox.dialog('option','title', title);
+			$('#message-content').html(message);
+			lib.mBox.dialog('open');
+		},
 		getTheme: function(){
 			$.cookie.json = true;
 			current_theme =  $.cookie('theme');

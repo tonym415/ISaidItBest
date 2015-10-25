@@ -8,8 +8,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		userGrid,
 		getCategories,
 		valHandler,
-		dMessage,
-		msgBox;
+		dMessage;
 
 	// create counter for sub-category templates
 	$('#subCatTemplate').data("tempCount",0);
@@ -17,22 +16,10 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 	// page setup
 	app.createNavBar();
 	$("input[type=submit], input[type=button]").button();
-	msgBox = $( "#dialog-message" ).dialog({
-		minHeight: 350,
-		maxHeight: 500,
-		minWidth: 450,
-		maxWidth: 600,
-		autoOpen: false,
-		dialogClass: 'no-close',
-		modal: true,
-		open: function(){
-			icon = '<span class="ui-icon ui-icon-circle-zoomout" style="float:left; margin:0 7px 5px 0;"></span>';
-			$(this).parent().find("span.ui-dialog-title").prepend(icon);
-		},
-		buttons: {
-			Ok: function(){ $(this).dialog("close"); }
-		}
-    });
+
+	// global messagbox
+	var msgBox = app.msgBox($('#dialog-message'));
+	dMessage = app.dMessage;
 
 	function submitInfo(data, desc){
 		$.ajax({
@@ -48,37 +35,37 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 						result = JSON.parse(result)[0];
 					}catch(err){
 						msg = "<h2>Stack Trace:</h2><p>" + err.stack + "</p><h2>Ajax Result:</h2><p>" + result + "</p>";
-						dMessage("Error: " + err, msg);
+						dMessage(app, "Error: " + err, msg);
 						console.log(err);
 					}
 				}
 				// internal error handling
 				if (result.hasOwnProperty('error')){
 					msg = "<h2>Error:</h2><p>" + result.error.error + "</p><h2>Message:</h2><p>" + result.error.stm + "</p>";
-					dMessage("Error", msg);
+					dMessage(app, "Error", msg);
 					console.log(result.error);
 				}else{
 					switch (data.function){
 						case "AC":
-							dMessage("Success", "Category Adopted");
+							dMessage(app, "Success", "Category Adopted");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#adoptCategory'));
 							break;
 						case "DC":
-							dMessage("Success", "Category Removed");
+							dMessage(app, "Success", "Category Removed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#deleteCategory'));
 							break;
 						case "RC":
-							dMessage("Success", "Category Renamed");
+							dMessage(app, "Success", "Category Renamed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#renameCategory'));
 							break;
 						case "CC":
-							dMessage("Success", "Category Added");
+							dMessage(app, "Success", "Category Added");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#createCategory'));
@@ -87,18 +74,26 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 						case "UU":
 							userGrid.trigger('reloadGrid');
 							editor.dialog("close");
+							break;
+						case "CQ":
+							dMessage(app, "Success", "Question Added");
+							resetForm($('#createQuestion'));
+							break;
 					}
 				}
 			})
-			.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
-			.always(function() { return false; });
+			.fail(function(jqXHR, textStatus, errorThrown) {
+				dMessage(app, 'Request Failed', textStatus + ' ' + errorThrown);
+				console.log('request failed! ' + textStatus);
+			});
 		}
 
 	function resetForm(form){
 		form.children('.orig')
 			.find(':checkbox').trigger('click')
 			.find('select').selectmenu('value', '')
-			.find('input[type=text]').val('');
+			.find('input[type=text]').val('')
+			.find('textarea').val('');
 		attachValidator(form.prop('id'));
 	}
 
@@ -164,13 +159,28 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		active: false
 	});
 
-	dMessage = function(title, message){
-		title = (title === undefined) ? "Error" : title;
-		message = (message === undefined) ? "Sub-category not found" : message;
-		msgBox.dialog('option','title', title);
-		$('#message').html(message);
-		msgBox.dialog('open');
-	};
+	// set a watch for additions/removal on the dom for select boxes (not including template)
+	$("select[id*=Question]")
+		.livequery(function(){
+			// add validation
+			$(this).closest('form').validate();
+			$(this).rules("add", {
+				selectNotEqual : "",
+				messages: {
+					selectNotEqual: "Please choose a subcategory"
+				}
+			});
+
+			// initialize selectmenu
+			$(this).selectmenu({
+				width: 350,
+				change: function(){
+					$(this).closest('form').find('textarea[name$=Text]')
+						.prop("disabled", false)
+						.val($("option:selected", this).text());
+				}
+			});
+		});
 
 	// set a watch for additions/removal on the dom for select boxes (not including template)
 	$("select[id*=Category]:not([id*=temp])")
@@ -193,7 +203,11 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 					//  bind change event to all select menus to enable subcategory menu selection
 			        boolSubs = $(this).siblings('input').prop("checked");
 					// if sub-categories are requested
-					if (boolSubs){ subCheck($(this)); }
+					if (boolSubs) subCheck($(this));
+
+					// add events to load questions if appropriate
+					prefix = $(this).prop('id').prefix();
+					if (prefix === 'q_') getCatQuestions($(this).val());
 				}
 			});
 		});
@@ -284,6 +298,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 	        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
 	        			// add new option to select menu based on parent id
 	        			$(this)
+							.addClass('required')
 							.empty()
 							.append(new Option("None", ""));
 							tmpSelect = $(this);
@@ -313,7 +328,7 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
         	msg = "No Sub-category found for: " + current_selection;
         	title = "Selection Error: " + current_selection;
         	msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
-        	dMessage(title, msg);
+        	dMessage(app, title, msg);
         }
 	}
 
@@ -339,9 +354,9 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			console.log(textStatus + ': getJSON request failed! ' + errorThrown);
-		})
-		.always(function() { app.hideLoading(); });
+			dMessage(app, textStatus + ': request failed! ', errorThrown);
+			console.log(textStatus + ': request failed! ' + errorThrown);
+		});
 	};
 	getCategories();
 
@@ -382,6 +397,34 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 
 	};
 
+	getCatQuestions = function(catID){
+		data = {'function' : 'GQ'};
+		if (catID !== undefined) data.category_id = catID;
+		$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			function: 'utility',
+			data: data,
+			type: "POST",
+			url: app.engine
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+				result = JSON.parse(result)[0];
+			}
+			// internal error handling
+			if (result.error !== undefined){
+				dMessage(app, result.error.error, result.error.msg);
+				console.log(result.error);
+				return result;
+			}
+			// load question selectmenu
+			qList = $('#q_currentQuestion');
+			qList.empty();
+			$.each(result.questions, function(){
+				qList.append($('<option />').val(this.question_id).text(this.question_text));
+			});
+		});
+	};
 
 
 	editor = $('#editor').dialog({
@@ -422,7 +465,8 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;
 
-	userGrid = lib.getGrid("#jqGrid");
+	logGrid = lib.getLogGrid("#logGrid");
+	userGrid = lib.getUserGrid("#userGrid");
 	userGrid.jqGrid('setGridParam', {
 		onSelectRow: function(id, status, e){
 			data = $(this).getRowData(id);
@@ -440,4 +484,13 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 			editor.dialog("open");
 		}
 	});
+
+	$('#logGrid').jqGrid('navGrid', '#logpager', {add:false,edit:false,del:false});
+	function gridResize(){
+		logGrid.jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
+		userGrid.jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
+	}
+	gridResize();
+	$(window).resize(gridResize());
+
 });
