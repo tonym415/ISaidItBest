@@ -38,7 +38,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			}else{
 				// create cookie using user info
 				// console.log(result)
-				app.setCookie('user', result);
+				app.setCookie('user', result[0]);
 				window.location.assign(app.pages.game);
 			}
         })

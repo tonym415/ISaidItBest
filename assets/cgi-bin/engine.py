@@ -53,8 +53,8 @@ def showParams(fs):
     returnJson(fs)
 
 
-def getAllUsers():
-    returnJson({"records": User().getAllUsers()})
+def getAllUsers(fs):
+    returnJson(User(fs).getAllUsers())
 
 
 def submitUserInfo(fs):
@@ -79,9 +79,8 @@ def validateUser(fs):
         if valid_user:
             user_info = u.getUser()
 
-            # prune unnecessary info
-            del user_info['password']
-
+            # do not send back hashed password
+            del user_info[0]['password']
     returnJson(user_info)
 
 
@@ -207,7 +206,7 @@ def doFunc(fStor):
     elif funcName == "GC":
         globals()['getCategories']()
     elif funcName == "GAU":
-        globals()['getAllUsers']()
+        globals()['getAllUsers'](fStor)
     elif funcName == "VU":
         globals()['validateUser'](fStor)
     elif funcName == "SUI":
@@ -239,7 +238,7 @@ def main():
     info = {'id': 'deleteCategory', 'd_Category': 3,
             'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
 
-    form = formMockup(function="GQ", category_id=1)
+    form = formMockup(function="VU", username='user', password='password')
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

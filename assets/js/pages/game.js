@@ -19,13 +19,7 @@ require([
 
 		// handle page setup upon arrival
 		app.createNavBar();
-		$.cookie.json = true;
-		info = app.getCookie('user');
-		userSpan = "<div>Welcome, <a href='" + app.pages.profile + "'> " + info.username + "</a></div>";
-		wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />";
-		$("#userInfo").append(userSpan);
-		$(wins).appendTo("#userInfo div");
-
+		
 		// Page Stylings
 		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
 		$("input[type=button]").button();

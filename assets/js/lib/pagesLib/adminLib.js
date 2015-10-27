@@ -1,4 +1,4 @@
-define(['jquery', 'app', 'validate'], function($, app) {
+define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, app) {
     var formManager;
 
     // validator methods
@@ -105,29 +105,43 @@ define(['jquery', 'app', 'validate'], function($, app) {
 
     function getUserGrid(element){
         var grid = $(element).jqGrid({
-            mtype: "POST",
             url: app.engine + "?function=GAU",
-            function: 'utility',
-            contentType: "application/json",
             datatype: "json",
+            caption: "User Manager",
             jsonReader: {
-                root: "records",
+                root: "rows",
+                page: "page",
+                total: "total",
+                records: "records",
                 id: "user_id",
-                repeatitems: false
+                repeatitems: true
             },
+            colNames: [
+                'User ID',
+                'First Name',
+                'Last Name',
+                'User Name',
+                'Email',
+                'Credit',
+                'Role',
+                'Created',
+                'Wins',
+                'Losses',
+                'Active'
+            ],
             colModel: [
-               { label: 'User ID', name: 'user_id', width: 50, formatter: "integer", align: "center"},
-               { label: 'First Name', name: 'first_name', width: 75, align: "center" },
-               { label: 'Last Name', name: 'last_name', width: 90, align: "center" },
-               { label: 'User Name', name: 'username', width: 90, align: "center" },
-               { label: 'Email', name: 'email', width: 90, formatter: "email", align: "center" },
-               { label: 'Credit', name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center"},
-               { label: 'Role', name: 'role', width: 50, align: "center" },
-               { label: 'Created', name: 'created', width: 100, formatter: "date", formatoptions: { srcformat: 'Y-m-d H:i:s', newformat: 'd-M-Y'}, align: "center"},
-               { label: 'Wins', name: 'wins', width: 30, formatter: "integer", align: "center"},
-               { label: 'Losses', name: 'losses', width: 30, formatter: "integer", align: "center"},
-               { label: 'Active', name: 'active', width: 30, formatter: "checkbox", align: "center"},
-               { label: 'Active', name: 'active', width: 3, hidden: true}
+               {name: 'user_id', width: 50, formatter: "integer", align: "center"},
+               {name: 'first_name', width: 75, align: "center" },
+               {name: 'last_name', width: 90, align: "center" },
+               {name: 'username', width: 90, align: "center" },
+               {name: 'email', width: 90, formatter: "email", align: "center" },
+               {name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center"},
+               {name: 'role', width: 50, align: "center" },
+               {name: 'created', width: 100, align: "center"},
+               {name: 'wins', width: 30, formatter: "integer", align: "center"},
+               {name: 'losses', width: 30, formatter: "integer", align: "center"},
+               {name: 'active', width: 30, formatter: "checkbox", align: "center"}
+            //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
            loadError:function(xhr,status, err){
                try {
@@ -136,69 +150,69 @@ define(['jquery', 'app', 'validate'], function($, app) {
                } catch(e) {
                    alert(xhr.responseText);}
            },
-           loadonce: true,
-           height: "100%",
+           rowNum: 5,
+           rowList: [10, 25, 50, 100],
+           sortname: 'created',
+           sortorder: 'desc',
+           gridview: true,
+           autoencode: true,
            viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rowNum: 30,
            rownumbers: true,
-           pager: $("#userPager"),
-           defaults : {
-               recordtext: "View {0} - {1} of {2}",
-                   emptyrecords: "No records to view",
-               loadtext: "Loading...",
-               pgtext : "Page {0} of {1}"
-           }
+           toppager: true,
+           regional: 'en',
+           height: "%",
+           shrinkToFit: true,
+           autoWidth: true,
+           gridModal: true,
+           pager: "#userPager"
        });
        return grid;
    }
 
     function getLogGrid(element){
         var grid = $(element).jqGrid({
-            mtype: "POST",
             url: app.engine + "?function=GL",
-            function: 'utility',
-            contentType: "application/json",
             datatype: "json",
             jsonReader: {
-                root: "records",
+                root: "rows",
+                page: "page",
+                total: "total",
+                records: "records",
                 id: "log_id",
-                repeatitems: false
+                repeatitems: true
             },
+            colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
             colModel: [
-               { label: 'ID', name: 'log_id', width: 30, formatter: "integer", align: "center"},
-               { label: 'User', name: 'username', width: 75, align: "center" },
-               { label: 'Description', name: 'description', width: 150, align: "center" },
-               { label: 'Action', name: 'action', width: 150, align: "center" },
-               { label: 'Result', name: 'result', width: 150,  align: "center" },
-               { label: 'Detail', name: 'detail', width: 150, align: "center"},
-               { label: 'Created', name: 'datetime', width: 100, sortable: true, align: "center"},
+               {name: 'log_id', width: 30, index: "log_id", search: true},
+               {name: 'username', index: 'username', width: 75, search: true},
+               {name: 'description', index: 'description', width: 150, search: true},
+               {name: 'action', index: 'action', width: 150, search: true},
+               {name: 'result', index: 'result', width: 150, search: true},
+               {name: 'detail', index: 'detail', width: 150, search: true},
+               {name: 'datetime', index: 'datetime', width: 100, searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'yy-mm-dd'});} }},
            ],
            loadError:function(xhr,status, err){
                try {
-                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
-                   {buttonalign:'right'});
+                   dMessage(app,"Error loading Logs", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
                } catch(e) {
-                   alert(xhr.responseText);}
+                   alert(xhr.responseText);
+               }
            },
-           loadonce: true,
-           rowList: [10,20,40],
-           height: "100%",
-           width: "auto",
+           rowNum: 10,
+           rowList: [10,20,50],
            sortname: 'datetime',
            sortorder: 'desc',
-           viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rowNum: 30,
-           rownumbers: true,
-           autoencode: true,
            gridview: true,
-           shrinkToFit: false,
-           pager: $("#logPager"),
-           defaults : {
-               recordtext: "View {0} - {1} of {2}",
-                   emptyrecords: "No records to view",
-               loadtext: "Loading...",
-               pgtext : "Page {0} of {1}"
-           }
+           autoencode: true,
+           viewrecords: true, // show the current page, data rang and total records on the toolbar
+           rownumbers: true,
+           toppager: true,
+           regional: 'en',
+           height: 400,
+           shrinkToFit: true,
+           autoWidth: true,
+           gridModal: true,
+           pager: $("#logPager")
        });
        return grid;
    }

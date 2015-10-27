@@ -4,6 +4,7 @@ The User class is used to handle all functions related to the User
 """
 import os
 import sys
+from math import ceil
 from passlib.hash import pbkdf2_sha256
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
@@ -19,8 +20,10 @@ class User(object):
 
     def __init__(self, *userInfo, **kwargs):
         self._cnx = lib.db2.get_connection()
+        self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
         for dictionary in userInfo:
             for key in dictionary:
+                # print('Key: %s' % key)
                 setattr(self, "user_" + key, dictionary[key])
 
         for key in kwargs:
@@ -33,48 +36,85 @@ class User(object):
 
     def getAllUsers(self):
         """ get user information by name """
-        returnDict = {}
-        query = """SELECT user_id, first_name,last_name, email,
-                username, password , credit , wins, losses,
-                 paypal_account, roles.role, created, active  FROM  users
-                 INNER JOIN roles USING(role_id) WHERE 1
-            """
-        cursor = self._cnx.cursor(buffered=True, dictionary=True)
-        try:
-            cursor.execute(query)
-            if cursor.rowcount > 0:
-                returnDict = cursor.fetchall()
+        params = self.sanitizeParams()
+        if 'page' in params.keys():  # for use with jqGrid
+            ops = {
+                'eq': '=',   # equal
+                'ne': '<>',  # not equal
+                'lt': '<',   # less than
+                'le': '<=',  # less than or equal to
+                'gt': '>',   # greater than
+                'ge': '>=',  # greater than or equal to
+                'bw': 'LIKE',  # begins with
+                'bn': 'NOT LIKE',  # doesn't begin with
+                'in': 'LIKE',  # is in
+                'ni': 'NOT LIKE',  # is not in
+                'ew': 'LIKE',  # ends with
+                'en': 'NOT LIKE',  # doesn't end with
+                'cn': 'LIKE',  # contains
+                'nc': 'NOT LIKE'  # doesn't contain
+            }
 
-            else:
-                raise Exception("%s yields %s" %
-                                (cursor.statement.replace('\n', ' ')
-                                 .replace('            ', ''), cursor.rowcount))
+            def getWhereClause(col, oper, val, ops):
+                if oper == 'bw' or oper == 'bn':
+                    val += '%'
+                if oper == 'ew' or oper == 'en':
+                    val += '%%s' % val
+                if oper == 'cn' or oper == 'nc' or oper == 'in' or oper == 'ni':
+                    val = '%%s%' % val
+                return " WHERE %s %s '%s' " % (col, ops[oper], val)
+                # return " WHERE $col {$ops[$oper]} '$val' ";
 
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
+            where = ""
+            searchBool = params['_search'] if '_search' in params.keys() and params[
+                '_search'] == 'true' else False
+            searchField = params['searchField'] if 'searchField' in params.keys() else False
+            searchOper = params['searchOper'] if 'searchOper' in params.keys() else False
+            searchString = params['searchString'] if 'searchString' in params.keys() else False
 
-        return returnDict
+            params = {
+                'page': int(params['page']),
+                'limit': int(params['rows']),
+                'sidx': params['sidx'] if 'sidx' in params.keys() else 1,
+                'sord': params['sord']
+            }
+            if searchBool:
+                where = getWhereClause(searchField, searchOper, searchString, ops)
+            # get count of records
+            query = ("SELECT COUNT(*) as count FROM  users "
+                     "INNER JOIN roles USING(role_id) WHERE 1")
+            row = self.executeQuery(query, ())
+            count = row[0]['count']
+
+            params['records'] = count
+            params['total'] = ceil(count / params['limit']) if count > 0 else 0
+            vPage = params['page']
+            vLimit = params['limit']
+            params['start'] = (vPage * vLimit) - vLimit
+            query = ("SELECT user_id, first_name,last_name, email,"
+                     "username, password , credit , wins, losses,"
+                     "paypal_account, roles.role, "
+                     "DATE_FORMAT(created, '%d %b %Y %T') as created, active  "
+                     "FROM  users INNER JOIN roles USING(role_id)")
+            query += where
+            query += "ORDER BY %(sidx)s  %(sord)s LIMIT %(start)s, %(limit)s"
+            params['rows'] = self.executeQuery(query, params)
+            return params
+        else:
+            query = ("SELECT user_id, first_name,last_name, email,"
+                     "username, password , credit , wins, losses,"
+                     "paypal_account, roles.role, "
+                     "DATE_FORMAT(created, '%d %b %Y %T') as created, active  "
+                     "FROM  users INNER JOIN roles USING(role_id) WHERE 1")
+            return self.executeQuery(query, ())
 
     def getUser(self):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
-        returnDict = {}
         query = """SELECT  user_id ,  first_name , last_name , email ,
                 username, credit, wins, losses, paypal_account , password,
                 created, role,  active  FROM  users JOIN roles USING(role_id) WHERE username = %s"""
-        cursor = self._cnx.cursor(buffered=True, dictionary=True)
-        try:
-            cursor.execute(query, (self.user_username,))
-            if cursor.rowcount > 0:
-                returnDict = cursor.fetchone()
-            else:
-                raise Exception("%s yields %s" %
-                                (cursor.statement.replace('\n', ' ')
-                                 .replace('            ', ''), cursor.rowcount))
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-
-        return returnDict
+        return self.executeQuery(query, (self.user_username,))
 
     def submitUser(self):
         """ inserts user info into the database """
@@ -91,10 +131,8 @@ class User(object):
             query_params['password'], rounds=200000, salt_size=16)
 
         try:
-            cursor = self._cnx.cursor(buffered=True)
-            cursor.execute(query, query_params)
-            self._cnx.commit()
-            uid = cursor.lastrowid
+            self.executeModifyQuery(query, query_params)
+            uid = self.cursor.lastrowid
             # add user_id to current instance
             setattr(self, "user_user_id", uid)
             returnObj = self.getUser()
@@ -105,40 +143,69 @@ class User(object):
 
     def isValidUser(self):
         """ determine if user is valid based on username/password """
-        userInfo = self.getUser()
-        print(userInfo)
-        if 'error' not in userInfo:
-            print(userInfo)
+        userInfo = self.getUser()[0]
+        if 'error' in userInfo:
+            validUser = False
+        else:
             # test given password against database password
             hashed_pw = userInfo['password']
-            # print("id: %s, inst: %s, hash: %s" % (self.user_user_id,
-            # self.user_password, hashed_pw))
             validUser = pbkdf2_sha256.verify(self.user_password, hashed_pw)
-            # print("Valid: " + str(validUser))
-        else:
-            validUser = False
 
         return validUser
 
     def isUser(self):
         """ checking for username availability """
         query = """SELECT  username  FROM  users  WHERE username = %s"""
-        cursor = self._cnx.cursor(buffered=True)
-        cursor.execute(query, (self.user_username,))
+        self.executeQuery(query, (self.user_username,))
         """ if number of rows fields is bigger them 0 that means it's NOT
          available returning 0, 1 otherwise
          """
-        # print("(%s : retured %d rows)\n" % (cursor.statement, cursor.rowcount))
+        return (0, 1)[self.cursor.rowcount > 0]
 
-        return (0, 1)[cursor.rowcount > 0]
+    def executeModifyQuery(self, query, params):
+        returnDict = {}
+        try:
+            self.cursor.execute(query, params)
+            self._cnx.commit()
+        except Exception as e:
+            returnDict['error'] = "{}".format(e)
+            returnDict['stm'] = self.cursor.statement
+
+        return returnDict
+
+    def executeQuery(self, query, params):
+        returnDict = {}
+        try:
+            self.cursor.execute(query, params)
+            if self.cursor.rowcount > 0:
+                returnDict = self.cursor.fetchall()
+            else:
+                raise Exception("%s yields %s" %
+                                (self.cursor.statement.replace('\n', ' ')
+                                 .replace('            ', ''), self.cursor.rowcount))
+        except Exception as e:
+            returnDict['error'] = "{}".format(e)
+            returnDict['stm'] = self.cursor.statement
+
+        return returnDict
 
 if __name__ == "__main__":
     info = {}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
-    info = {"confirm_password": "password", "first_name":
-            "Antonio", "paypal_account": "tonym415", "password":
-            "password", "email": "tonym415@gmail.com", "last_name":
-            "Moses", "username": "tonym415"}
+    info = {"_search": "true",
+            'searchField': 'last_name',
+            'searchString': 'Moses',
+            'searchOper': 'eq',
+            'filters': '',
+            "rows": "5",
+            "page": "1",
+            "sord": "asc",
+            'sidx': 'created',
+            "nd": "1445875128229"}
+    # info = {"confirm_password": "password", "first_name":
+    #         "Antonio", "paypal_account": "tonym415", "password":
+    #         "password", "email": "tonym415@gmail.com", "last_name":
+    #         "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
     # info['username'] = "bob"
@@ -147,8 +214,9 @@ if __name__ == "__main__":
     """ remove  from data dict """
     u_info = {i: info[i]
               for i in info if i != 'function' and '_password' not in i}
-    # print(u_info)
+    # print(info)
 
-    # print(User().getAllUsers())
-    u = User(u_info)
-    print(u.getUser())
+    print(User(info).getAllUsers())
+    # u = User(u_info)
+    # print(u.isValidUser())
+    # print(u.getUser())

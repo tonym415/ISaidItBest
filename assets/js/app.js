@@ -29,6 +29,16 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
 			$('#navBar').append(listItem);
 		}
+
+		// logged in user
+		$.cookie.json = true;
+		info = $.cookie('user');
+		if (info){
+			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
+			wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />";
+			$("#navDiv").append(userSpan);
+			// $(wins).appendTo("#navDiv div");
+		}
 		// universal messagbox
 		$('body').after('<div id="dialog-message" title=""></div>');
 		$('#dialog-message').append("<p id='message-content'></p>");
@@ -106,7 +116,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 					type: "POST",
 					url: app_engine
 					})
-					.done(function(data, textStatus, jqXHR){ console.log("Logged data: " + data); })
+					.done(function(data, textStatus, jqXHR){
+						console.log("Logged data: " + JSON.stringify(data, null, 4));
+					})
 					.fail(function(jqXHR, textStatus, errorThrown) { console.log('log request failed! ' + textStatus); })
 					.always(function() { return false; });
 			}

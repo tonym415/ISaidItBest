@@ -1,7 +1,16 @@
 /*
 	Handles js interaction for the signup page
  */
-require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'], function($, app, jqGrid, lib){
+require([
+	'jquery',
+	'app',
+	'jqGrid',
+	'adminLib',
+	'validate',
+	'jqueryUI',
+	'livequery',
+	'locale',
+	], function($, app, jqGrid, lib){
 	var objCategories,
 		loadCategories,
 		editor,
@@ -148,7 +157,8 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 	$( "[id$=tabs]" ).tabs({
 		width: 650,
 		create: formLoad,
-		activate: formLoad
+		activate: formLoad,
+		heightStyle: 'fill'
 	});
 
 	$( "[id$=Accordion]" ).accordion({
@@ -485,12 +495,12 @@ require(['jquery','app', 'jqGrid','adminLib', 'validate','jqueryUI', 'livequery'
 		}
 	});
 
-	$('#logGrid').jqGrid('navGrid', '#logpager', {add:false,edit:false,del:false});
-	function gridResize(){
-		logGrid.jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
-		userGrid.jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
-	}
-	gridResize();
-	$(window).resize(gridResize());
+	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true });
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: true });
+
+
+	$(window).on('resize', function(){
+		$('[id*=Grid').jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
+	});
 
 });
