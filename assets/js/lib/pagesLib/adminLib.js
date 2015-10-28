@@ -1,9 +1,8 @@
-define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, app) {
+define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
     var formManager;
 
     // validator methods
     $.validator.addMethod("selectNotEqual", function(value, element, param) {
-        // , $.validator.format("Select box must not equal '{0}''")// return param != $(element).find('option:selected').text();
         return param != value;
     });
 
@@ -103,10 +102,29 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, a
         }
     };
 
-    function getUserGrid(element){
-        var grid = $(element).jqGrid({
-            url: app.engine + "?function=GAU",
+    var gridCommon = {
             datatype: "json",
+           loadError:function(xhr,status, err){
+               try {
+                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
+                   {buttonalign:'right'});
+               } catch(e) {
+                   alert(xhr.responseText);}
+           },
+           gridview: true,
+           autoencode: true,
+           viewrecords: true, // show the current page, data rang and total records on the toolbar
+           rownumbers: true,
+           toppager: true,
+           shrinkToFit: true,
+           autoWidth: true,
+           gridModal: true,
+     };
+
+    function getUserGrid(element){
+        // create grid specific settings
+        var uGrid = {
+            url: app.engine + "?function=GAU",
             caption: "User Manager",
             jsonReader: {
                 root: "rows",
@@ -143,30 +161,17 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, a
                {name: 'active', width: 30, formatter: "checkbox", align: "center"}
             //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
-           loadError:function(xhr,status, err){
-               try {
-                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
-                   {buttonalign:'right'});
-               } catch(e) {
-                   alert(xhr.responseText);}
-           },
            rowNum: 5,
            rowList: [10, 25, 50, 100],
            sortname: 'created',
            sortorder: 'desc',
-           gridview: true,
-           autoencode: true,
-           viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rownumbers: true,
-           toppager: true,
-           regional: 'en',
-           height: "%",
-           shrinkToFit: true,
-           autoWidth: true,
-           gridModal: true,
            pager: "#userPager"
-       });
-       return grid;
+       };
+
+       // blend specific and common settings
+       $.extend(uGrid, gridCommon);
+       // return instance
+       return $(element).jqGrid(uGrid);
    }
 
     function getLogGrid(element){
@@ -183,7 +188,7 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, a
             },
             colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
             colModel: [
-               {name: 'log_id', width: 30, index: "log_id", search: true},
+               {name: 'log_id', width: 30, index: "log_id", search: true, searchoptions:{sopt:['eq','ne','lt','le','gt','ge']}},
                {name: 'username', index: 'username', width: 75, search: true},
                {name: 'description', index: 'description', width: 150, search: true},
                {name: 'action', index: 'action', width: 150, search: true},
@@ -207,8 +212,7 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid','locale'], function($, a
            viewrecords: true, // show the current page, data rang and total records on the toolbar
            rownumbers: true,
            toppager: true,
-           regional: 'en',
-           height: 400,
+           height: "400",
            shrinkToFit: true,
            autoWidth: true,
            gridModal: true,

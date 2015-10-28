@@ -103,11 +103,10 @@ class Log(object):
             vLimit = params['limit']
             params['start'] = (vPage * vLimit) - vLimit
             query = ("SELECT log_id, username, description, action, result, detail, "
-                     "DATE_FORMAT(datetime, '%y %m %d') AS datetime FROM log "
+                     "DATE_FORMAT(datetime, '%y-%m-%d') AS datetime FROM log "
                      "join users using(user_id)")
             query += where
             query += " ORDER BY %(sidx)s %(sord)s LIMIT %(start)s, %(limit)s"
-            print(query)
             params['rows'] = self.executeQuery(query, params)
             return params
 

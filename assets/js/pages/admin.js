@@ -4,12 +4,11 @@
 require([
 	'jquery',
 	'app',
-	'jqGrid',
+	'jqueryUI',
 	'adminLib',
 	'validate',
-	'jqueryUI',
 	'livequery',
-	'locale',
+	'jqGrid',
 	], function($, app, jqGrid, lib){
 	var objCategories,
 		loadCategories,
@@ -496,7 +495,7 @@ require([
 	});
 
 	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true });
-	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: true });
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: false });
 
 
 	$(window).on('resize', function(){
