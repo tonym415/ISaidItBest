@@ -1,4 +1,4 @@
-define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
+define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     var formManager;
 
     // validator methods
@@ -102,29 +102,10 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
         }
     };
 
-    var gridCommon = {
-            datatype: "json",
-           loadError:function(xhr,status, err){
-               try {
-                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
-                   {buttonalign:'right'});
-               } catch(e) {
-                   alert(xhr.responseText);}
-           },
-           gridview: true,
-           autoencode: true,
-           viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rownumbers: true,
-           toppager: true,
-           shrinkToFit: true,
-           autoWidth: true,
-           gridModal: true,
-     };
-
     function getUserGrid(element){
-        // create grid specific settings
-        var uGrid = {
+        var grid = $(element).jqGrid({
             url: app.engine + "?function=GAU",
+            datatype: "json",
             caption: "User Manager",
             jsonReader: {
                 root: "rows",
@@ -148,7 +129,7 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
                 'Active'
             ],
             colModel: [
-               {name: 'user_id', width: 50, formatter: "integer", align: "center"},
+               {name: 'user_id', key:true, width: 50,  align: "center"},
                {name: 'first_name', width: 75, align: "center" },
                {name: 'last_name', width: 90, align: "center" },
                {name: 'username', width: 90, align: "center" },
@@ -156,22 +137,35 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
                {name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center"},
                {name: 'role', width: 50, align: "center" },
                {name: 'created', width: 100, align: "center"},
-               {name: 'wins', width: 30, formatter: "integer", align: "center"},
-               {name: 'losses', width: 30, formatter: "integer", align: "center"},
-               {name: 'active', width: 30, formatter: "checkbox", align: "center"}
+               {name: 'wins', width: 30,  align: "center"},
+               {name: 'losses', width: 30, align: "center"},
+               {name: 'active', width: 30, align: "center"}
             //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
+           loadError:function(xhr,status, err){
+               try {
+                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
+                   {buttonalign:'right'});
+               } catch(e) {
+                   alert(xhr.responseText);}
+           },
            rowNum: 5,
-           rowList: [10, 25, 50, 100],
+           rowList: [5, 10, 25, 50, 100],
            sortname: 'created',
            sortorder: 'desc',
+           gridview: true,
+           autoencode: true,
+           viewrecords: true, // show the current page, data rang and total records on the toolbar
+           rownumbers: true,
+           toppager: true,
+           regional: 'en',
+           height: 400,
+           shrinkToFit: true,
+           autoWidth: true,
+           gridModal: true,
            pager: "#userPager"
-       };
-
-       // blend specific and common settings
-       $.extend(uGrid, gridCommon);
-       // return instance
-       return $(element).jqGrid(uGrid);
+       });
+       return grid;
    }
 
     function getLogGrid(element){
@@ -188,7 +182,7 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
             },
             colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
             colModel: [
-               {name: 'log_id', width: 30, index: "log_id", search: true, searchoptions:{sopt:['eq','ne','lt','le','gt','ge']}},
+               {name: 'log_id', key: true, width: 30, index: "log_id", search: true},
                {name: 'username', index: 'username', width: 75, search: true},
                {name: 'description', index: 'description', width: 150, search: true},
                {name: 'action', index: 'action', width: 150, search: true},
@@ -212,7 +206,8 @@ define(['jquery', 'app', 'validate','jqueryUI','jqGrid'], function($, app) {
            viewrecords: true, // show the current page, data rang and total records on the toolbar
            rownumbers: true,
            toppager: true,
-           height: "400",
+           regional: 'en',
+           height: 400,
            shrinkToFit: true,
            autoWidth: true,
            gridModal: true,

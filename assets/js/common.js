@@ -13,19 +13,18 @@ requirejs.config({
 		adminLib: 'lib/pagesLib/adminLib',
 		// The libraries to be used
 		jquery: [
-			'//jqueryvalidation.org/files/lib/jquery-1.11.1',
-			//'//code.jquery.com/jquery-1.11.3.min',
+			'//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery',
 			// if the CDN location fails, load from this location
-			//'lib/jquery-1.11.3'
+			'lib/jquery-1.11.3'
 		],
 		jqueryUI: [
+			'//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui',
 			// '//code.jquery.com/ui/1.11.4/jquery-ui.min',
 			// if the CDN location fails, load from this location
 			'lib/jquery-ui'
 		],
 		validate: [
 			'//cdn.jsdelivr.net/jquery.validation/1.14.0/jquery.validate',
-			//'//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate',
 			// if the CDN location fails, load from this location
 			'lib/jquery.validate'
 		],
@@ -34,11 +33,28 @@ requirejs.config({
 		flipclock: 'lib/flipclock',
 		cookie: 'lib/jquery-cookie',
 		steps: 'lib/jquery.steps',
-		jqGrid: 'lib/jquery.jqgrid.src',
+		// jqGrid: 'lib/jquery.jqgrid.min',
+		// jqGrid: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.min',
 		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar',
 		// locale for grid
-		locale: 'lib/grid.locale-en'
+		jqGrid: ['//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
+			'lib/grid.locale-en'],
+		gridCss: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/css/ui.jqgrid.css'
+
+	},
+	shim: {
+		jquery: {
+			exports: '$'
+		},
+		jqueryUI: {
+			exports: '$',
+			deps: ['jquery']
+		},
+		jqGrid: {
+			deps: ['//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.js',
+				 '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src.js']
+		}
 
 	}
 });

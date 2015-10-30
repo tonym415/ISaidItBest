@@ -2,14 +2,14 @@
 	Handles js interaction for the signup page
  */
 require([
-	'jquery',
 	'app',
-	'jqueryUI',
 	'adminLib',
+	'jqGrid',
+	'jquery',
+	'jqueryUI',
 	'validate',
 	'livequery',
-	'jqGrid',
-	], function($, app, jqGrid, lib){
+	], function(app, lib, jqGrid){
 	var objCategories,
 		loadCategories,
 		editor,
