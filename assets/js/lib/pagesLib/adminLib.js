@@ -1,5 +1,8 @@
 define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     var formManager;
+    // global messagbox
+	var msgBox = app.msgBox($('#dialog-message'));
+	dMessage = app.dMessage;
 
     // validator methods
     $.validator.addMethod("selectNotEqual", function(value, element, param) {
@@ -129,7 +132,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                 'Active'
             ],
             colModel: [
-               {name: 'user_id', key:true, width: 50,  align: "center"},
+               {name: 'user_id', key:true, width: 50,  align: "center", hidden: true},
                {name: 'first_name', width: 75, align: "center" },
                {name: 'last_name', width: 90, align: "center" },
                {name: 'username', width: 90, align: "center" },
@@ -139,14 +142,16 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                {name: 'created', width: 100, align: "center"},
                {name: 'wins', width: 30,  align: "center"},
                {name: 'losses', width: 30, align: "center"},
-               {name: 'active', width: 30, align: "center"}
+               {name: 'active', width: 30, align: "center", formatter: "checkbox", formatoptions: { disabled: false},
+            edittype: "checkbox", editoptions: {value: "Yes:No", defaultValue: "Yes"},
+            stype: "select", searchoptions: { sopt: ["eq", "ne"], 
+                value: ":Any;1:Yes;0:No" } }
             //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
            loadError:function(xhr,status, err){
-               try {
-                   $.jgrid.info_dialog($.jgrid.errors.errcap,'<div class="ui-state-error">'+ xhr.responseText +'</div>', $.jgrid.edit.bClose,
-                   {buttonalign:'right'});
-               } catch(e) {
+                try {
+                   dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
+                } catch(e) {
                    alert(xhr.responseText);}
            },
            rowNum: 5,
@@ -182,7 +187,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
             },
             colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
             colModel: [
-               {name: 'log_id', key: true, width: 30, index: "log_id", search: true},
+               {name: 'log_id', key: true, width: 30, index: "log_id", hidden: true},
                {name: 'username', index: 'username', width: 75, search: true},
                {name: 'description', index: 'description', width: 150, search: true},
                {name: 'action', index: 'action', width: 150, search: true},
@@ -194,6 +199,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                try {
                    dMessage(app,"Error loading Logs", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
                } catch(e) {
+                   dMessage(app,"Error loading Logs", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
                    alert(xhr.responseText);
                }
            },

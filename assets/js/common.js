@@ -38,8 +38,10 @@ requirejs.config({
 		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar',
 		// locale for grid
-		jqGrid: ['//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
-			'lib/grid.locale-en'],
+		jqGrid: [
+			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
+			'lib/grid.locale-en'
+			],
 		gridCss: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/css/ui.jqgrid.css'
 
 	},
@@ -52,7 +54,7 @@ requirejs.config({
 			deps: ['jquery']
 		},
 		jqGrid: {
-			deps: ['//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.js',
+			deps: ['jqueryUI',
 				 '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src.js']
 		}
 

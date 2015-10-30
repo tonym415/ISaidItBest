@@ -494,8 +494,8 @@ require([
 		}
 	});
 
-	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true });
-	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: false });
+	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
 
 
 	$(window).on('resize', function(){

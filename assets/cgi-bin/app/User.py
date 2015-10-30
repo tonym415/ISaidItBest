@@ -4,6 +4,7 @@ The User class is used to handle all functions related to the User
 """
 import os
 import sys
+import json
 from math import ceil
 from passlib.hash import pbkdf2_sha256
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
@@ -55,15 +56,14 @@ class User(object):
                 'nc': 'NOT LIKE'  # doesn't contain
             }
 
-            def getWhereClause(col, oper, val, ops):
+            def getWhereClause(col, oper, val):
                 if oper == 'bw' or oper == 'bn':
                     val += '%'
                 if oper == 'ew' or oper == 'en':
-                    val += '%%s' % val
+                    val += '%' + val
                 if oper == 'cn' or oper == 'nc' or oper == 'in' or oper == 'ni':
-                    val = '%%s%' % val
-                return " WHERE %s %s '%s' " % (col, ops[oper], val)
-                # return " WHERE $col {$ops[$oper]} '$val' ";
+                    val = '%' + val + '%'
+                return "  %s %s '%s' " % (col, ops[oper], val)
 
             where = ""
             searchBool = params['_search'] if '_search' in params.keys() and params[
@@ -71,6 +71,7 @@ class User(object):
             searchField = params['searchField'] if 'searchField' in params.keys() else False
             searchOper = params['searchOper'] if 'searchOper' in params.keys() else False
             searchString = params['searchString'] if 'searchString' in params.keys() else False
+            filters = params['filters'] if 'filters' in params.keys() else False
 
             params = {
                 'page': int(params['page']),
@@ -79,10 +80,34 @@ class User(object):
                 'sord': params['sord']
             }
             if searchBool:
-                where = getWhereClause(searchField, searchOper, searchString, ops)
+                where += " WHERE "
+                if searchField:
+                    where += getWhereClause(searchField, searchOper,
+                                            searchString)
+                elif filters:   # filter options
+                    buildwhere = ""
+
+                    # handle string value of cgi var
+                    if isinstance(filters, str):
+                        filters = json.loads(filters)
+
+                    rules = filters['rules']
+                    for idx in range(len(rules)):
+                        field = rules[idx]['field']
+                        op = rules[idx]['op']
+                        data = rules[idx]['data']
+
+                        if idx > 0:
+                            buildwhere = filters['groupOp']
+                            buildwhere += getWhereClause(field, op, data)
+                        else:
+                            buildwhere += getWhereClause(field, op, data)
+                        where += buildwhere
+
             # get count of records
             query = ("SELECT COUNT(*) as count FROM  users "
-                     "INNER JOIN roles USING(role_id) WHERE 1")
+                     "INNER JOIN roles USING(role_id) ")
+            query += where
             row = self.executeQuery(query, ())
             count = row[0]['count']
 
