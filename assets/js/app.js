@@ -46,10 +46,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 
 	function msgBox(element){
 		var mbox = element.dialog({
-			minHeight: 350,
-			maxHeight: 500,
-			minWidth: 450,
-			maxWidth: 600,
+			autoResize: true,
 			autoOpen: false,
 			dialogClass: 'no-close',
 			modal: true,

@@ -7,6 +7,7 @@ from formMockup import formMockup
 import json
 import cgitb
 import os
+import traceback
 
 if "REQUEST_METHOD" not in os.environ:
     import sys
@@ -165,15 +166,21 @@ def modifyQuestion(fs):
 def getCategoryQuestionsByID(fs):
     returnObj = {}
     q = Question(fs).getQuestionsByCat()
-    if 'error' not in q[0].keys():
-        returnObj['questions'] = q
-    else:
-        returnObj = q
+    try:
+        if 'error' not in q[0].keys():
+            returnObj['questions'] = q
+        else:
+            returnObj = q
+    except KeyError as e:
+        returnObj = {'error': {
+            'error': 'None',
+            'msg': 'No question are available for this category'
+        }}
+
     returnJson(returnObj)
 
+
 # this will eventually be a database call
-
-
 def loadCategoryQuestions(category):
     """ Loads all questions for a specific category """
     returnObj = {}
@@ -238,7 +245,7 @@ def main():
     info = {'id': 'deleteCategory', 'd_Category': 3,
             'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
 
-    form = formMockup(function="VU", username='user', password='password')
+    form = formMockup(function="GQ", category_id="2")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

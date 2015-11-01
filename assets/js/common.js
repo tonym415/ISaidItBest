@@ -6,6 +6,7 @@
 // configure RequireJS
 requirejs.config({
 	baseURL: "assets/js",
+	waitSeconds: 15,
 	paths: {
 		// global application object
 		app: 'app',
@@ -42,6 +43,7 @@ requirejs.config({
 			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
 			'lib/grid.locale-en'
 			],
+		jqGridSrc: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src',
 		gridCss: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/css/ui.jqgrid.css'
 
 	},
@@ -54,8 +56,7 @@ requirejs.config({
 			deps: ['jquery']
 		},
 		jqGrid: {
-			deps: ['jqueryUI',
-				 '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src.js']
+			deps: ['jqueryUI', 'jqGridSrc']
 		}
 
 	}

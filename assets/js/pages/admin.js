@@ -408,7 +408,11 @@ require([
 
 	getCatQuestions = function(catID){
 		data = {'function' : 'GQ'};
-		if (catID !== undefined) data.category_id = catID;
+		q_txt = $('#q_editText').val('');
+		qList = $('#q_currentQuestion');
+		qList.empty();
+		if (catID === "") return false;
+		data.category_id = catID;
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
 			function: 'utility',
@@ -418,7 +422,8 @@ require([
 		})
 		.done(function(result){
 			if (typeof(result) !== 'object'){
-				result = JSON.parse(result)[0];
+				dMessage(app, 'Error Getting Category Questions', result);
+				return result;
 			}
 			// internal error handling
 			if (result.error !== undefined){
@@ -427,8 +432,6 @@ require([
 				return result;
 			}
 			// load question selectmenu
-			qList = $('#q_currentQuestion');
-			qList.empty();
 			$.each(result.questions, function(){
 				qList.append($('<option />').val(this.question_id).text(this.question_text));
 			});
@@ -474,30 +477,55 @@ require([
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;
 
-	logGrid = lib.getLogGrid("#logGrid");
-	userGrid = lib.getUserGrid("#userGrid");
+	logGrid = $("#logGrid").jqGrid(lib.getGrid("#logGrid"));
+	userGrid = $("#userGrid").jqGrid(lib.getGrid("#userGrid"));
 	userGrid.jqGrid('setGridParam', {
 		onSelectRow: function(id, status, e){
-			data = $(this).getRowData(id);
-			editor.dialog("option","title", "Editing Details for: " + data.first_name + " " + data.last_name);
-			$.each(data, function(key, value){
-				element = $("input[id='" + key + "']");
-				if (element.length > 0){
-					if (element.prop('type') == 'checkbox'){
-						element.prop('checked', (value == '1'));
-					}else{
-						element.val(value);
-					}
-				}
-			});
-			editor.dialog("open");
+			// row = $(this).jqGrid('getGridParam','selrow');
+			// if (row !== null) $(this).jqGrid('editGridRow', row, {height: 280, reloadAfterSubmit: false});
+			// else dMessage('Error', 'Please select row!');
+			// data = $(this).getRowData(id);
+			// editor.dialog("option","title", "Editing Details for: " + data.first_name + " " + data.last_name);
+			// $.each(data, function(key, value){
+			// 	element = $("input[id='" + key + "']");
+			// 	if (element.length > 0){
+			// 		if (element.prop('type') == 'checkbox'){
+			// 			element.prop('checked', (value == '1'));
+			// 		}else{
+			// 			element.val(value);
+			// 		}
+			// 	}
+			// });
+			// editor.dialog("open");
 		}
 	});
 
 	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
-	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: true, add: false, del: false, refresh: true },{height: 320, reloadAfterSubmit: false},{},{},{multipleSearch: true, showQuery: true});
 
-
+	(function grpLog(){
+		var colModel = $('#logGrid')[0].p.colModel;
+		$('#logColumns')
+			.empty()
+			.append(new Option("None", "clear"))
+			.selectmenu({
+				width: 200,
+				change: function(){
+					var vl = $(this).val();
+					if(vl) {
+						if(vl == "clear") {
+							logGrid.jqGrid('groupingRemove',true);
+						} else {
+							logGrid.jqGrid('groupingGroupBy',vl);
+						}
+					}
+				}
+			});
+			element = $('#logColumns');
+			$.each(colModel, function(idx, mod){
+				element.append(new Option(mod.label, mod.name));
+			});
+	})();
 	$(window).on('resize', function(){
 		$('[id*=Grid').jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
 	});

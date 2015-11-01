@@ -105,10 +105,67 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
         }
     };
 
-    function getUserGrid(element){
-        var grid = $(element).jqGrid({
+    gridDefaults = {
+        loadError:function(xhr,status, err){
+            try {
+               dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
+            } catch(e) {
+               alert(xhr.responseText);}
+       },
+       datatype: 'json',
+       grouping: true,
+       rowNum: 10,
+       rowList: [10, 25, 50, 100, 200, 500],
+       gridview: true,
+       autoencode: true,
+       viewrecords: true, // show the current page, data rang and total records on the toolbar
+       rownumbers: true,
+       toppager: true,
+       regional: 'en',
+       height: 325,
+       shrinkToFit: true,
+       autoWidth: true,
+       gridModal: true,
+       hiddengrid: true,
+       jqModal: true
+    };
+
+    gridOptions = {
+        logGrid: {
+            url: app.engine + "?function=GL",
+            jsonReader: {
+                root: "rows",
+                page: "page",
+                total: "total",
+                records: "records",
+                id: "log_id",
+                repeatitems: true
+            },
+            // colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
+            colModel: [
+               {label: 'ID', name: 'log_id', key: true, width: 30, index: "log_id"},
+               {label: 'User', name: 'username', index: 'username', width: 75, search: true},
+               {label: 'Desc', name: 'description', index: 'description', width: 150, search: true},
+               {label: 'Action', name: 'action', index: 'action', width: 150, search: true},
+               {label: 'Result', name: 'result', index: 'result', width: 150, search: true},
+               {label: 'Detail', name: 'detail', index: 'detail', width: 150, search: true},
+               {label: 'When?', name: 'datetime', index: 'datetime', width: 100, searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'yy-mm-dd'});} }},
+           ],
+           rowNum: 25,
+           sortname: 'datetime',
+           sortorder: 'desc',
+           groupingView: {
+               groupField: ['datetime'],
+               groupColumnShow : [true],
+               groupText : ['<b>{0} - {1} Item(s)</b>'],
+               groupCollapse : true,
+               groupOrder: ['desc']
+           },
+           toppager: false,
+           pager: $("#logPager")
+        },
+        userGrid: {
             url: app.engine + "?function=GAU",
-            datatype: "json",
             caption: "User Manager",
             jsonReader: {
                 root: "rows",
@@ -132,98 +189,39 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                 'Active'
             ],
             colModel: [
-               {name: 'user_id', key:true, width: 50,  align: "center", hidden: true},
-               {name: 'first_name', width: 75, align: "center" },
-               {name: 'last_name', width: 90, align: "center" },
-               {name: 'username', width: 90, align: "center" },
-               {name: 'email', width: 90, formatter: "email", align: "center" },
-               {name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center"},
-               {name: 'role', width: 50, align: "center" },
-               {name: 'created', width: 100, align: "center"},
-               {name: 'wins', width: 30,  align: "center"},
-               {name: 'losses', width: 30, align: "center"},
-               {name: 'active', width: 30, align: "center", formatter: "checkbox", formatoptions: { disabled: false},
+               {name: 'user_id', key:true, width: 50,  align: "center",editable: false, editoptions:{readonly: true, size: 20}},
+               {name: 'first_name', width: 75, align: "center",editable: true,  editoptions:{size: 20}},
+               {name: 'last_name', width: 90, align: "center",editable: true, editoptions:{size: 20} },
+               {name: 'username', width: 90, align: "center",editable: true, editoptions:{size: 20} },
+               {name: 'email', width: 90, formatter: "email", align: "center",editable: true, editoptions:{size: 20} },
+               {name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center",editable: true, editoptions:{size: 20}},
+               {name: 'role', width: 50, align: "center",editable: true, edittype: "select", editoptions:{value:"1:user;2:admin"} },
+               {name: 'created', width: 100, align: "center",editable: false, editoptions:{size: 20, readonly: true}},
+               {name: 'wins', width: 30,  align: "center",editable: false, editoptions:{size: 20, readonly: true}},
+               {name: 'losses', width: 30, align: "center",editable: false, editoptions:{size: 20, readonly: true}},
+               {name: 'active', width: 30, align: "center",editable: true, formatter: "checkbox", formatoptions: { disabled: false},
             edittype: "checkbox", editoptions: {value: "Yes:No", defaultValue: "Yes"},
-            stype: "select", searchoptions: { sopt: ["eq", "ne"], 
+            stype: "select", searchoptions: { sopt: ["eq", "ne"],
                 value: ":Any;1:Yes;0:No" } }
             //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
-           loadError:function(xhr,status, err){
-                try {
-                   dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
-                } catch(e) {
-                   alert(xhr.responseText);}
-           },
-           rowNum: 5,
-           rowList: [5, 10, 25, 50, 100],
+        //    postData: {'function': 'UU'},
            sortname: 'created',
            sortorder: 'desc',
-           gridview: true,
-           autoencode: true,
-           viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rownumbers: true,
-           toppager: true,
-           regional: 'en',
-           height: 400,
-           shrinkToFit: true,
-           autoWidth: true,
-           gridModal: true,
+           groupingView: { groupField: ['role']},
+           editurl: app.engine + '?function=UU',
            pager: "#userPager"
-       });
-       return grid;
+       }
+    };
+   function getGrid(element){
+        gridName = element.substring(1);
+        gridSettings = $.extend(gridDefaults, gridOptions[gridName]);
+        return gridSettings;
+        // return $(element).jqGrid(gridSettings);
    }
 
-    function getLogGrid(element){
-        var grid = $(element).jqGrid({
-            url: app.engine + "?function=GL",
-            datatype: "json",
-            jsonReader: {
-                root: "rows",
-                page: "page",
-                total: "total",
-                records: "records",
-                id: "log_id",
-                repeatitems: true
-            },
-            colNames: ['ID','User', 'Desc','Action','Result','Detail','When?'],
-            colModel: [
-               {name: 'log_id', key: true, width: 30, index: "log_id", hidden: true},
-               {name: 'username', index: 'username', width: 75, search: true},
-               {name: 'description', index: 'description', width: 150, search: true},
-               {name: 'action', index: 'action', width: 150, search: true},
-               {name: 'result', index: 'result', width: 150, search: true},
-               {name: 'detail', index: 'detail', width: 150, search: true},
-               {name: 'datetime', index: 'datetime', width: 100, searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'yy-mm-dd'});} }},
-           ],
-           loadError:function(xhr,status, err){
-               try {
-                   dMessage(app,"Error loading Logs", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
-               } catch(e) {
-                   dMessage(app,"Error loading Logs", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
-                   alert(xhr.responseText);
-               }
-           },
-           rowNum: 10,
-           rowList: [10,20,50],
-           sortname: 'datetime',
-           sortorder: 'desc',
-           gridview: true,
-           autoencode: true,
-           viewrecords: true, // show the current page, data rang and total records on the toolbar
-           rownumbers: true,
-           toppager: true,
-           regional: 'en',
-           height: 400,
-           shrinkToFit: true,
-           autoWidth: true,
-           gridModal: true,
-           pager: $("#logPager")
-       });
-       return grid;
-   }
     return {
         formManager: formManager,
-        getLogGrid: getLogGrid,
-        getUserGrid: getUserGrid
+        getGrid: getGrid
     };
 });
