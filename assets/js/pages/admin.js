@@ -97,8 +97,8 @@ require([
 		}
 
 	function resetForm(form){
-		form.children('.orig')
-			.find(':checkbox').trigger('click')
+		form.children().not('.clone')
+			.find(':checkbox').prop('checked', false)
 			.find('select').selectmenu('value', '')
 			.find('input[type=text]').val('')
 			.find('textarea').val('');
@@ -211,6 +211,18 @@ require([
 					$(this).closest('form').validate().element(this);
 					//  bind change event to all select menus to enable subcategory menu selection
 			        boolSubs = $(this).siblings('input').prop("checked");
+
+					// check to see if clones are present
+					clones = $(this).parent().siblings('.clone');
+					hasClones = clones.length > 0;
+					// remove clones
+					if (hasClones){
+						// kill all clones below current check
+						$.each(clones, function(){
+							$(this).remove();
+						});
+					}
+
 					// if sub-categories are requested
 					if (boolSubs) subCheck($(this));
 
@@ -231,11 +243,8 @@ require([
 						var select = $(this).siblings('select');
 						subCheck(select);
 					}else{
-						// check the id of the checkbox to see if it is a clone
-						chkID = $(this).prop('id');
-
 						// get all p tags that are not the original and do not contain the submit button
-						cloneP = $(this).parent().siblings().not('p:has("input[type=submit]")').not('.orig');
+						cloneP = $(this).parent().siblings('.clone');
 						// kill all clones below current check
 						$.each(cloneP, function(){
 							$(this).remove();
@@ -277,6 +286,8 @@ require([
         	parentP = $('#subCatTemplate');
         	// clone it
         	var clone = parentP.children().clone();
+			// add identifying class for later removal
+			clone.addClass('clone');
 
         	// get current iteration of instantiation of the template for naming
 			var iteration = parentP.data('tempCount');
@@ -407,11 +418,16 @@ require([
 	};
 
 	getCatQuestions = function(catID){
-		data = {'function' : 'GQ'};
+		// clear previous selections
 		q_txt = $('#q_editText').val('');
-		qList = $('#q_currentQuestion');
-		qList.empty();
+		$('#q_currentQuestion')
+			.empty()
+			.append(new Option('None',""))
+			.selectmenu('destroy')
+			.selectmenu({width: 200, style: 'dropdown' });
 		if (catID === "") return false;
+		qList = $('#q_currentQuestion');
+		data = {'function' : 'GQ'};
 		data.category_id = catID;
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
@@ -438,70 +454,15 @@ require([
 		});
 	};
 
-
-	editor = $('#editor').dialog({
-		dialogClass: "no-close",
-		height: 500,
-		minWidth: 450,
-		autoOpen: false,
-		modal: true,
-		open: function(){
-			$('form', this).trigger('focus');
-		},
-		show: {
-	        effect: "blind",
-	        duration: 500
-	    },
-	    hide: {
-	        effect: "slideUp",
-	        duration: 500
-	    },
-	    buttons: [{
-			text: "Save",
-	    	icons: {
-	    		primary: "ui-icon-disk"
-	    	},
-	    	click: function(){
-	    		$(this).find('form').trigger('submit');
-	    	}
-	    },{
-			text: "Cancel",
-	    	icons: { primary: "ui-icon-cancel" },
-	    	click: function(){
-	    		$(this).dialog("close");
-	    	}
-	    }]
-	});
-
 	// Grid options
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;
 
 	logGrid = $("#logGrid").jqGrid(lib.getGrid("#logGrid"));
 	userGrid = $("#userGrid").jqGrid(lib.getGrid("#userGrid"));
-	userGrid.jqGrid('setGridParam', {
-		onSelectRow: function(id, status, e){
-			// row = $(this).jqGrid('getGridParam','selrow');
-			// if (row !== null) $(this).jqGrid('editGridRow', row, {height: 280, reloadAfterSubmit: false});
-			// else dMessage('Error', 'Please select row!');
-			// data = $(this).getRowData(id);
-			// editor.dialog("option","title", "Editing Details for: " + data.first_name + " " + data.last_name);
-			// $.each(data, function(key, value){
-			// 	element = $("input[id='" + key + "']");
-			// 	if (element.length > 0){
-			// 		if (element.prop('type') == 'checkbox'){
-			// 			element.prop('checked', (value == '1'));
-			// 		}else{
-			// 			element.val(value);
-			// 		}
-			// 	}
-			// });
-			// editor.dialog("open");
-		}
-	});
 
 	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
-	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: true, add: false, del: false, refresh: true },{height: 320, reloadAfterSubmit: false},{},{},{multipleSearch: true, showQuery: true});
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: true, add: false, del: true, refresh: true },{height: 320, reloadAfterSubmit: true},{},{height: 320, reloadAfterSubmit: true},{multipleSearch: true, showQuery: true});
 
 	(function grpLog(){
 		var colModel = $('#logGrid')[0].p.colModel;
@@ -526,6 +487,8 @@ require([
 				element.append(new Option(mod.label, mod.name));
 			});
 	})();
+
+	// handle grid resizing
 	$(window).on('resize', function(){
 		$('[id*=Grid').jqGrid('setGridWidth',  parseInt($(window).width()) - 40);
 	});

@@ -61,11 +61,16 @@ def getAllUsers(fs):
 def submitUserInfo(fs):
     """ submit user info to database """
     returnObj = {'error': ''}
-    uInfo = User(fs).submitUser()
-    if uInfo['user_id'] == 0:
-        returnObj['error'] = uInfo['message']
+    if 'oper' in fs:
+        uInfo = User(fs).updateUser()
     else:
+        uInfo = User(fs).submitUser()
+
+    # handle return values
+    if uInfo['user_id'] != 0:
         returnObj = uInfo
+    else:
+        returnObj['error'] = uInfo['message']
 
     returnJson(returnObj)
 
@@ -197,7 +202,6 @@ def doFunc(fStor):
     """
     fStor = cgiFieldStorageToDict(fStor)
     funcName = fStor['function']
-
     """ sanitize store for use in classes """
     unused_members = ['function', '_password']
     fStor = {i: fStor[i] for i in fStor if i not in unused_members}
@@ -216,7 +220,7 @@ def doFunc(fStor):
         globals()['getAllUsers'](fStor)
     elif funcName == "VU":
         globals()['validateUser'](fStor)
-    elif funcName == "SUI":
+    elif funcName in ["SUI", "UU"]:
         globals()['submitUserInfo'](fStor)
     elif funcName == "SP":
         globals()['showParams'](fStor)

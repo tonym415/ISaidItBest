@@ -116,13 +116,13 @@ class User(object):
             vPage = params['page']
             vLimit = params['limit']
             params['start'] = (vPage * vLimit) - vLimit
-            query = ("SELECT user_id, first_name,last_name, email,"
-                     "username, password , credit , wins, losses,"
+            query = ("SELECT user_id, first_name,last_name, email, "
+                     "username, password , credit , wins, losses, "
                      "paypal_account, roles.role, "
                      "DATE_FORMAT(created, '%d %b %Y %T') as created, active  "
-                     "FROM  users INNER JOIN roles USING(role_id)")
+                     "FROM  users INNER JOIN roles USING(role_id) ")
             query += where
-            query += "ORDER BY %(sidx)s  %(sord)s LIMIT %(start)s, %(limit)s"
+            query += " ORDER BY %(sidx)s %(sord)s LIMIT %(start)s, %(limit)s"
             params['rows'] = self.executeQuery(query, params)
             return params
         else:
@@ -141,9 +141,41 @@ class User(object):
                 created, role,  active  FROM  users JOIN roles USING(role_id) WHERE username = %s"""
         return self.executeQuery(query, (self.user_username,))
 
+    def updateUser(self):
+        """ update user info """
+        params = self.sanitizeParams()
+        # rename id key for query string
+        if 'id' in params.keys():
+            params['user_id'] = params.pop('id')
+            setattr(self, "user_user_id", params['user_id'])
+
+        query = "UPDATE users SET"
+        if params['oper'] == 'edit':
+            for idx, k in enumerate(params):
+                # remove unnecessary keys
+                if k == 'oper' or k == 'user_id':
+                    continue
+                elif k == 'role':
+                    # correct column name
+                    k = 'role_id'
+                    query += " %s = %r," % (k, params['role'])
+                    continue
+                elif k == 'active':
+                    # correct values for columns
+                    params[k] = (0, 1)[params[k] == "Yes"]
+                query += " %s = %r," % (k, params[k])
+
+            # remove trailing comma
+            query = query[:-1] + " WHERE user_id = %(user_id)s"
+        if params['oper'] == 'del':
+            query += ' active = 0 WHERE user_id = %(user_id)s'
+
+        self.executeModifyQuery(query, params)
+        return {'user_id': self.cursor.lastrowid, 'stm': self.cursor.statement}
+
     def submitUser(self):
         """ inserts user info into the database """
-        returnObj = {"USER_ID": 0}
+        returnObj = {"user_id": 0}
         query = ("INSERT INTO  users"
                  "(first_name ,  last_name , email ,  username ,  password ,"
                  "paypal_account) VALUES (%(first_name)s, %(last_name)s,"
@@ -215,18 +247,16 @@ class User(object):
         return returnDict
 
 if __name__ == "__main__":
-    info = {}
+    info = {"active": "Yes",
+            "credit": "65.00",
+            "email": "32@sa.com",
+            "first_name": "Antonio",
+            "id": "50",
+            "last_name": "Moses",
+            "oper": "edit",
+            "role": "2",
+            "username": "ass"}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
-    info = {"_search": "true",
-            'searchField': 'last_name',
-            'searchString': 'Moses',
-            'searchOper': 'eq',
-            'filters': '',
-            "rows": "5",
-            "page": "1",
-            "sord": "asc",
-            'sidx': 'created',
-            "nd": "1445875128229"}
     # info = {"confirm_password": "password", "first_name":
     #         "Antonio", "paypal_account": "tonym415", "password":
     #         "password", "email": "tonym415@gmail.com", "last_name":
@@ -241,7 +271,6 @@ if __name__ == "__main__":
               for i in info if i != 'function' and '_password' not in i}
     # print(info)
 
-    print(User(info).getAllUsers())
+    print(User(info).updateUser())
     # u = User(u_info)
-    # print(u.isValidUser())
     # print(u.getUser())

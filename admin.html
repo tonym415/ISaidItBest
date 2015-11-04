@@ -23,7 +23,7 @@
 							<h3>Create Category</h3>
 							<form id='createCategory'>
 								<div class='errors'></div>
-								<p class='orig'>
+								<p >
 									<label for='c_Category'>Category Name:</label>
 									<input id='c_Category' name='c_Category' type='text' class="required" />
 								</p>
@@ -99,7 +99,7 @@
 						<h3>Create Question</h3>
 						<form id='createQuestion'>
 							<div class='errors'></div>
-							<p class='orig'>
+							<p >
 								<label for='q_Category'>Category:</label>
 								<select id='q_Category' name='q_category' required>
 									<option value="">None</option>
@@ -107,19 +107,19 @@
 								<label for='q_parentCategoryChk'>Sub?</label>
 								<input id='q_parentCategoryChk' name='q_parentCategoryChk' type='checkbox' />
 							</p>
-							<p class='orig'>
+							<p >
 								<label for='q_text'>Question text:</label>
 								<input id='q_text' name='q_text' required />
 								<!-- <textarea id='q_text' name='q_text' rows="3" cols="50" required/> -->
 							</p>
-							<p class='orig'>
+							<p >
 							<input class='full-width' type='submit' value="New Question" />
 							</p>
 						</form>
 						<h3>Edit Question</h3>
 						<form id='editQuestion'>
 							<div class='errors'></div>
-							<p class='orig'>
+							<p >
 								<label for='q_currentCategory'>Category to Change:</label>
 								<select  id='q_currentCategory' name='q_currentCategory' required>
 									<option value="---">None</option>
@@ -127,19 +127,19 @@
 								<label for='q_currentCategoryChk'>Sub?</label>
 								<input id='q_currentCategoryChk' name='q_currentCategoryChk' type='checkbox' />
 							</p>
-							<p class='orig'>
+							<p >
 								<label for='q_currentQuestion'>Category Questions:</label>
 								<select  id='q_currentQuestion' name='q_currentQuestion' required>
-									<option value="---">None</option>
+									<option value="">None</option>
 								</select>
 							</p>
-							<p class='orig'>
+							<p >
 								<label for='q_editText'>Edit Question:</label>
 								<textarea id='q_editText' name='q_editText' rows="3" cols="50" required></textarea>
 								<!-- <input id='q_editText' name='q_editText' type='text' disabled/><br /> -->
 							</p>
 							<p>
-								<input type='submit' value="Rename Sub-Category" />
+								<input type='submit' value="Save Question" />
 							</p>
 						</form>
 						<h3>Delete Question</h3>
@@ -149,10 +149,18 @@
 								<label for='q_deleteCategory'>Category of question:</label>
 								<select id='q_deleteCategory'>
 									<option value="---">None</option>
-								</select><br />
+								</select>
+								<label for='q_deleteCategoryChk'>Sub?</label>
+								<input id='q_deleteCategoryChk' name='q_deleteCategoryChk' type='checkbox' />
+							</p>
+							<p >
+								<label for='q_Question'>Category Questions:</label>
+								<select  id='q_Question' name='q_Question' required>
+									<option value="">None</option>
+								</select>
 							</p>
 							<p>
-								<input type='submit' value="Delete Sub-Category" />
+								<input type='submit' value="Delete Question" />
 							</p>
 						</form>
 				    </div> <!-- End SubCat Accordion -->

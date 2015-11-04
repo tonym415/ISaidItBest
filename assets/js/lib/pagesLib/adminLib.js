@@ -113,7 +113,6 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                alert(xhr.responseText);}
        },
        datatype: 'json',
-       grouping: true,
        rowNum: 10,
        rowList: [10, 25, 50, 100, 200, 500],
        gridview: true,
@@ -151,6 +150,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
                {label: 'Detail', name: 'detail', index: 'detail', width: 150, search: true},
                {label: 'When?', name: 'datetime', index: 'datetime', width: 100, searchoptions:{dataInit:function(el){$(el).datepicker({dateFormat:'yy-mm-dd'});} }},
            ],
+           grouping: true,
            rowNum: 25,
            sortname: 'datetime',
            sortorder: 'desc',
@@ -190,12 +190,12 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
             ],
             colModel: [
                {name: 'user_id', key:true, width: 50,  align: "center",editable: false, editoptions:{readonly: true, size: 20}},
-               {name: 'first_name', width: 75, align: "center",editable: true,  editoptions:{size: 20}},
-               {name: 'last_name', width: 90, align: "center",editable: true, editoptions:{size: 20} },
-               {name: 'username', width: 90, align: "center",editable: true, editoptions:{size: 20} },
+               {name: 'first_name', width: 75, align: "center",editable: true,sortable: true, sorttype: 'text',  editoptions:{size: 20}},
+               {name: 'last_name', width: 90, align: "center",editable: true,sortable: true, sorttype: 'text', editoptions:{size: 20} },
+               {name: 'username', width: 90, align: "center",editable: true,sortable: true, sorttype: 'text', editoptions:{size: 20} },
                {name: 'email', width: 90, formatter: "email", align: "center",editable: true, editoptions:{size: 20} },
                {name: 'credit', width: 50, formatter: "currency", formatoptions: {prefix: "$", thousandsSeparator: ",", decimalPlaces: 2}, align: "center",editable: true, editoptions:{size: 20}},
-               {name: 'role', width: 50, align: "center",editable: true, edittype: "select", editoptions:{value:"1:user;2:admin"} },
+               {name: 'role', width: 50, align: "center", sortable: true, sorttype: 'text', editable: true, edittype: "select", editoptions:{value:"1:admin;2:user"} },
                {name: 'created', width: 100, align: "center",editable: false, editoptions:{size: 20, readonly: true}},
                {name: 'wins', width: 30,  align: "center",editable: false, editoptions:{size: 20, readonly: true}},
                {name: 'losses', width: 30, align: "center",editable: false, editoptions:{size: 20, readonly: true}},
@@ -203,9 +203,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
             edittype: "checkbox", editoptions: {value: "Yes:No", defaultValue: "Yes"},
             stype: "select", searchoptions: { sopt: ["eq", "ne"],
                 value: ":Any;1:Yes;0:No" } }
-            //    { label: 'Active', name: 'active', width: 3, hidden: true}
            ],
-        //    postData: {'function': 'UU'},
            sortname: 'created',
            sortorder: 'desc',
            groupingView: { groupField: ['role']},
@@ -215,9 +213,10 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     };
    function getGrid(element){
         gridName = element.substring(1);
-        gridSettings = $.extend(gridDefaults, gridOptions[gridName]);
+        // get a copy of defaults to modify
+        gDefaults = $.extend(true, {}, gridDefaults);
+        gridSettings = $.extend(gDefaults, gridOptions[gridName]);
         return gridSettings;
-        // return $(element).jqGrid(gridSettings);
    }
 
     return {

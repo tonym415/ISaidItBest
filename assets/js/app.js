@@ -19,30 +19,47 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		};
 
 	var navBar = function(){
+		// logged in user
+		$.cookie.json = true;
+		info = $.cookie('user');
+
 		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header');
 		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default');
 		for(var key in navPages){
-			// the following line is necessary for production
-			// it is comment now for testing purposes only
-			// TODO: uncomment line below
-			// if (key == 'profile') continue;
+			// don't show admin to reg user
+			if (info === undefined){
+				if (key == 'profile') continue;
+				if (key == 'admin') continue;
+			}else{
+				if (key == 'admin' && info.role == 'user') continue;
+			}
+			// main in progress so dont clutter
+			if (key == 'main') continue;
+
+			// add pages to header
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
 			$('#navBar').append(listItem);
 		}
 
-		// logged in user
-		$.cookie.json = true;
-		info = $.cookie('user');
 		if (info){
 			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
-			wins = "<br /><img src='../assets/css/images/checked.gif' width='16px' height='16px'/>   Wins: " + info.wins + "<br />";
 			$("#navDiv").append(userSpan);
-			// $(wins).appendTo("#navDiv div");
+			logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
+			$("#navDiv").append(logSpan);
 		}
 		// universal messagbox
 		$('body').after('<div id="dialog-message" title=""></div>');
 		$('#dialog-message').append("<p id='message-content'></p>");
+		this.logout(this);
 	};
+
+	function logout(app){
+		$('#logout a').on('click', function(e){
+			e.preventDefault();
+			$.removeCookie('user');
+			window.location.assign(app.pages.home);
+		});
+	}
 
 	function msgBox(element){
 		var mbox = element.dialog({
@@ -101,7 +118,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 					'function': 'LOG',
 					'user_id': user.user_id,
 					'description': options.desc || 'utility function',
-					'action' : options.data,
+					'action' : options.data || 'utility data',
 					'result' : xhr.responseText,
 					'detail' : options.url + " | " + xhr.status + " | " + xhr.statusText
 				};
@@ -234,6 +251,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		hideLoading: unloading,
 		setTheme: setTheme,
 		prettyPrint: pprint,
+		logout: logout,
 		msgBox : msgBox,
 		dMessage : function(lib, title, message){
 			title = (title === undefined) ? "Error" : title;

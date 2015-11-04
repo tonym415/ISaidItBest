@@ -78,7 +78,7 @@ class Category(object):
                           "category": params['r_newCategory']}
 
         returnVal = self.executeModifyQuery(query, params)
-        return {'success': self.cursor.lastrowid} if 'error' not in returnVal else {'error': returnVal}
+        return {'success': self.cursor.lastrowid, 'stm': self.cursor.statement} if 'error' not in returnVal else {'error': returnVal}
 
     def newCategory(self):
         """ insert new category with/without parent_id """

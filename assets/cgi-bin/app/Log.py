@@ -42,7 +42,7 @@ class Log(object):
                  " %(detail)s) ")
         params = self.sanitizeParams()
 
-        params['action'] = "" if 'action' not in params.keys() else param['action']
+        params['action'] = "" if 'action' not in params.keys() else params['action']
         returnVal = self.executeModifyQuery(query, params)
         return {'success': self.cursor.lastrowid} if 'error' not in returnVal else {'error': returnVal}
 
@@ -88,7 +88,7 @@ class Log(object):
                 where += " WHERE "
                 if searchField:
                     where += getWhereClause(searchField, searchOper,
-                                        searchString)
+                                            searchString)
                 elif filters:   # filter options
                     buildwhere = ""
 
