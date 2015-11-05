@@ -1,8 +1,6 @@
 define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     var formManager;
-    // global messagbox
-	var msgBox = app.msgBox($('#dialog-message'));
-	dMessage = app.dMessage;
+    app.createMsgBox();
 
     // validator methods
     $.validator.addMethod("selectNotEqual", function(value, element, param) {
@@ -108,7 +106,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     gridDefaults = {
         loadError:function(xhr,status, err){
             try {
-               dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
+               app.dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
             } catch(e) {
                alert(xhr.responseText);}
        },

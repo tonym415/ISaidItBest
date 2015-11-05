@@ -10,13 +10,6 @@ require([
 	'validate',
 	'livequery',
 	], function(app, lib, jqGrid){
-	var objCategories,
-		loadCategories,
-		editor,
-		userGrid,
-		getCategories,
-		valHandler,
-		dMessage;
 
 	// create counter for sub-category templates
 	$('#subCatTemplate').data("tempCount",0);
@@ -25,9 +18,8 @@ require([
 	app.createNavBar();
 	$("input[type=submit], input[type=button]").button();
 
-	// global messagbox
-	var msgBox = app.msgBox($('#dialog-message'));
-	dMessage = app.dMessage;
+	// load category selectmenus
+	app.getCategories(app);
 
 	function submitInfo(data, desc){
 		$.ajax({
@@ -43,37 +35,37 @@ require([
 						result = JSON.parse(result)[0];
 					}catch(err){
 						msg = "<h2>Stack Trace:</h2><p>" + err.stack + "</p><h2>Ajax Result:</h2><p>" + result + "</p>";
-						dMessage(app, "Error: " + err, msg);
+						app.dMessage(app, "Error: " + err, msg);
 						console.log(err);
 					}
 				}
 				// internal error handling
 				if (result.hasOwnProperty('error')){
 					msg = "<h2>Error:</h2><p>" + result.error.error + "</p><h2>Message:</h2><p>" + result.error.stm + "</p>";
-					dMessage(app, "Error", msg);
+					app.dMessage(app, "Error", msg);
 					console.log(result.error);
 				}else{
 					switch (data.function){
 						case "AC":
-							dMessage(app, "Success", "Category Adopted");
+							app.dMessage(app, "Success", "Category Adopted");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#adoptCategory'));
 							break;
 						case "DC":
-							dMessage(app, "Success", "Category Removed");
+							app.dMessage(app, "Success", "Category Removed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#deleteCategory'));
 							break;
 						case "RC":
-							dMessage(app, "Success", "Category Renamed");
+							app.dMessage(app, "Success", "Category Renamed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#renameCategory'));
 							break;
 						case "CC":
-							dMessage(app, "Success", "Category Added");
+							app.dMessage(app, "Success", "Category Added");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#createCategory'));
@@ -84,14 +76,14 @@ require([
 							editor.dialog("close");
 							break;
 						case "CQ":
-							dMessage(app, "Success", "Question Added");
+							app.dMessage(app, "Success", "Question Added");
 							resetForm($('#createQuestion'));
 							break;
 					}
 				}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
-				dMessage(app, 'Request Failed', textStatus + ' ' + errorThrown);
+				app.dMessage(app, 'Request Failed', textStatus + ' ' + errorThrown);
 				console.log('request failed! ' + textStatus);
 			});
 		}
@@ -228,7 +220,16 @@ require([
 
 					// add events to load questions if appropriate
 					prefix = $(this).prop('id').prefix();
-					if (prefix === 'q_') getCatQuestions($(this).val());
+					if (prefix === 'q_') {
+						// clear previous selections
+						q_txt = $('#q_editText').val('');
+						$('#q_currentQuestion')
+							.empty()
+							.append(new Option('None',""))
+							.selectmenu('destroy')
+							.selectmenu({width: 200, style: 'dropdown' });
+							app.getCatQuestions($(this).val(), '#q_currentQuestion');
+					}
 				}
 			});
 		});
@@ -268,7 +269,7 @@ require([
 
         // check the categories object for subcategories of current selection
         catCollection = [];
-		$.each(objCategories, function(idx, objCat){
+		$.each(app.objCategories, function(idx, objCat){
 			parentID = objCat.parent_id;
 			catID = objCat.category_id;
 
@@ -348,112 +349,9 @@ require([
         	msg = "No Sub-category found for: " + current_selection;
         	title = "Selection Error: " + current_selection;
         	msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
-        	dMessage(app, title, msg);
+        	app.dMessage(app, title, msg);
         }
 	}
-
-	getCategories = function(){
-	 	$.ajax({
-			contentType: "application/x-www-form-urlencoded",
-			function: 'utility',
-			data: {'function' : 'GC'},
-			type: "POST",
-			url: app.engine
-		})
-		.done(function(result){
-			if (typeof(result) !== 'object'){
-			 	result = JSON.parse(result)[0];
-			}
-			// internal error handling
-			if (result.error !== undefined){
-				console.log(result.error);
-				return result;
-			}else{
-				objCategories = result.categories;
-				loadCategories();
-			}
-		})
-		.fail(function(jqXHR, textStatus, errorThrown) {
-			dMessage(app, textStatus + ': request failed! ', errorThrown);
-			console.log(textStatus + ': request failed! ' + errorThrown);
-		});
-	};
-	getCategories();
-
-
-	/**
-	 * loads categories into appropriate selectmenu
-	 * @param  {object} categories object containing all category data
-	 * @return none
-	 */
-	loadCategories = function(){
-		if (objCategories === undefined) {
-			getCategories();
-			return false;
-		}
-		// get all "Category" select menus
-		menus = $('#tabs select[id$=Category]');
-		$.each(menus, function(){
-			$(this)
-				.empty()
-				.append(new Option("None", ""));
-			element = $(this);
-			$.each(objCategories, function(idx, objCat){
-				parentID = objCat.parent_id;
-				cat = objCat.category;
-				id = objCat.category_id;
-				if (element.hasClass('allCategories')){
-					// do not filter categories
-					element.append(new Option(cat, id));
-				}else{
-					// get top level categories
-					if (parentID === 0){
-						element.append(new Option(cat, id));
-					}
-				}
-			});
-			$(this).selectmenu().selectmenu("refresh", true);
-		});
-
-	};
-
-	getCatQuestions = function(catID){
-		// clear previous selections
-		q_txt = $('#q_editText').val('');
-		$('#q_currentQuestion')
-			.empty()
-			.append(new Option('None',""))
-			.selectmenu('destroy')
-			.selectmenu({width: 200, style: 'dropdown' });
-		if (catID === "") return false;
-		qList = $('#q_currentQuestion');
-		data = {'function' : 'GQ'};
-		data.category_id = catID;
-		$.ajax({
-			contentType: "application/x-www-form-urlencoded",
-			function: 'utility',
-			data: data,
-			type: "POST",
-			url: app.engine
-		})
-		.done(function(result){
-			if (typeof(result) !== 'object'){
-				dMessage(app, 'Error Getting Category Questions', result);
-				return result;
-			}
-			// internal error handling
-			if (result.error !== undefined){
-				dMessage(app, result.error.error, result.error.msg);
-				console.log(result.error);
-				return result;
-			}
-			// load question selectmenu
-			$.each(result.questions, function(){
-				qList.append($('<option />').val(this.question_id).text(this.question_text));
-			});
-		});
-	};
-
 	// Grid options
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;

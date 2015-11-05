@@ -12,43 +12,47 @@
 	<div id="accordion">
 		<h3>Parameter Selection</h3>
 		<div id="paramDiv">
-			<p>
-			<form action="/" id="gameParameters">
-			<fieldset>
+			<form id="gameParameters">
 				<p>
-					<label for='category'>Category</label>
-					<select id="category" class="sel category" >
-						<option value="---">None</option>
-						<option value="baseball">Baseball</option>
-						<option value="nfl">NFL</option>
-						<option value="collegefootball">College Football</option>
-						<option value="soccer">Soccer</option>
-					</select>
+					<label for='p_paramCategory'>Category</label>
+					<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
+					<label for='p_paramCategoryChk'>Sub?</label>
+					<input id='p_paramCategoryChk' name='p_paramCategoryChk' type='checkbox' />
+					<div class="clear"></div>
+					<span errorfor="p_paramCategory"></span>
 				</p>
 				<p>
-					<label for="subCategory">Category questions</label>
-					<select id="subCategory" class="sel"> <option value="---">None</option> </select>
+					<label for="paramQuestions">Category questions</label>
+					<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required>
+						<option value="">None</option>
+					</select>
+					<div class="clear"></div>
+					<span errorfor="paramQuestions"></span>
 				</p>
 				<p>
 					<label for='timeLimit'>Time Limit</label>
-					<select id="timeLimit" class="sel">
+					<select id="timeLimit" name="timeLimit" class="sel" required>
 						<option value="2">2:00</option>
 						<option value="5">5:00</option>
 						<option value="10">10:00</option>
 					</select>
+					<div class="clear"></div>
+					<span errorfor="timeLimit"></span>
 				</p>
 				<p>
 				<label for='wager'>Wager</label>
-					<select id="wager" class="sel">
+					<select id="wager" name="wager" class="sel" required>
 						<option value="1">1 credits</option>
 						<option value="5">5 credits</option>
 						<option value="10">10 credits</option>
 					</select>
+					<div class="clear"></div>
+					<span errorfor="wager"></span>
 				</p>
-				<input type="button" value="Submit Parameters" id="btn_submitParameters">
-			</fieldset>
+				<p>
+					<input type="submit" value="Submit Parameters">
+				</p>
 			</form>
-			</p>
 			<div id='game_messages'></div>
 		</div>
 		<h3>Debate Game</h3>
@@ -71,14 +75,30 @@
 						<p><textarea rows="4" cols="50" id="comment"></textarea>
 						</p>
 						<p><button id="submitDebate" type="button">Submit comment</button></p>
-				</fieldset>	
+				</fieldset>
 				</form>
 				</center>
 			</div>
 			</p>
 		</div>
+	<h3>Pre Game</h3>
+	<div>
+		<object width="600" height="430"><param name="movie" value="http://www.fupa.com/games/bricks.swf"></param><embed src="http://www.fupa.com/games/bricks.swf" type="application/x-shockwave-flash" width="600" height="430"></embed></object><br/><a href="http://www.fupa.com/">Find more free online flash games at Fupa.com</a>
 	</div>
+</div>
 </center>
+<div id='subCatTemplate' style='display:none'>
+	<p>
+		<label for='temp_subCategory'>Sub-Category Name:</label>
+		<select id='temp_subCategory' name='temp_subCategory' >
+			<option value="---">None</option>
+		</select>
+		<label for='temp_CategoryChk'>Sub?</label>
+		<input id='temp_CategoryChk' type='checkbox' />
+		<br />
+	</p>
+</div>
+
 </body>
 <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>

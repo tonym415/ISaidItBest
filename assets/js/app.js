@@ -4,7 +4,7 @@
  * @return {Object} object with specific initialization and data handling for game.html
  */
 define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
-
+	var objCategories = {};
 	var defaultTheme = 'excite-bike';
 	var app_engine = "/assets/cgi-bin/engine.py";
 
@@ -43,14 +43,19 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 
 		if (info){
 			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
-			$("#navDiv").append(userSpan);
+			// $("#navDiv").append(userSpan);
 			logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
-			$("#navDiv").append(logSpan);
+			$("#navDiv").append(userSpan).append(logSpan);
 		}
 		// universal messagbox
 		$('body').after('<div id="dialog-message" title=""></div>');
 		$('#dialog-message').append("<p id='message-content'></p>");
+
+		// add event listener for logout
 		this.logout(this);
+
+		// initialize universal messagebox
+		this.createMsgBox();
 	};
 
 	function logout(app){
@@ -61,8 +66,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		});
 	}
 
-	function msgBox(element){
-		var mbox = element.dialog({
+	function createMsgBox(element){
+		var mbox = $('#dialog-message').dialog({
 			autoResize: true,
 			autoOpen: false,
 			dialogClass: 'no-close',
@@ -177,7 +182,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 	 }
 
 	 function pprint(str){
-	 	return JSON.stringify(str, null, 2);
+	 	return "<pre>" + JSON.stringify(str, null, 2) + "</pre>";
 	 }
 
 	/**
@@ -188,6 +193,100 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 	 	length = Object.getOwnPropertyNames(obj).length;
 	 	return 	length > 0 ? false : true;
 	 }
+	var getCategories = function(app){
+	 	$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			function: 'utility',
+			data: {'function' : 'GC'},
+			type: "POST",
+			url: app_engine
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+			 	result = JSON.parse(result)[0];
+			}
+			// internal error handling
+			if (result.error !== undefined){
+				console.log(result.error);
+				return result;
+			}else{
+				app.objCategories = result.categories;
+				loadCategories(app.objCategories);
+			}
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			app.dMessage(app, textStatus + ': request failed! ', errorThrown);
+			console.log(textStatus + ': request failed! ' + errorThrown);
+		});
+	};
+
+	 /**
+ 	 * loads categories into appropriate selectmenu
+ 	 * @param  {object} categories object containing all category data
+ 	 * @return none
+ 	 */
+ 	var loadCategories = function(objCategories){
+ 		if (objCategories === undefined) {
+ 			getCategories();
+ 			return false;
+ 		}
+ 		// get all "Category" select menus
+ 		menus = $('select[id$=Category]').not('[id*=Sub]');
+ 		$.each(menus, function(){
+ 			$(this)
+ 				.empty()
+ 				.append(new Option("None", ""));
+ 			element = $(this);
+ 			$.each(objCategories, function(idx, objCat){
+ 				parentID = objCat.parent_id;
+ 				cat = objCat.category;
+ 				id = objCat.category_id;
+ 				if (element.hasClass('allCategories')){
+ 					// do not filter categories
+ 					element.append(new Option(cat, id));
+ 				}else{
+ 					// get top level categories
+ 					if (parentID === 0){
+ 						element.append(new Option(cat, id));
+ 					}
+ 				}
+ 			});
+ 			$(this).selectmenu().selectmenu("refresh", true);
+ 		});
+
+ 	};
+
+
+	var getCatQuestions = function(catID, elementID){
+		app = this;
+		if (catID === "") return false;
+		qList = $(elementID);
+		data = {'function' : 'GQ'};
+		data.category_id = catID;
+		$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			function: 'utility',
+			data: data,
+			type: "POST",
+			url: app_engine
+		})
+		.done(function(result){
+			if (typeof(result) !== 'object'){
+				app.dMessage(app, 'Error Getting Category Questions', result);
+				return result;
+			}
+			// internal error handling
+			if (result.error !== undefined){
+				app.dMessage(app, result.error.error, result.error.msg);
+				console.log(result.error);
+				return result;
+			}
+			// load question selectmenu
+			$.each(result.questions, function(){
+				qList.append($('<option />').val(this.question_id).text(this.question_text));
+			});
+		});
+	};
 
 	/**
 	 * Capitalizes string
@@ -240,6 +339,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		pages: navPages,
 		// CGI script that does all the work
 		engine : app_engine,
+		objCategories: objCategories,
 		// utility functions
 		isEmpty: isEmpty,
 		setCookie: setCookie,
@@ -252,7 +352,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		setTheme: setTheme,
 		prettyPrint: pprint,
 		logout: logout,
-		msgBox : msgBox,
+		createMsgBox: createMsgBox,
+		getCategories: getCategories,
+		loadCategories: loadCategories,
+		getCatQuestions: getCatQuestions,
 		dMessage : function(lib, title, message){
 			title = (title === undefined) ? "Error" : title;
 			message = (message === undefined) ? "Sub-category not found" : message;

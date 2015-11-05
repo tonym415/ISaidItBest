@@ -132,8 +132,13 @@ Themeroller styles
     border-spacing: 0px 0px !important;
 }
 
-form  { display: table; border-spacing: 10px 20px; width: 90%;   }
-p     { display: table-row;  }
-label { display: table-cell; }
-input { display: table-cell; }
+.field-validation-error, .input-validation-error {
+    color: red;
+	font-style: italic
+}
+input.checkbox { border: none }
+form  { display: table; border-spacing: 2px 2px; width: 90%;   }
+p     { display: table-row ;  }
+label { display: table-cell ; }
+input { display: table-cell ; }
 select { display: table-cell; }

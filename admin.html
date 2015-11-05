@@ -195,49 +195,6 @@
 
 <!-- BEGIN PAGE UTILITY STRUCTURES -->
 
-	<!-- Editor dialog form for editing user information -->
-	<div id="editor">
-		<p class='validateTips'>All form fields are required</p>
-		<form id='update'>
-			<fieldset>
-				<p>
-					<label for='first_name'>First Name:</label>
-					<input id='first_name' name="first_name" required/>
-				</p>
-				<p>
-					<label for='last_name'>Last Name:</label>
-					<input id='last_name' name='last_name' required/>
-				</p>
-				<p>
-					<label for='username'>User Name:</label>
-					<input id='username' name='username' required/>
-				</p>
-				<p>
-					<label for='email'>Email:</label>
-					<input id='email' name='email' required/>
-				</p>
-				<p>
-					<label for='role'>Role:</label>
-					<select id='role' name='role' required>
-						<option value='2'>User</option>
-						<option value='1'>Admin</option>
-					</select>
-				</p>
-				<p>
-					<label for='active'>Active:</label>
-					<input id='active' name='active' type='checkbox' />
-				</p>
-
-			</fieldset>
-			<input type='submit' tabindex="-1" style="position:absolute; top:-1000px">
-		</form>
-	</div>
-
-	<!-- message dialog -->
-	<!-- <div id='dialog-message' title=''>
-		<p id='message'></p>
-	</div> -->
-
 <div id='subCatTemplate' style='display:none'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category Name:</label>
