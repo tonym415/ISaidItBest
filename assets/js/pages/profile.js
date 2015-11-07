@@ -2,10 +2,10 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
-	disabled_fields = ['username', 'created'];
 	// page set up
-	app.createNavBar();
-	$("input[type=submit]").button();
+	app.init('profile');
+
+	disabled_fields = ['username', 'created'];
 	$.each(disabled_fields, function(idx, value){
 		$("input[name='" + value + "']").attr("disabled", true);
 	});

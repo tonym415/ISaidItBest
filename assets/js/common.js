@@ -38,7 +38,10 @@ requirejs.config({
 		// jqGrid: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.min',
 		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar',
-		// locale for grid
+		tooltipster: 'lib/jquery.tooltipster.min',
+		// qtip2
+		imagesLoaded: 'lib/imagesLoaded.pkg.min',
+		qtip: 'lib/jquery.qtip',
 		jqGrid: [
 			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
 			'lib/grid.locale-en'
@@ -57,7 +60,12 @@ requirejs.config({
 		},
 		jqGrid: {
 			deps: ['jqueryUI', 'jqGridSrc']
+		},
+		tooltipster: {
+			deps: ['jquery']
+		},
+		qtip: {
+			deps: ['jquery']
 		}
-
 	}
 });

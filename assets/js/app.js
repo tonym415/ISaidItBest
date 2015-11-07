@@ -3,7 +3,7 @@
  * @module app
  * @return {Object} object with specific initialization and data handling for game.html
  */
-define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
+define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], function($){
 	var objCategories = {};
 	var defaultTheme = 'excite-bike';
 	var app_engine = "/assets/cgi-bin/engine.py";
@@ -18,6 +18,44 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 			'main': 'main.html'
 		};
 
+	$.fn.tooltipster('setDefaults',{
+		trigger: 'custom',
+		onlyOne: false,
+		positionTracker: true,
+		position: 'right',
+		updateAnimation: false,
+		animation: 'swing',
+		positionTrackerCallback: function(){
+			this.hide();
+		}
+	});
+
+	var init = function(page){
+		this.createNavBar();
+
+		// page specific initialization
+		switch (page) {
+			case 'game':
+				// load category selectmenu
+				this.getCategories();
+				$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
+				$(".sel").selectmenu({ width: 200 });
+				// create counter for sub-category templates
+				$('#subCatTemplate').data("tempCount",0);
+				break;
+			case 'admin':
+				// load category selectmenu
+				this.getCategories();
+				// create counter for sub-category templates
+				$('#subCatTemplate').data("tempCount",0);
+				break;
+			default:
+
+		}
+
+		// jquery-fy page with Page Stylings
+		$("input[type=submit]").button();
+	};
 	var navBar = function(){
 		// logged in user
 		$.cookie.json = true;
@@ -32,6 +70,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 				if (key == 'admin') continue;
 			}else{
 				if (key == 'admin' && info.role == 'user') continue;
+				if (key == 'registration') continue;
 			}
 			// main in progress so dont clutter
 			if (key == 'main') continue;
@@ -44,7 +83,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		if (info){
 			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
 			// $("#navDiv").append(userSpan);
-			logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
+			// logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
+			logSpan = "<span ><a href='javascript:void(0)'>Logout?</a></span>";
 			$("#navDiv").append(userSpan).append(logSpan);
 		}
 		// universal messagbox
@@ -193,7 +233,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 	 	length = Object.getOwnPropertyNames(obj).length;
 	 	return 	length > 0 ? false : true;
 	 }
-	var getCategories = function(app){
+	var getCategories = function(){
+		app = this;
 	 	$.ajax({
 			contentType: "application/x-www-form-urlencoded",
 			function: 'utility',
@@ -215,7 +256,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			app.dMessage(app, textStatus + ': request failed! ', errorThrown);
+			app.dMessage(textStatus + ': request failed! ', errorThrown);
 			console.log(textStatus + ': request failed! ' + errorThrown);
 		});
 	};
@@ -231,7 +272,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
  			return false;
  		}
  		// get all "Category" select menus
- 		menus = $('select[id$=Category]').not('[id*=Sub]');
+ 		menus = $('select[id$=Category]').not('[id*=Sub]').not('[id*=temp]');
  		$.each(menus, function(){
  			$(this)
  				.empty()
@@ -272,12 +313,12 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		})
 		.done(function(result){
 			if (typeof(result) !== 'object'){
-				app.dMessage(app, 'Error Getting Category Questions', result);
+				app.dMessage('Error Getting Category Questions', result);
 				return result;
 			}
 			// internal error handling
 			if (result.error !== undefined){
-				app.dMessage(app, result.error.error, result.error.msg);
+				app.dMessage(result.error.error, result.error.msg);
 				console.log(result.error);
 				return result;
 			}
@@ -332,8 +373,43 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 	 */
 	setTheme();
 
+    // validator selectmenu method
+    $.validator.addMethod("selectNotEqual", function(value, element, param) {
+        return param != value;
+    });
+
+	// validator defaults
+	$.validator.setDefaults({
+		debug: true,
+		ignore: "",
+		// wrapper: 'li',
+		errorPlacement: function (error, element) {
+			if (element.context.nodeName === "SELECT"){
+				element = $('#' + element.context.id + '-button');
+			}
+			// last chance to init element if not done already
+			$(element).tooltipster();
+			var lastError = $(element).data('lastError'), // get the last message if one exists
+				newError = $(error).text();               // set the current message
+
+			$(element).data('lastError', newError);  // set "lastError" to the current message for the next time 'errorPlacement' is called
+
+			if(newError !== '' && newError !== lastError){  // make sure the message is not blank and not equal to the last message before allowing the Tooltip to update itself
+				$(element)
+					.tooltipster('content', newError) // insert content into tooltip
+					.tooltipster('show');              // show the tooltip
+			}
+		},
+		success: function (label, element) {
+			if (element.nodeName === "SELECT"){
+				element = $('#' + element.id + '-button');
+			}
+			$(element).tooltipster('hide');  // hide tooltip when field passes validation
+		}
+	});
 	/** return the app object with var/functions built in */
 	return {
+		init: init,
 		defaultTheme: defaultTheme,
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,
@@ -356,12 +432,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 		getCategories: getCategories,
 		loadCategories: loadCategories,
 		getCatQuestions: getCatQuestions,
-		dMessage : function(lib, title, message){
+		dMessage : function(title, message){
+			app = this;
 			title = (title === undefined) ? "Error" : title;
 			message = (message === undefined) ? "Sub-category not found" : message;
-			lib.mBox.dialog('option','title', title);
+			app.mBox.dialog('option','title', title);
 			$('#message-content').html(message);
-			lib.mBox.dialog('open');
+			app.mBox.dialog('open');
 		},
 		getTheme: function(){
 			$.cookie.json = true;
@@ -449,6 +526,104 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI'], function($){
 					});
 				});
 
-			}
+			},
+		subCheck:function(element){
+			app = this;
+			if (element === undefined) return false;
+
+			// get calling element info
+			current_id = parseInt(element.val());
+	        current_selection = $("option:selected", element).text();
+	        element_id_prefix = element.attr('id').prefix();
+	        element_is_top = false;
+
+	        // quit if None selected
+			if (isNaN(current_id)) return false;
+
+	        // check the categories object for subcategories of current selection
+	        catCollection = [];
+			$.each(app.objCategories, function(idx, objCat){
+				parentID = objCat.parent_id;
+				catID = objCat.category_id;
+
+				if (current_id == catID && parentID === undefined ){ element_is_top = true; }
+				// accumulate children
+				if (parentID == current_id){
+					catCollection.push(objCat);
+				}
+			});
+
+	        if (catCollection.length > 0){
+	        	/* create subcategory select, fill and new subs checkbox */
+
+	        	// get the template paragraph element
+	        	parentP = $('#subCatTemplate');
+	        	// clone it
+	        	var clone = parentP.children().clone();
+				// add identifying class for later removal
+				clone.addClass('clone');
+
+	        	// get current iteration of instantiation of the template for naming
+				var iteration = parentP.data('tempCount');
+				// increment iteration as index and save new iteration
+	    		index = ++iteration;
+	    		parentP.data('tempCount', iteration);
+
+	        	// loop through all child elements to modify before appending to the dom
+	        	clone.children().each(function(){
+	        		changeID = true;
+					elName = null;
+					elID = null;
+	        		// get the id ov the current element
+	        		var templateID = $(this).prop('id');
+	        		// make sure there are no blank ids
+	        		switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
+						case 'label':
+		        			strFor = $(this).prop('for');
+		        			origPrefix = strFor.prefix();
+		        			strFor = strFor.replace(origPrefix, element_id_prefix) + index;
+		        			// change 'for' property for label
+		        			$(this).prop('for', strFor);
+		        			changeID = false;
+		        			break;
+	        			case 'select':
+	        			case 'select-one':
+		        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
+		        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
+		        			// add new option to select menu based on parent id
+		        			$(this)
+								.addClass('required')
+								.empty()
+								.append(new Option("None", ""));
+								tmpSelect = $(this);
+								$.each(catCollection, function(idx, objCat){
+									cat = objCat.category;
+									id = objCat.category_id;
+									tmpSelect.append(new Option(cat, id));
+								});
+								break;
+						case 'checkbox':
+		        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
+							elName = elID;
+		        			break;
+		        		default:
+		        			changeID = false;
+	        		}
+	        		// only change the id of necessary elements
+	        		if (changeID)  {
+
+						$(this).prop({"id":elID, "name": elName });
+
+					}
+	        	});
+	        	element.parent().after(clone);
+	        }else{
+	        	// category is top-level
+	        	msg = "No Sub-category found for: " + current_selection;
+	        	title = "Selection Error: " + current_selection;
+	        	msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
+	        	app.dMessage(title, msg);
+	        }
+		}
 	};
 });

@@ -13,35 +13,35 @@
         <p>Register for our debate website and to begin showing your skills </p>
         <p></p>
         <div>
-        <form id="signup"> 
+        <form id="signup">
             <h1>Account Information</h1>
             <fieldset>
-                <legend>Account</legend> 
+                <legend>Account</legend>
                 <label for="username">Username:</label>
-                <input type="text" name="username" required aria-required="true"><span id='username_availability_result'></span><br />
-                <label for="password">Password:</label> 
-                <input type="password" name="password" required aria-required="true"><br /> 
+                <input type="text" name="username" id="username" required aria-required="true"><span id='username_availability_result'></span><br />
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" required aria-required="true"><br />
                 <label for="confirm_password">Confirm Password:</label>
-                <input type="password" name="confirm_password" required aria-required="true">
+                <input type="password" name="confirm_password" id="confirm_password" required aria-required="true">
             </fieldset>
 
             <h1>About You</h1>
             <fieldset>
                 <legend>Personal Information</legend>
                 <label for="first_name">First Name:</label>
-                <input type="text" name="first_name" required  aria-required="true">
+                <input type="text" name="first_name" id="first_name" required  aria-required="true">
                 <label for="last_name">Last Name:</label>
-                <input type="text" name="last_name" required  aria-required="true">
+                <input type="text" name="last_name" id="last_name" required  aria-required="true">
                 <label for="email">Email:</label>
-                <input type="email" name="email" required aria-required="true">
+                <input type="email" name="email" id="email" required aria-required="true">
             </fieldset>
 
             <h1>Miscellaneous</h1>
             <fieldset>
                 <legend>Additional Info</legend>
                 <label for="paypal_account">Paypal Account Name:</label>
-                <input type="text" name="paypal_account" required aria-required="true">
-            </fieldset> 
+                <input type="text"  name="paypal_account" id="paypal_account" required aria-required="true">
+            </fieldset>
         </form>
     </body>
     <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>

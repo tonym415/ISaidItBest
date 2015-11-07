@@ -2,10 +2,8 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' , 'validate','jqueryUI'], function($, app){
-	app.createNavBar()
-	$("input[type=submit]").button();
-	var msgBox = app.msgBox($('#dialog-message'));
-	var dMessage = app.dMessage;
+	app.init('contact');
+
 		/**
 	 *  Submits an ajax call to send signup info to the database
 	 *
@@ -31,18 +29,9 @@ require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 					"message": data.error
 				});
 			}else{
-				dMessage(app, data.message.title, data.message.message);
-				// $("#errors").text(data.message.message);
-				// $("#errors").dialog({
-				// 	title: data.message.title,
-				// 	autoOpen: true,
-				// 	modal: true
-				//
-				// });
+				app.dMessage(data.message.title, data.message.message);
 			}
-		})
-		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
-		.always(function() { /*console.log('getJSON request ended!');*/ });
+		});
 	 }
 
 

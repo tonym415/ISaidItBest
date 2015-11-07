@@ -9,25 +9,19 @@ require([
 	'validate',
 	'jqueryUI',
 	'livequery',
-	'cookie'
+	'cookie',
+	'tooltipster'
 	], function($, app){
 		// if not logged in send to login page
 		user = app.getCookie('user');
 		if (user === undefined){
 			window.location.assign(app.pages.home);
 		}
-
 		// handle page setup upon arrival
-		app.createNavBar();
+		app.init('game');
 
-		// Page Stylings
-		$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
-		$("input[type=submit]").button();
-		$(".sel").selectmenu({ width: 200 });
-		// $("#paramQuestions").selectmenu({ disabled: true });
-
-		// load category selectmenu
-		app.getCategories(app);
+		// create counter for sub-category templates
+		$('#subCatTemplate').data("tempCount",0);
 
 	/**
 	 * Clock instantiation
@@ -39,36 +33,12 @@ require([
 			clockFace: 'MinuteCounter'
 		});
 
-    // validator selectmenu method
-    $.validator.addMethod("selectNotEqual", function(value, element, param) {
-        return param != value;
-    });
 
 	// set up parameter form validation
 	$('#gameParameters').validate({
-		debug: true,
-		ignore: "",
-		errorElement: 'span',
-		errorClass: "field-validation-error",
-		highlight: function (element, errorClass) {
-            $(element).addClass("input-validation-error");
-        },
-        unhighlight: function (element, errorClass) {
-            $(element).removeClass("input-validation-error");
-        },
-		errorPlacement: function (error, element) {
-		   error.insertAfter($('span[errorfor="' + element.attr("name") + '"]'));
-	    },
-		invalidHandler: function (form, validator) {
-           $.each(validator.errorList, function (index, value) {
-               if (value.element.nodeName.toLowerCase() == 'select') {
-                   $(value.element).next('span').addClass("input-validation-error");
-               }
-           });
-        },
 		submitHandler: function(){
 			vals = $(this.currentForm).serializeForm();
-			app.dMessage(app, 'Values', app.prettyPrint(vals));
+			app.dMessage('Values', app.prettyPrint(vals));
 		},
 		rules: {
 			p_paramCategory: { selectNotEqual: "" },
@@ -103,14 +73,14 @@ require([
 	// set a watch for additions/removal on the dom for select boxes (not including template)
 	$("select[id*=Category]:not([id*=temp])")
 		.livequery(function(){
-			// // add validation
-			// $(this).closest('form').validate();
-			// $(this).rules("add", {
-			// 	selectNotEqual : "",
-			// 	messages: {
-			// 		selectNotEqual: "Please choose a subcategory"
-			// 	}
-			// });
+			// add validation
+			$(this).closest('form').validate();
+			$(this).rules("add", {
+				selectNotEqual : "",
+				messages: {
+					selectNotEqual: "Please choose a subcategory"
+				}
+			});
 
 			// initialize selectmenu
 			$(this).selectmenu({
@@ -120,7 +90,7 @@ require([
 					primeQBox("#" + $(this).prop('id'));
 
 					// validate select
-					// $(this).closest('form').validate().element(this);
+					$(this).closest('form').validate().element(this);
 					//  bind change event to all select menus to enable subcategory menu selection
 					boolSubs = $(this).siblings('input').prop("checked");
 
@@ -136,7 +106,7 @@ require([
 					}
 
 					// if sub-categories are requested
-					if (boolSubs) subCheck($(this));
+					if (boolSubs) app.subCheck($(this));
 
 				}
 			});
@@ -150,7 +120,7 @@ require([
 					event.stopPropagation();
 					if($(this).is(':checked')){
 						var select = $(this).siblings('select');
-						subCheck(select);
+						app.subCheck(select);
 					}else{
 						// load appropriate questions for selection
 						primeQBox("#" + $(this).siblings('select').prop('id'));
@@ -165,102 +135,4 @@ require([
 				}
 			);
 		});
-
-	function subCheck(element){
-		if (element === undefined) return false;
-
-		// get calling element info
-		current_id = parseInt(element.val());
-		current_selection = $("option:selected", element).text();
-		element_id_prefix = element.attr('id').prefix();
-		element_is_top = false;
-
-		// quit if None selected
-		if (isNaN(current_id)) return false;
-
-		// check the categories object for subcategories of current selection
-		catCollection = [];
-		$.each(app.objCategories, function(idx, objCat){
-			parentID = objCat.parent_id;
-			catID = objCat.category_id;
-
-			if (current_id == catID && parentID === undefined ){ element_is_top = true; }
-			// accumulate children
-			if (parentID == current_id){
-				catCollection.push(objCat);
-			}
-		});
-
-		if (catCollection.length > 0){
-			/* create subcategory select, fill and new subs checkbox */
-
-			// get the template paragraph element
-			parentP = $('#subCatTemplate');
-			// clone it
-			var clone = parentP.children().clone();
-			// add identifying class for later removal
-			clone.addClass('clone');
-
-			// get current iteration of instantiation of the template for naming
-			var iteration = parentP.data('tempCount');
-			// increment iteration as index and save new iteration
-			index = ++iteration;
-			parentP.data('tempCount', iteration);
-
-			// loop through all child elements to modify before appending to the dom
-			clone.children().each(function(){
-				changeID = true;
-				elName = null;
-				elID = null;
-				// get the id ov the current element
-				var templateID = $(this).prop('id');
-				// make sure there are no blank ids
-				switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
-					case 'label':
-						strFor = $(this).prop('for');
-						origPrefix = strFor.prefix();
-						strFor = strFor.replace(origPrefix, element_id_prefix) + index;
-						// change 'for' property for label
-						$(this).prop('for', strFor);
-						changeID = false;
-						break;
-					case 'select':
-					case 'select-one':
-						elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
-						elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
-						// add new option to select menu based on parent id
-						$(this)
-							.addClass('required')
-							.empty()
-							.append(new Option("None", ""));
-							tmpSelect = $(this);
-							$.each(catCollection, function(idx, objCat){
-								cat = objCat.category;
-								id = objCat.category_id;
-								tmpSelect.append(new Option(cat, id));
-							});
-							break;
-					case 'checkbox':
-						elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
-						elName = elID;
-						break;
-					default:
-						changeID = false;
-				}
-				// only change the id of necessary elements
-				if (changeID)  {
-
-					$(this).prop({"id":elID, "name": elName });
-
-				}
-			});
-			element.parent().after(clone);
-		}else{
-			// category is top-level
-			msg = "No Sub-category found for: " + current_selection;
-			title = "Selection Error: " + current_selection;
-			msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
-			app.dMessage(app, title, msg);
-		}
-	}
 });

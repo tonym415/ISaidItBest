@@ -11,15 +11,8 @@ require([
 	'livequery',
 	], function(app, lib, jqGrid){
 
-	// create counter for sub-category templates
-	$('#subCatTemplate').data("tempCount",0);
-
 	// page setup
-	app.createNavBar();
-	$("input[type=submit], input[type=button]").button();
-
-	// load category selectmenus
-	app.getCategories(app);
+	app.init('admin');
 
 	function submitInfo(data, desc){
 		$.ajax({
@@ -35,37 +28,37 @@ require([
 						result = JSON.parse(result)[0];
 					}catch(err){
 						msg = "<h2>Stack Trace:</h2><p>" + err.stack + "</p><h2>Ajax Result:</h2><p>" + result + "</p>";
-						app.dMessage(app, "Error: " + err, msg);
+						app.dMessage("Error: " + err, msg);
 						console.log(err);
 					}
 				}
 				// internal error handling
 				if (result.hasOwnProperty('error')){
 					msg = "<h2>Error:</h2><p>" + result.error.error + "</p><h2>Message:</h2><p>" + result.error.stm + "</p>";
-					app.dMessage(app, "Error", msg);
+					app.dMessage("Error", msg);
 					console.log(result.error);
 				}else{
 					switch (data.function){
 						case "AC":
-							app.dMessage(app, "Success", "Category Adopted");
+							app.dMessage("Success", "Category Adopted");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#adoptCategory'));
 							break;
 						case "DC":
-							app.dMessage(app, "Success", "Category Removed");
+							app.dMessage("Success", "Category Removed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#deleteCategory'));
 							break;
 						case "RC":
-							app.dMessage(app, "Success", "Category Renamed");
+							app.dMessage("Success", "Category Renamed");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#renameCategory'));
 							break;
 						case "CC":
-							app.dMessage(app, "Success", "Category Added");
+							app.dMessage("Success", "Category Added");
 							objCategories = result.categories;
 							loadCategories();
 							resetForm($('#createCategory'));
@@ -76,14 +69,14 @@ require([
 							editor.dialog("close");
 							break;
 						case "CQ":
-							app.dMessage(app, "Success", "Question Added");
+							app.dMessage("Success", "Question Added");
 							resetForm($('#createQuestion'));
 							break;
 					}
 				}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
-				app.dMessage(app, 'Request Failed', textStatus + ' ' + errorThrown);
+				app.dMessage('Request Failed', textStatus + ' ' + errorThrown);
 				console.log('request failed! ' + textStatus);
 			});
 		}
@@ -105,16 +98,6 @@ require([
 		submitInfo(formData, lib.formManager[formID].desc);
 		return false;
 	};
-
-	// validator defaults
-	$.validator.setDefaults({
-		debug: true,
-		wrapper: 'li',
-		ignore: "",
-        errorPlacement: function(error, element){
-            error.appendTo(element.closest('form').children('.errors'));
-        }
-	});
 
 	function formLoad(e, ui){
 		panel = (ui.newPanel === undefined) ? ui.panel : ui.newPanel;
@@ -216,7 +199,7 @@ require([
 					}
 
 					// if sub-categories are requested
-					if (boolSubs) subCheck($(this));
+					if (boolSubs) app.subCheck($(this));
 
 					// add events to load questions if appropriate
 					prefix = $(this).prop('id').prefix();
@@ -242,7 +225,7 @@ require([
 					event.stopPropagation();
 					if($(this).is(':checked')){
 						var select = $(this).siblings('select');
-						subCheck(select);
+						app.subCheck(select);
 					}else{
 						// get all p tags that are not the original and do not contain the submit button
 						cloneP = $(this).parent().siblings('.clone');
@@ -255,103 +238,6 @@ require([
 			);
 		});
 
-	function subCheck(element){
-		if (element === undefined) return false;
-
-		// get calling element info
-		current_id = parseInt(element.val());
-        current_selection = $("option:selected", element).text();
-        element_id_prefix = element.attr('id').prefix();
-        element_is_top = false;
-
-        // quit if None selected
-		if (isNaN(current_id)) return false;
-
-        // check the categories object for subcategories of current selection
-        catCollection = [];
-		$.each(app.objCategories, function(idx, objCat){
-			parentID = objCat.parent_id;
-			catID = objCat.category_id;
-
-			if (current_id == catID && parentID === undefined ){ element_is_top = true; }
-			// accumulate children
-			if (parentID == current_id){
-				catCollection.push(objCat);
-			}
-		});
-
-        if (catCollection.length > 0){
-        	/* create subcategory select, fill and new subs checkbox */
-
-        	// get the template paragraph element
-        	parentP = $('#subCatTemplate');
-        	// clone it
-        	var clone = parentP.children().clone();
-			// add identifying class for later removal
-			clone.addClass('clone');
-
-        	// get current iteration of instantiation of the template for naming
-			var iteration = parentP.data('tempCount');
-			// increment iteration as index and save new iteration
-    		index = ++iteration;
-    		parentP.data('tempCount', iteration);
-
-        	// loop through all child elements to modify before appending to the dom
-        	clone.children().each(function(){
-        		changeID = true;
-				elName = null;
-				elID = null;
-        		// get the id ov the current element
-        		var templateID = $(this).prop('id');
-        		// make sure there are no blank ids
-        		switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
-        			case 'label':
-	        			strFor = $(this).prop('for');
-	        			origPrefix = strFor.prefix();
-	        			strFor = strFor.replace(origPrefix, element_id_prefix) + index;
-	        			// change 'for' property for label
-	        			$(this).prop('for', strFor);
-	        			changeID = false;
-	        			break;
-        			case 'select':
-        			case 'select-one':
-	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
-	        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
-	        			// add new option to select menu based on parent id
-	        			$(this)
-							.addClass('required')
-							.empty()
-							.append(new Option("None", ""));
-							tmpSelect = $(this);
-							$.each(catCollection, function(idx, objCat){
-								cat = objCat.category;
-								id = objCat.category_id;
-								tmpSelect.append(new Option(cat, id));
-							});
-							break;
-					case 'checkbox':
-	        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
-						elName = elID;
-	        			break;
-	        		default:
-	        			changeID = false;
-        		}
-        		// only change the id of necessary elements
-        		if (changeID)  {
-
-					$(this).prop({"id":elID, "name": elName });
-
-				}
-        	});
-        	element.parent().after(clone);
-        }else{
-        	// category is top-level
-        	msg = "No Sub-category found for: " + current_selection;
-        	title = "Selection Error: " + current_selection;
-        	msg += (element_is_top) ? " is a top-level category!" : " has no sub-categories";
-        	app.dMessage(app, title, msg);
-        }
-	}
 	// Grid options
 	$.jgrid.no_legacy_api = true;
 	$.jgrid.useJSON = true;

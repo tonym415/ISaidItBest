@@ -1,11 +1,11 @@
-define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
+define(['jquery', 'app'], function($, app) {
     var formManager;
     app.createMsgBox();
 
-    // validator methods
-    $.validator.addMethod("selectNotEqual", function(value, element, param) {
-        return param != value;
-    });
+    // // validator methods
+    // $.validator.addMethod("selectNotEqual", function(value, element, param) {
+    //     return param != value;
+    // });
 
     /*
     * multi-form managment object
@@ -106,7 +106,7 @@ define(['jquery', 'app','jqGrid', 'validate'], function($, app, jqGrid) {
     gridDefaults = {
         loadError:function(xhr,status, err){
             try {
-               app.dMessage(app,"Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
+               app.dMessage("Error loading Users", '<div class="ui-state-error">'+ xhr.responseText +'</div>');
             } catch(e) {
                alert(xhr.responseText);}
        },

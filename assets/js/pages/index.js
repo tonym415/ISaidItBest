@@ -2,8 +2,8 @@
 	Handles js interaction for the login page
  */
 define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate, app){
-	$("input[type=submit]").button();
-	app.createNavBar();
+	app.init('home');
+
 	var user = app.getCookie('user');
 	if (user !== undefined){
 		// if same session USERNAME should be set
@@ -51,7 +51,6 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 
 //form validations
 	$("#login").validate({
-		dubug: true,
 		submitHandler: valHandler,
 		rules: {
 			username: {

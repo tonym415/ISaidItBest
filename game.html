@@ -13,21 +13,18 @@
 		<h3>Parameter Selection</h3>
 		<div id="paramDiv">
 			<form id="gameParameters">
+				<div class='errors'></div>
 				<p>
 					<label for='p_paramCategory'>Category</label>
 					<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
 					<label for='p_paramCategoryChk'>Sub?</label>
 					<input id='p_paramCategoryChk' name='p_paramCategoryChk' type='checkbox' />
-					<div class="clear"></div>
-					<span errorfor="p_paramCategory"></span>
 				</p>
 				<p>
 					<label for="paramQuestions">Category questions</label>
 					<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required>
 						<option value="">None</option>
 					</select>
-					<div class="clear"></div>
-					<span errorfor="paramQuestions"></span>
 				</p>
 				<p>
 					<label for='timeLimit'>Time Limit</label>
@@ -36,8 +33,6 @@
 						<option value="5">5:00</option>
 						<option value="10">10:00</option>
 					</select>
-					<div class="clear"></div>
-					<span errorfor="timeLimit"></span>
 				</p>
 				<p>
 				<label for='wager'>Wager</label>
@@ -46,8 +41,6 @@
 						<option value="5">5 credits</option>
 						<option value="10">10 credits</option>
 					</select>
-					<div class="clear"></div>
-					<span errorfor="wager"></span>
 				</p>
 				<p>
 					<input type="submit" value="Submit Parameters">
@@ -89,13 +82,14 @@
 </center>
 <div id='subCatTemplate' style='display:none'>
 	<p>
-		<label for='temp_subCategory'>Sub-Category Name:</label>
+		<label for='temp_subCategory'>Sub-Category:</label>
 		<select id='temp_subCategory' name='temp_subCategory' >
-			<option value="---">None</option>
+			<option value="">None</option>
 		</select>
 		<label for='temp_CategoryChk'>Sub?</label>
 		<input id='temp_CategoryChk' type='checkbox' />
-		<br />
+		<div class="clear"></div>
+		<span errorfor="temp_subCategory"></span>
 	</p>
 </div>
 

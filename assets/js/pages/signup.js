@@ -3,8 +3,7 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
-	app.createNavBar()
-	$("input[type=submit]").button();
+	app.init('registration');
 
 	/**
 	 *  Submits an ajax call to send signup info to the database
@@ -41,7 +40,7 @@ var valHandler = function(){
 	formData = $(this.currentForm).serializeForm();
 	formData['function'] = "SUI";
 	submitUserInfo(formData);
-}
+};
 
 	// wizardify form and set up validation
 	$('form').steps({
@@ -93,9 +92,9 @@ var valHandler = function(){
 		}).validate({
 			debug: true,
 			submitHandler: valHandler,
-			errorPlacement: function(error, element){
-				element.after(error);
-			},
+			// errorPlacement: function(error, element){
+			// 	element.after(error);
+			// },
 			rules: {
 				first_name: "required",
 				last_name: "required",
