@@ -128,14 +128,6 @@ Themeroller styles
     position: absolute;
 }
 
-.errors {
-    border-spacing: 0px 0px !important;
-}
-
-.field-validation-error, .input-validation-error {
-    color: red;
-	font-style: italic
-}
 input.checkbox { border: none }
 form  { display: table; border-spacing: 2px 2px; width: 90%;   }
 p     { display: table-row ;  }
