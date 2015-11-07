@@ -10,7 +10,6 @@ require([
 	'validate',
 	'livequery',
 	], function(app, lib, jqGrid){
-
 	// page setup
 	app.init('admin');
 

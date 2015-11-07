@@ -16,6 +16,7 @@ from app.Log import *
 from app.User import *
 from app.Category import *
 from app.Question import *
+from app.Game import *
 
 
 cgitb.enable()
@@ -196,6 +197,11 @@ def loadCategoryQuestions(category):
     returnJson(returnObj)
 
 
+def gameFunctions(fs):
+    """ gathers all categories """
+    returnJson(Game(fs).addToQueue())
+
+
 def doFunc(fStor):
     """ Deciphers function to run based on POSTed parameters
         Excutes the desired function with appropriate parameters
@@ -228,6 +234,8 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName == "UAC":
         globals()['userAvailabilityCheck'](fStor)
+    elif funcName == "SGP":
+        globals()['gameFunctions'](fStor)
     elif funcName == "CU":
         globals()['contactUs'](fStor)
     elif funcName in ["LOG", 'GL']:

@@ -31,7 +31,18 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	});
 
 	var init = function(page){
+		if (page !== 'home' && page !== 'registration'){
+			// if not logged in send to login page
+			user = this.getCookie('user');
+			if (user === undefined) window.location.assign(this.pages.home);
+		}
+
+		//  Initalize app setup functions
+		setTheme();
 		this.createNavBar();
+
+		// initialize universal messagebox
+		this.createMsgBox();
 
 		// page specific initialization
 		switch (page) {
@@ -55,7 +66,11 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 		// jquery-fy page with Page Stylings
 		$("input[type=submit]").button();
+
+		// add event listener for logout
+		this.logout();
 	};
+
 	var navBar = function(){
 		// logged in user
 		$.cookie.json = true;
@@ -83,22 +98,18 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		if (info){
 			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
 			// $("#navDiv").append(userSpan);
-			// logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
-			logSpan = "<span ><a href='javascript:void(0)'>Logout?</a></span>";
+			logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
+			// logSpan = "<span ><a href='javascript:void(0)'>Logout?</a></span>";
 			$("#navDiv").append(userSpan).append(logSpan);
 		}
 		// universal messagbox
 		$('body').after('<div id="dialog-message" title=""></div>');
 		$('#dialog-message').append("<p id='message-content'></p>");
 
-		// add event listener for logout
-		this.logout(this);
-
-		// initialize universal messagebox
-		this.createMsgBox();
 	};
 
-	function logout(app){
+	function logout(){
+		app = this;
 		$('#logout a').on('click', function(e){
 			e.preventDefault();
 			$.removeCookie('user');
@@ -161,7 +172,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				user = getCookie("user");
 				data = {
 					'function': 'LOG',
-					'user_id': user.user_id,
+					'user_id': (user === undefined) ? 0 : user.user_id,
 					'description': options.desc || 'utility function',
 					'action' : options.data || 'utility data',
 					'result' : xhr.responseText,
@@ -348,47 +359,60 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	    return this.substring(0, this.indexOf(separator) + 1);
 	};
 
-/**
-		 * Converts form data to js object
-		 * @return {formdata} object
-		 */
-		$.fn.serializeForm = function() {
-		    var o = {"id": this.prop('id')};
-		    var a = this.serializeArray();
-		    $.each(a, function() {
-		        if (o[this.name] !== undefined) {
-		            if (!o[this.name].push) {
-		                o[this.name] = [o[this.name]];
-		            }
-		            o[this.name].push(this.value || '');
-		        } else {
-		            o[this.name] = this.value || '';
-		        }
-		    });
-		    return o;
-		};
+	/**
+	 * Converts form data to js object
+	 * @return {formdata} object
+	 */
+	$.fn.serializeForm = function() {
+	    var o = {"id": this.prop('id')};
+	    var a = this.serializeArray();
+	    $.each(a, function() {
+	        if (o[this.name] !== undefined) {
+	            if (!o[this.name].push) {
+	                o[this.name] = [o[this.name]];
+	            }
+	            o[this.name].push(this.value || '');
+	        } else {
+	            o[this.name] = this.value || '';
+	        }
+	    });
+	    return o;
+	};
 
 	/**
-	 * Initalize app setup functions
+	 * Converts seconds to HH:MM:SS
+	 * @return {string} string
 	 */
-	setTheme();
+	String.prototype.toHHMMSS = function () {
+	    var sec_num = parseInt(this, 10); // don't forget the second param
+	    var hours   = Math.floor(sec_num / 3600);
+	    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+	    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+	    if (hours   < 10) {hours   = "0"+hours;}
+	    if (minutes < 10) {minutes = "0"+minutes;}
+	    if (seconds < 10) {seconds = "0"+seconds;}
+	    var time    = hours+':'+minutes+':'+seconds;
+	    return time;
+	};
 
     // validator selectmenu method
     $.validator.addMethod("selectNotEqual", function(value, element, param) {
         return param != value;
-    });
+    },"Please choose a subcategory");
 
 	// validator defaults
 	$.validator.setDefaults({
 		debug: true,
 		ignore: "",
-		// wrapper: 'li',
 		errorPlacement: function (error, element) {
+			// account for jquery selectmenu
 			if (element.context.nodeName === "SELECT"){
 				element = $('#' + element.context.id + '-button');
 			}
 			// last chance to init element if not done already
-			$(element).tooltipster();
+			if ($(element).data('tooltipster-ns') === undefined) $(element).tooltipster();
+
 			var lastError = $(element).data('lastError'), // get the last message if one exists
 				newError = $(error).text();               // set the current message
 

@@ -12,16 +12,12 @@ require([
 	'cookie',
 	'tooltipster'
 	], function($, app){
-		// if not logged in send to login page
-		user = app.getCookie('user');
-		if (user === undefined){
-			window.location.assign(app.pages.home);
-		}
+		// game parameters global var
+		var params,
+			pollCounter = 0;
+
 		// handle page setup upon arrival
 		app.init('game');
-
-		// create counter for sub-category templates
-		$('#subCatTemplate').data("tempCount",0);
 
 	/**
 	 * Clock instantiation
@@ -33,12 +29,43 @@ require([
 			clockFace: 'MinuteCounter'
 		});
 
+	// get players and start game
+	function getGame(){
+		params.function = 'GG';
+		$.ajax({
+			data: params,
+			url: app.engine,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'Game Creation',
+			success: function(data){
+				if (data.status !== 'complete'){
+					if (pollCounter < 15){
+						pollCounter++;
+						setTimeout(getGame(), 15000);
+					}else{
+						pollCounter = 0;
+					}
+				}else{
+					// update game ui
+					console.log(pollCounter);
+					console.log(data);
+				}
+			}
+		});
+	}
 
 	// set up parameter form validation
 	$('#gameParameters').validate({
 		submitHandler: function(){
 			vals = $(this.currentForm).serializeForm();
-			app.dMessage('Values', app.prettyPrint(vals));
+			info = app.getCookie('user');
+			vals.user_id = info.user_id;
+			vals.function = 'SGP';
+			params = vals;
+			$.post(app.engine, vals);
+			app.dMessage('Params', app.prettyPrint(params));
+			getGame();
 		},
 		rules: {
 			p_paramCategory: { selectNotEqual: "" },
@@ -55,8 +82,7 @@ require([
 	});
 
 	// load question box with values based on category/subcategory
-	function primeQBox(element){
-		catID = $(element).val();
+	function primeQBox(catID){
 		// destination selectmenu
 		q_select = '#paramQuestions';
 		// reset questions list
@@ -73,12 +99,13 @@ require([
 	// set a watch for additions/removal on the dom for select boxes (not including template)
 	$("select[id*=Category]:not([id*=temp])")
 		.livequery(function(){
+			id = $(this).prop('id');
 			// add validation
 			$(this).closest('form').validate();
 			$(this).rules("add", {
 				selectNotEqual : "",
 				messages: {
-					selectNotEqual: "Please choose a subcategory"
+					id : "Please choose a subcategory"
 				}
 			});
 
@@ -87,7 +114,7 @@ require([
 				width: 200,
 				change: function(){
 					// load appropriate questions for selection
-					primeQBox("#" + $(this).prop('id'));
+					primeQBox($(this).val());
 
 					// validate select
 					$(this).closest('form').validate().element(this);

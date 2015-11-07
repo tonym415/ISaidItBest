@@ -34,19 +34,15 @@ requirejs.config({
 		flipclock: 'lib/flipclock',
 		cookie: 'lib/jquery-cookie',
 		steps: 'lib/jquery.steps',
-		// jqGrid: 'lib/jquery.jqgrid.min',
-		// jqGrid: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.min',
 		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar',
-		tooltipster: 'lib/jquery.tooltipster.min',
-		// qtip2
-		imagesLoaded: 'lib/imagesLoaded.pkg.min',
-		qtip: 'lib/jquery.qtip',
+		tooltipster: 'lib/jquery.tooltipster',
 		jqGrid: [
 			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
 			'lib/grid.locale-en'
 			],
-		jqGridSrc: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src',
+		jqGridSrc: [//'//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src',
+			'lib/jquery.jqgrid.src'],
 		gridCss: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/css/ui.jqgrid.css'
 
 	},
@@ -57,6 +53,10 @@ requirejs.config({
 		jqueryUI: {
 			exports: '$',
 			deps: ['jquery']
+		},
+		jqGridSrc: {
+			exports: 'jqGridSrc',
+			deps: ['jquery', 'jqueryUI']
 		},
 		jqGrid: {
 			deps: ['jqueryUI', 'jqGridSrc']
