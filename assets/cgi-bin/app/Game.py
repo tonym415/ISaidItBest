@@ -51,6 +51,15 @@ class Game(object):
         return query
         return self.executeQuery(query, ())
 
+    def getMetaData(self):
+        """ get metadata """
+        returnObj = {}
+        query = ("SELECT time_id, time_in_seconds FROM time_options WHERE active = 1")
+        returnObj['times'] = self.executeQuery(query, ())
+        query = ("SELECT credit_id, credit_value FROM credit_options WHERE active = 1")
+        returnObj['wagers'] = self.executeQuery(query, ())
+        return returnObj
+
     def executeModifyQuery(self, query, params):
         returnDict = {}
         try:
@@ -94,4 +103,4 @@ if __name__ == "__main__":
     # info['stuff'] = "stuff"
 
     # print(Game(info).addToQueue())
-    print(Game(info).getGame())
+    print(Game().getMetaData())

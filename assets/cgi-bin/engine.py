@@ -186,20 +186,15 @@ def getCategoryQuestionsByID(fs):
     returnJson(returnObj)
 
 
-# this will eventually be a database call
-def loadCategoryQuestions(category):
-    """ Loads all questions for a specific category """
+def gameFunctions(fs):
     returnObj = {}
-    returnObj[category] = {}
-    for x in range(1, len(category) + 1):
-        returnObj[category]["q%s" % x] = "%s question %d" % (category, x)
+    if 'id' in fs:
+        if fs['id'] == 'gameParameters':
+            returnObj = Game(fs).addToQueue()
+        elif fs['id'] in ['getMetaData']:
+            returnObj = Game(fs).getMetaData()
 
     returnJson(returnObj)
-
-
-def gameFunctions(fs):
-    """ gathers all categories """
-    returnJson(Game(fs).addToQueue())
 
 
 def doFunc(fStor):
@@ -212,31 +207,27 @@ def doFunc(fStor):
     unused_members = ['function', '_password']
     fStor = {i: fStor[i] for i in fStor if i not in unused_members}
 
-    if funcName == "LCQ":
-        globals()['loadCategoryQuestions'](fStor['category']),
-    elif funcName in ["CQ", "EQ", "DQ"]:
+    if funcName in ["CQ", "EQ", "DQ"]:
         globals()['modifyQuestion'](fStor)
     elif funcName in ["CC", "RC", "DC", "AC"]:
         globals()['modifyCategory'](fStor)
-    elif funcName == "GQ":
+    elif funcName in ["GQ"]:
         globals()['getCategoryQuestionsByID'](fStor)
-    elif funcName == "GC":
+    elif funcName in ["GC"]:
         globals()['getCategories']()
-    elif funcName == "GAU":
+    elif funcName in ["GAU"]:
         globals()['getAllUsers'](fStor)
-    elif funcName == "VU":
+    elif funcName in ["VU"]:
         globals()['validateUser'](fStor)
     elif funcName in ["SUI", "UU"]:
         globals()['submitUserInfo'](fStor)
-    elif funcName == "SP":
-        globals()['showParams'](fStor)
-    elif funcName == "TD":
+    elif funcName in ["TD"]:
         globals()['testDep'](fStor)
-    elif funcName == "UAC":
+    elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName == "SGP":
+    elif funcName in ["SGP", "GMD"]:
         globals()['gameFunctions'](fStor)
-    elif funcName == "CU":
+    elif funcName in ["CU"]:
         globals()['contactUs'](fStor)
     elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)

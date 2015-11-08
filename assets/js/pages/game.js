@@ -29,6 +29,42 @@ require([
 			clockFace: 'MinuteCounter'
 		});
 
+	(function loadMeta(){
+		$.ajax({
+			data: {'function': "GMD", 'id': 'getMetaData'},
+			url: app.engine,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'utility (load metadata)',
+			success: function(data){
+				$('#wager')
+					.empty()
+					.append(new Option("None", ""));
+				// load question selectmenu
+				$.each(data.wagers, function(){
+					$('#wager')
+						.append($('<option />')
+						.val(this.credit_id)
+						.text(this.credit_value + ' credit(s)'))
+						.val("")
+						.selectmenu('refresh');
+				});
+				$('#timeLimit')
+					.empty()
+					.append(new Option("None", ""));
+				// load question selectmenu
+				$.each(data.times, function(){
+					$('#timeLimit')
+						.append($('<option />')
+						.val(this.time_id)
+						.text(this.time_in_seconds.toString().toMMSS()))
+						.val("")
+						.selectmenu('refresh');
+				});
+			}
+		});
+	})();
+
 	// get players and start game
 	function getGame(){
 		params.function = 'GG';

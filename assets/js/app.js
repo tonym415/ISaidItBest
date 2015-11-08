@@ -336,6 +336,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			// load question selectmenu
 			$.each(result.questions, function(){
 				qList.append($('<option />').val(this.question_id).text(this.question_text));
+				qList.val("");
+				qList.selectmenu('refresh');
 			});
 		});
 	};
@@ -383,16 +385,17 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	 * Converts seconds to HH:MM:SS
 	 * @return {string} string
 	 */
-	String.prototype.toHHMMSS = function () {
+	String.prototype.toMMSS = function () {
 	    var sec_num = parseInt(this, 10); // don't forget the second param
 	    var hours   = Math.floor(sec_num / 3600);
 	    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
 	    var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-	    if (hours   < 10) {hours   = "0"+hours;}
+	    // if (hours   < 10) {hours   = "0"+hours;}
 	    if (minutes < 10) {minutes = "0"+minutes;}
 	    if (seconds < 10) {seconds = "0"+seconds;}
-	    var time    = hours+':'+minutes+':'+seconds;
+	    // var time    = hours+':'+minutes+':'+seconds;
+	    var time    = minutes+':'+seconds;
 	    return time;
 	};
 
