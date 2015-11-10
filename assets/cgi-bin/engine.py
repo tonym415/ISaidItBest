@@ -190,10 +190,29 @@ def gameFunctions(fs):
     returnObj = {}
     if 'id' in fs:
         if fs['id'] == 'gameParameters':
-            returnObj = Game(fs).addToQueue()
+            if fs['counter'] == '0':
+                returnObj = Game(fs).addToQueue()
+            else:
+                # get players from queue
+                data = Game(fs).getGame()
+                # send return data
+                returnObj['data'] = data
+
+                if len(data) >= 3:
+                    # if queue properly populated
+                    returnObj['status'] = 'complete'
+                else:
+                    # if queue not properly populated
+                    returnObj['status'] = 'pending'
         elif fs['id'] in ['getMetaData']:
             returnObj = Game(fs).getMetaData()
 
+    returnJson(returnObj)
+
+
+def profileUpdate(fs):
+    returnObj = {}
+    returnObj['file'] = User(fs).profileUpdate()
     returnJson(returnObj)
 
 
@@ -225,12 +244,14 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName in ["SGP", "GMD"]:
+    elif funcName in ["GMD", "GG"]:
         globals()['gameFunctions'](fStor)
     elif funcName in ["CU"]:
         globals()['contactUs'](fStor)
     elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)
+    elif funcName in ["PU"]:
+        globals()['profileUpdate'](fStor)
     else:
         globals()['showParams'](fStor)
 
@@ -248,7 +269,14 @@ def main():
     info = {'id': 'deleteCategory', 'd_Category': 3,
             'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
 
-    form = formMockup(function="GQ", category_id="2")
+    form = formMockup(id="gameParameters",
+                      p_paramCategory="1",
+                      paramQuestions="8",
+                      timeLimit="1",
+                      wager="17",
+                      user_id="52",
+                      function="GG",
+                      counter="2")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

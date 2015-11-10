@@ -219,6 +219,10 @@ class User(object):
          """
         return (0, 1)[self.cursor.rowcount > 0]
 
+    def profileUpdate(self):
+        params = self.sanitizeParams()
+        return params['uploader']
+
     def executeModifyQuery(self, query, params):
         returnDict = {}
         try:

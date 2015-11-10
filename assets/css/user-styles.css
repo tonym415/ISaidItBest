@@ -8,7 +8,21 @@ body {
 fieldset {
     border: 0;
 }
-
+.content {
+  display: none;
+}
+fieldset .pass{
+  padding: 1em;
+  /*border:1px solid;*/
+  }
+label .pass {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  font-weight:bold;
+  }
 .profile-avatar {
     height: 100px;
     width: 100px;
@@ -127,6 +141,8 @@ Themeroller styles
     right: 0;
     position: absolute;
 }
+
+textarea {vertical-align: top;}
 
 input.checkbox { border: none }
 form  { display: table; border-spacing: 2px 2px; width: 90%;   }

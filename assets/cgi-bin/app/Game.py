@@ -40,16 +40,55 @@ class Game(object):
                  "%(timeLimit)s)")
         params = self.sanitizeParams()
         returnVal = self.executeModifyQuery(query, params)
-        return {'success': self.cursor.lastrowid} if 'error' not in returnVal else {'error': returnVal}
+        query = ("SELECT * FROM game_queue WHERE queue_id = %s")
+        return self.executeQuery(query, (self.cursor.lastrowid,))
+
+    def getPlayerQueue(self):
+        """ get all user in queue ready for game """
+        query = ("SELECT queue_id, user_id, game_queue.question_id, "
+                 "game_queue.wager_id, game_queue.time_id, active FROM "
+                 "game_queue JOIN  (SELECT question_id, wager_id, time_id FROM "
+                 "game_queue WHERE active = 1 GROUP BY question_id, wager_id, "
+                 "time_id HAVING count(*) >= 3) AS sub ON "
+                 "(game_queue.question_id=sub.question_id) AND "
+                 "(game_queue.wager_id=sub.wager_id) "
+                 "AND(game_queue.time_id=sub.time_id)")
+        return self.executeQuery(query, (), True)
+
+    def getQueuedUsers(self):
+        """ get available user in queue """
+        params = self.sanitizeParams()
+        query = ("SELECT queue_id, user_id FROM game_queue WHERE question_id = "
+                 "%(paramQuestions)s and wager_id = %(wager)s and time_id = "
+                 "%(timeLimit)s limit 0, 3")
+        return self.executeQuery(query, params, True)
+
+    def getGameID(self):
+        """ get next game_id """
+        query = ("SELECT COALESCE(MAX(game_id), 1) as game_id FROM game WHERE 1")
+        return self.executeQuery(query, ())[0]['game_id']
 
     def getGame(self):
-        """ get user information by name """
-        query = ("SELECT queue_id, user_id, active FROM game_queue LEFT JOIN (SELECT question_id, wager_id, time_id FROM game_queue "
-                 " GROUP BY question_id, wager_id, time_id HAVING count(*) > 3) "
-                 "AS sub ON (game_queue.question_id=sub.question_id) AND (game_queue.wager_id=sub.wager_id) "
-                 " AND (game_queue.time_id=sub.time_id) WHERE active = 1")
-        return query
-        return self.executeQuery(query, ())
+        # set game_id
+        g_id = self.getGameID()
+
+        # get queued users
+        users = self.getQueuedUsers()
+
+        # move users from queue to game
+        for qUser in users:
+            qUser['game_id'] = g_id
+            # update queue
+            query = ("UPDATE game_queue SET active = 0 WHERE "
+                     "queue_id = %(queue_id)s")
+            self.executeModifyQuery(query, qUser)
+
+            # update game
+            query = ("INSERT INTO game (user_id, game_id) VALUES "
+                     "(%(user_id)s, %(game_id)s)")
+            self.executeModifyQuery(query, qUser)
+
+        return {'game_id': g_id}
 
     def getMetaData(self):
         """ get metadata """
@@ -71,12 +110,14 @@ class Game(object):
 
         return returnDict
 
-    def executeQuery(self, query, params):
+    def executeQuery(self, query, params, returnEmpty=False):
         returnDict = {}
         try:
             self.cursor.execute(query, params)
             if self.cursor.rowcount > 0:
                 returnDict = self.cursor.fetchall()
+            elif returnEmpty:
+                returnDict = {}
             else:
                 raise Exception("%s yields %s" %
                                 (self.cursor.statement.replace('\n', ' ')
@@ -89,18 +130,17 @@ class Game(object):
 
 if __name__ == "__main__":
     info = {
-        "id": "gameParameters",
-        "p_paramCategory": "1",
-        "p_paramCategoryChk": "on",
-        "p_subCategory[]": "38",
-        "paramQuestions": "6",
-        "timeLimit": "2",
-        "wager": "1",
-        "user_id": 52,
-        "function": "SGP"
+        'id': 'gameParameters',
+        'p_paramCategory': '1',
+        'paramQuestions': '8',
+        'timeLimit': '1',
+        'wager': '1',
+        'user_id': '52',
+        'function': 'GG',
+        'counter': '2'
     }
     """ modify user information for testing """
     # info['stuff'] = "stuff"
 
     # print(Game(info).addToQueue())
-    print(Game().getMetaData())
+    print(Game(info).getQueuedUsers())

@@ -4,15 +4,13 @@
     <head>
         <meta charset="utf-8" />
         <title>Member Profile</title>
+        <link rel="stylesheet" href="assets/css/screen.css">
         <link rel="stylesheet" href="assets/css/plugins/jquery-steps.css">
-        <!-- <link rel="stylesheet" media="screen" href="assets/css/screen.css"> -->
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
     <body class='ui-widget-header'>
-        <center><h1>Member Profile</h1></center> 
-        
-        <p></p>
-        <form id="profile">  
+        <center><h1>Member Profile</h1></center>
+        <form id="profile">
             <h1>Account Infomation</h1>
             <fieldset>
                 <p>
@@ -25,11 +23,23 @@
                     <br /><span id='username_availability_result'></span>
                 </p>
                 <p>
-                    <label for="password">Password:</label>   <!--should this be in encrypted format.-->
-                    <input type="password" name="password" required aria-required="true"> <!--it has input type password-->
+                    <fieldset name='changePassword' class="pass">
+                        <legend>
+                            <label >
+                                <input type='checkbox' name='togPass' id='togPass' />
+                                Change Password
+                            </label>
+                        </legend>
+                        <label for="origpassword">Old Password:</label>   <!--should this be in encrypted format.-->
+                        <input type="origpassword" name="origpassword" required aria-required="true"> <!--it has input type password-->
+                        <label for="newpassword">New Password:</label>   <!--should this be in encrypted format.-->
+                        <input type="newpassword" name="newpassword" required aria-required="true"> <!--it has input type password-->
+                        <label for="confirmpassword">Confirm Password:</label>   <!--should this be in encrypted format.-->
+                        <input type="confirmpassword" name="confirmpassword" required aria-required="true"> <!--it has input type password-->
+                    </fieldset>
                 </p>
-                <p>
-                    <!-- <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"> -->
+                <!-- <p>
+                     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
                     <fieldset>
                         <input class='paypal' type="hidden" name="cmd" value="_s-xclick">
                         <input class='paypal' type="hidden" name="hosted_button_id" value="69U37XMXFLMWY">
@@ -44,9 +54,9 @@
                         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit_paypal" alt="PayPal - The safer, easier way to pay online!">
                         <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                     </fieldset>
-                    <!-- </form> -->
+                    </form>
 
-                </p>
+                </p> -->
             </fieldset>
 
             <h1>Personal Information</h1>
@@ -71,51 +81,57 @@
                     <label for="paypal_account">Paypal Account Name:</label>
                     <input type="text" name="paypal_account" required aria-required="true">
                 </p>
-                <p>
-                    <label for="profile-avatar">Avatar:</label>
-                    <div class='profile-avatar-wrap'>
-                        <img src="assets/css/images/anon_user.png" class="profile-avatar" id="profile-avatar" alt='Image for profile'>
-                        <input type="file" id='uploader' />
-                    </div>
+
                 <p>
                     <label id="themes_label" for="themes">Change Theme:</label><br />
-                    <select id="themes">
+                    <select id="themes" name="themes">
                         <option value='base'>Base</option>
                         <option value='black-tie'>Black Tie</option>
                         <option value='blitzer'>Blitzer</option>
-                        <option value='cupertino'>Cupertino</option>           
-                        <option value='dark-hive'>Dark Hive</option>           
-                        <option value='dot-luv'>Dot Luv</option>           
-                        <option value='eggplant'>Eggplant</option>           
-                        <option value='excite-bike'>Excite Bike</option>           
-                        <option value='flick'>Flick</option>           
-                        <option value='hot-sneaks'>Hot Sneaks</option>           
-                        <option value='humanity'>Humanity</option>           
-                        <option value='le-frog'>Le Frog</option>           
-                        <option value='mint-choc'>Mint Choc</option>           
-                        <option value='overcast'>Overcast</option>           
-                        <option value='pepper-grinder'>Pepper Grinder</option>           
-                        <option value='redmond'>Redmond</option>           
-                        <option value='smoothness'>Smoothness</option>           
-                        <option value='south-street'>South Street</option>           
-                        <option value='start'>Start</option>           
-                        <option value='sunny'>Sunny</option>           
-                        <option value='swanky-purse'>Swanky Purse</option>           
-                        <option value='trontastic'>Trontastic</option>           
-                        <option value='ui-darkness'>UI Darkness</option>           
+                        <option value='cupertino'>Cupertino</option>
+                        <option value='dark-hive'>Dark Hive</option>
+                        <option value='dot-luv'>Dot Luv</option>
+                        <option value='eggplant'>Eggplant</option>
+                        <option value='excite-bike'>Excite Bike</option>
+                        <option value='flick'>Flick</option>
+                        <option value='hot-sneaks'>Hot Sneaks</option>
+                        <option value='humanity'>Humanity</option>
+                        <option value='le-frog'>Le Frog</option>
+                        <option value='mint-choc'>Mint Choc</option>
+                        <option value='overcast'>Overcast</option>
+                        <option value='pepper-grinder'>Pepper Grinder</option>
+                        <option value='redmond'>Redmond</option>
+                        <option value='smoothness'>Smoothness</option>
+                        <option value='south-street'>South Street</option>
+                        <option value='start'>Start</option>
+                        <option value='sunny'>Sunny</option>
+                        <option value='swanky-purse'>Swanky Purse</option>
+                        <option value='trontastic'>Trontastic</option>
+                        <option value='ui-darkness'>UI Darkness</option>
                         <option value='ui-lightness'>UI Lightness</option>
                         <option value='vader'>Vader</option>
                     </select>
                 </p>
-            </fieldset> 
+                <p>
+                    <label for='bio'>Bio:</label>
+                    <textarea id='bio' name='bio' cols="50" rows="5"></textarea>
+                </p>
+                <p>
+                    <label for="profile-avatar">Avatar:</label>
+                    <div class='profile-avatar-wrap'>
+                        <img src="assets/css/images/anon_user.png" class="profile-avatar" id="profile-avatar" alt='Image for profile'>
+                        <input type="file" id='uploader' name='uploader' />
+                    </div>
+                </p>
+            </fieldset>
         </form>
     </center></body>
     <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
     <script>
-        require(['common'], function(){ 
+        require(['common'], function(){
             require(['pages/profile'], function(){
-                require(['avatar']); 
-            }); 
+                require(['avatar']);
+            });
         });
     </script>
 </html>

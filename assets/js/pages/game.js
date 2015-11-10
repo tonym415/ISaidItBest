@@ -10,10 +10,12 @@ require([
 	'jqueryUI',
 	'livequery',
 	'cookie',
-	'tooltipster'
+	'tooltipster',
+	'blockUI'
 	], function($, app){
 		// game parameters global var
 		var params,
+			paramMeta,
 			pollCounter = 0;
 
 		// handle page setup upon arrival
@@ -37,6 +39,7 @@ require([
 			dataType: 'json',
 			desc: 'utility (load metadata)',
 			success: function(data){
+				paramMeta = data;
 				$('#wager')
 					.empty()
 					.append(new Option("None", ""));
@@ -67,40 +70,45 @@ require([
 
 	// get players and start game
 	function getGame(){
-		params.function = 'GG';
-		$.ajax({
-			data: params,
-			url: app.engine,
-			type: 'POST',
-			dataType: 'json',
-			desc: 'Game Creation',
-			success: function(data){
-				if (data.status !== 'complete'){
-					if (pollCounter < 15){
+		var timeout = setTimeout(function(){
+			$.blockUI({message: $('#question'), css:{ width: '275px'}});
+			$.ajax({
+				data: params,
+				url: app.engine,
+				type: 'POST',
+				dataType: 'json',
+				desc: 'Game Creation',
+				global: false,
+				success: function(data){
+					if (pollCounter <= 3){
 						pollCounter++;
-						setTimeout(getGame(), 15000);
+						params.counter = pollCounter;
+						if (data.status !== 'complete'){
+							getGame();
+						}else{
+							$.unblockUI();
+							// update game ui
+							console.log(pollCounter);
+							console.log(data);
+						}
 					}else{
+						clearTimeout(timeout);
 						pollCounter = 0;
+						app.dMessage('Data', data);
 					}
-				}else{
-					// update game ui
-					console.log(pollCounter);
-					console.log(data);
 				}
-			}
-		});
+			});
+		}, 5000);
 	}
 
 	// set up parameter form validation
 	$('#gameParameters').validate({
 		submitHandler: function(){
-			vals = $(this.currentForm).serializeForm();
 			info = app.getCookie('user');
-			vals.user_id = info.user_id;
-			vals.function = 'SGP';
-			params = vals;
-			$.post(app.engine, vals);
-			app.dMessage('Params', app.prettyPrint(params));
+			params = $(this.currentForm).serializeForm();
+			params.user_id = info.user_id;
+			params.function = 'GG';
+			params.counter = pollCounter;
 			getGame();
 		},
 		rules: {

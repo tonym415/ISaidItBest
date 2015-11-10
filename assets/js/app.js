@@ -432,7 +432,17 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				element = $('#' + element.id + '-button');
 			}
 			$(element).tooltipster('hide');  // hide tooltip when field passes validation
-		}
+		},
+		showErrors: function (errorMap, errorList) {
+              if (typeof errorList[0] != "undefined") {
+                  var position = $(errorList[0].element).position().top;
+                  $('html, body').animate({
+                      scrollTop: position
+                  }, 300);
+
+              }
+              this.defaultShowErrors();
+          }
 	});
 	/** return the app object with var/functions built in */
 	return {
@@ -462,7 +472,12 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		dMessage : function(title, message){
 			app = this;
 			title = (title === undefined) ? "Error" : title;
-			message = (message === undefined) ? "Sub-category not found" : message;
+			if (message !== undefined){
+				// print objects in readable form
+				message = (typeof(message) === 'object') ? app.prettyPrint(message) : message;
+			}else{
+				message = "";
+			}
 			app.mBox.dialog('option','title', title);
 			$('#message-content').html(message);
 			app.mBox.dialog('open');

@@ -29,6 +29,7 @@ requirejs.config({
 			// if the CDN location fails, load from this location
 			'lib/jquery.validate'
 		],
+		additional_methods: 'lib/additional-methods',
 		// plugins
 		livequery: 'lib/jquery.livequery',
 		flipclock: 'lib/flipclock',
@@ -37,6 +38,7 @@ requirejs.config({
 		blockUI: 'lib/jquery.blockUI',
 		avatar: 'lib/avatar',
 		tooltipster: 'lib/jquery.tooltipster',
+		upload: 'lib/jquery.fileupload',
 		jqGrid: [
 			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
 			'lib/grid.locale-en'
@@ -66,6 +68,12 @@ requirejs.config({
 		},
 		qtip: {
 			deps: ['jquery']
+		},
+		upload: {
+			deps: ['jquery', 'jqueryUI']
 		}
+		// additional_methods: {
+		// 	deps:['validate']
+		// }
 	}
 });

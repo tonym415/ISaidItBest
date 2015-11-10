@@ -1,7 +1,15 @@
 /*
 	Handles js interaction for the signup page
  */
-require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
+require([
+	'jquery',
+	'app',
+	'validate',
+	'jqueryUI',
+	'steps',
+	'additional_methods',
+	'upload'
+	], function($, app){
 	// page set up
 	app.init('profile');
 
@@ -10,23 +18,49 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		$("input[name='" + value + "']").attr("disabled", true);
 	});
 
-
-	var dialog = $('#paypal_transaction').dialog({
-		autoOpen: false,
-		modal: true
-	});
-
-
+	$('#uploader').fileupload();
 
 	function updateUserInfo(data){
-		console.log(data)
+		app.dMessage('Data', data);
+		console.log(data);
+		$.ajax({
+			url: app.engine,
+			data: data,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'Update Profile',
+			success: function(data){
+				app.dMessage('data', data);
+			}
+		});
+
 	}
 
 	var valHandler = function(){
 		formData = $(this.currentForm).serializeForm();
 		formData['function'] = "UUI";
 		updateUserInfo(formData);
-	}
+
+		// upload avatar
+		if ($('#uploader').val() !== ""){
+			filesList = $('#uploader')[0].files;
+
+			$('#uploader').fileupload({
+				dataType: 'json',
+				url: app.engine + "?function=PU",
+				function: 'Avatar Upload',
+				done: function(e, data){
+					$.each(data.result, function(index, file){
+						$('<p/>').text(file.name).appendTo('#uploader');
+					});
+				}
+			});
+
+			$('#uploader').fileupload('add', {files: filesList});
+		}
+	};
+
+
 
 // validate signup form on keyup and submit
 	$("form").steps({
@@ -54,7 +88,7 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 	        // if (newIndex == 2) { Avatar.init(); return true; }
 
 	        // bypass validation (DEBUG)
-			return true;
+			// return true;
 
 	        // Disable validation on fields that are disabled or hidden.
 	        form.validate().settings.ignore = ":disabled,:hidden";
@@ -81,9 +115,7 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		        form.submit();
 		    }
 	 }).validate({
-		debug: true,
 		submitHandler: valHandler,
-		errorLabelContainer: $("profile_errors"),
 		rules: {
 			first_name: "required",
 			last_name: "required",
@@ -91,14 +123,31 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 				required: true,
 				minlength: 3
 			},
-			password: {
-				required: true,
-				minlength: 5
-			},
-			confirm_password: {
-				required: true,
+			origpassword: {
 				minlength: 5,
-				equalTo: $("input[name='password']")
+				required: {
+					depends: function(element){
+						return $('#togPass').is(':checked');
+					}
+				}
+			},
+			newpassword: {
+				minlength: 5,
+				required: {
+					depends: function(element){
+						return $('#togPass').is(':checked');
+					}
+				}
+			},
+			confirmpassword: {
+				minlength: 5,
+				required:{
+					depends: function(element){
+						value = ($(element).val() == $('#newpassword').val());
+						togged = $('#togPass').is(':checked');
+						return togged && value;
+					}
+				}
 			},
 			email: {
 				required: true,
@@ -107,6 +156,14 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 			paypal_account: {
 				required: true,
 				minlength: 2
+			},
+			uploader: {
+				accept: "image/*",
+				required: {
+					depends: function(element){
+						return ($(element).val() !== "");
+					}
+				}
 			}
 		},
 		messages: {
@@ -116,18 +173,25 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 				required: "Please enter a username",
 				minlength: "Your username must consist of at least 3 characters"
 			},
-			password: {
-				required: "Please provide a password",
+			origpassword: {
+				required: "Please provide the original password",
 				minlength: "Your password must be at least 5 characters long"
 			},
-			confirm_password: {
-				required: "Please provide a password",
+			newpassword: {
+				required: "Please provide new password",
+				minlength: "Your password must be at least 5 characters long"
+			},
+			confirmpassword: {
+				required: "Please confirm new password",
 				minlength: "Your password must be at least 5 characters long",
 				equalTo: "Please enter the same password as above"
 			},
 			email: {
 				required: "Please enter a valid email address",
 				email: "Your email address must be in the format of name@domain.com"
+			},
+			uploader: {
+				accept: "You tried to upload an invalid file type"
 			}
 		}
 	});
@@ -153,23 +217,10 @@ require(['jquery','app',  'validate','jqueryUI', 'steps'], function($, app){
 		}
 	});
 
-// paypal handler
-	$('body').on('click', 'input[name=submit_paypal]', function(event){
-		event.preventDefault();
+	$('#togPass').on('change', function(){
+		$(this).parent().parent().siblings().slideToggle('slow');
+	}).parent().parent().siblings().hide();
 
-		data = $('.paypal').serializeForm();
-		$.ajax({
-			contentType: "application/x-www-form-urlencoded",
-			desc: "Paypal Request",
-			data: data,
-			type: "POST",
-			"Access-Control-Allow-Origin" :"https://www.paypal.com/cgi-bin/webscr",
-			"Access-Control-Allow-Methods" : "GET,POST",
-			"Access-Control-Allow-Headers" : "Content-Type",
-			url: "https://www.paypal.com/cgi-bin/webscr",
-		});
-		console.log(data);
-	});
 	// run avatar setup
 	require(['avatar']);
 });
