@@ -3,16 +3,17 @@
 The User class is used to handle all functions related to the User
 """
 import os
+import io
 import sys
 import json
 from math import ceil
 from passlib.hash import pbkdf2_sha256
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
-import lib.db2
+from lib.Entity import Entity
 
 
-class User(object):
+class User(Entity):
 
     """ for User"""
     """ initalize User object """
@@ -20,8 +21,9 @@ class User(object):
     _context = [__name__ == "__main__"]
 
     def __init__(self, *userInfo, **kwargs):
-        self._cnx = lib.db2.get_connection()
-        self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
+        super(User, self).__init__()
+        # self._cnx = lib.db2.get_connection()
+        # self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
         for dictionary in userInfo:
             for key in dictionary:
                 # print('Key: %s' % key)
@@ -133,13 +135,26 @@ class User(object):
                      "FROM  users INNER JOIN roles USING(role_id) WHERE 1")
             return self.executeQuery(query, ())
 
-    def getUser(self):
+    def getUserByName(self):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         query = """SELECT  user_id ,  first_name , last_name , email ,
                 username, credit, wins, losses, paypal_account , password,
                 created, role,  active  FROM  users JOIN roles USING(role_id) WHERE username = %s"""
         return self.executeQuery(query, (self.user_username,))
+
+    def getUserByID(self):
+        """ get user information by name """
+        # if no user is found by the given name return empty dictionary
+        params = self.sanitizeParams()
+        query = ("SELECT data as theme, meta_name as dataType, username, role "
+                 " FROM users u LEFT JOIN roles r USING(role_id) "
+                 "LEFT JOIN users_metadata m ON u.user_id=m.user_id")
+        # query = ("SELECT  user_id ,  first_name , last_name , email , "
+        #          "username, credit, wins, losses, paypal_account , password, "
+        #          "created, role,  active  FROM  users JOIN roles USING(role_id) "
+        #          "WHERE user_id = %(user_id)s")
+        return self.executeQuery(query, params)
 
     def updateUser(self):
         """ update user info """
@@ -198,9 +213,14 @@ class User(object):
 
         return returnObj
 
-    def isValidUser(self):
+    def isValidUser(self, info):
         """ determine if user is valid based on username/password """
-        userInfo = self.getUser()[0]
+        # userInfo should be provided by calling function
+        if info:
+            userInfo = info
+        else:
+            userInfo = self.getUserByName()[0]
+
         if 'error' in userInfo:
             validUser = False
         else:
@@ -219,47 +239,72 @@ class User(object):
          """
         return (0, 1)[self.cursor.rowcount > 0]
 
-    def profileUpdate(self):
+    def profileAvatar(self):
         params = self.sanitizeParams()
-        return params['uploader']
+        fileContents = params['uploader']
+        s = io.BytesIO()
+        s.write(fileContents)
+        return s.getvalue()
 
-    def executeModifyQuery(self, query, params):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            self._cnx.commit()
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
+    def profileUpdate(self):
+        # get column names for user table
+        userCols = self.getColNames('users')
+        params = self.sanitizeParams()
 
-        return returnDict
+        # delete extraneous key
+        del params['id']
 
-    def executeQuery(self, query, params):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            if self.cursor.rowcount > 0:
-                returnDict = self.cursor.fetchall()
+        query = ("UPDATE users SET first_name = %(first_name)s, "
+                 "last_name = %(last_name)s, email = %(email)s, "
+                 "paypal_account = %(paypal_account)s")
+        # add password query fragment if necessary
+        if 'newpassword' in params.keys():
+            query += ", password = %(password)s"
+        query += " WHERE user_id = %(user_id)s"
+        self.executeModifyQuery(query, params)
+
+        # get data to enter in to the meta table for users
+        metaCols = []
+        for k in params.keys():
+            metaObj = {}
+            if k not in userCols:
+                metaObj['user_id'] = params['user_id']
+                metaObj['meta_name'] = k
+                metaObj['data'] = params[k]
+                metaCols.append(metaObj)
+
+        retVal = {}
+        for obj in metaCols:
+            # check to see if record exists
+            query = ("SELECT * FROM users_metadata WHERE user_id = %(user_id)s "
+                     " and meta_name = %(meta_name)s")
+            rec = self.executeQuery(query, obj, True)
+            if rec:
+                # if record exist update
+                query = ("UPDATE users_metadata SET data = %(data)s WHERE "
+                         " user_id = %(user_id)s and meta_name = %(meta_name)s")
             else:
-                raise Exception("%s yields %s" %
-                                (self.cursor.statement.replace('\n', ' ')
-                                 .replace('            ', ''), self.cursor.rowcount))
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
+                # if record does not exist insert
+                query = ("INSERT INTO users_metadata (user_id, meta_name, data) "
+                         "VALUES (%(user_id)s, %(meta_name)s, %(data)s)")
 
-        return returnDict
+            retVal = self.executeModifyQuery(query, obj)
+
+            if 'error' in retVal:
+                return retVal
+
+        return "Success"
+
 
 if __name__ == "__main__":
-    info = {"active": "Yes",
-            "credit": "65.00",
-            "email": "32@sa.com",
+    info = {"last_name": "Moses",
             "first_name": "Antonio",
-            "id": "50",
-            "last_name": "Moses",
-            "oper": "edit",
-            "role": "2",
-            "username": "ass"}
+            "email": "tonym415@gmail",
+            "themes": "hot-sneaks",
+            "paypal_account": "tonym415",
+            "user_id": "36",
+            "bio": "Me Stuff",
+            "id": "profile"}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
     # info = {"confirm_password": "password", "first_name":
     #         "Antonio", "paypal_account": "tonym415", "password":
@@ -275,6 +320,7 @@ if __name__ == "__main__":
               for i in info if i != 'function' and '_password' not in i}
     # print(info)
 
-    print(User(info).updateUser())
-    # u = User(u_info)
-    # print(u.getUser())
+    # print(User(info).updateUser())
+    u = User(u_info)
+    # print(u.profileUpdate())
+    print(u.getUserByID())

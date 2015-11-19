@@ -12,6 +12,7 @@ require([
 	], function($, app){
 	// page set up
 	app.init('profile');
+	var user = app.getCookie('user');
 
 	disabled_fields = ['username', 'created'];
 	$.each(disabled_fields, function(idx, value){
@@ -39,6 +40,13 @@ require([
 	var valHandler = function(){
 		formData = $(this.currentForm).serializeForm();
 		formData['function'] = "UUI";
+		formData.user_id = user.user_id;
+		// sanitize data
+		if (formData.origpassword === "" && formData.newpassword === "" && formData.confirmpassword === ""){
+			delete formData.origpassword;
+			delete formData.newpassword;
+			delete formData.confirmpassword;
+		}
 		updateUserInfo(formData);
 
 		// upload avatar

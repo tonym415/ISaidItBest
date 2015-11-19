@@ -14,22 +14,34 @@ require([
 	'blockUI'
 	], function($, app){
 		// game parameters global var
-		var params,
-			paramMeta,
+		var user,
+			timeout,
+			params,
+			paramMeta = {},
 			pollCounter = 0;
 
 		// handle page setup upon arrival
 		app.init('game');
+		user = app.getCookie('user');
 
-	/**
-	 * Clock instantiation
-	 * @type {FlipClock}
-	 */
-		clock = $('.countdown_timer').FlipClock({
-			autoStart: false,
-			countdown: true,
-			clockFace: 'MinuteCounter'
-		});
+	function enrichMeta(){
+		// created inbuilt search function
+		paramMeta.getTimeById = function(id){
+			var retVal = -1;
+		    var self = this;
+			var property = 'time_id';
+		    for(var index=0; index < self.times.length; index++){
+		        var item = self.times[index];
+		        if (item.hasOwnProperty(property)) {
+		            if (item[property] === parseInt(id)) {
+		                retVal = item.time_in_seconds;
+		                return retVal;
+		            }
+		        }
+		    }
+		    return retVal;
+		};
+	}
 
 	(function loadMeta(){
 		$.ajax({
@@ -40,6 +52,8 @@ require([
 			desc: 'utility (load metadata)',
 			success: function(data){
 				paramMeta = data;
+				// call enhancing function
+				enrichMeta();
 				$('#wager')
 					.empty()
 					.append(new Option("None", ""));
@@ -70,8 +84,8 @@ require([
 
 	// get players and start game
 	function getGame(){
-		var timeout = setTimeout(function(){
-			$.blockUI({message: $('#question'), css:{ width: '275px'}});
+		// create ajax poll
+		game = function(){
 			$.ajax({
 				data: params,
 				url: app.engine,
@@ -80,35 +94,50 @@ require([
 				desc: 'Game Creation',
 				global: false,
 				success: function(data){
-					if (pollCounter <= 3){
+					if (pollCounter <= 4){
 						pollCounter++;
 						params.counter = pollCounter;
-						if (data.status !== 'complete'){
+						if (data.status === 'pending'){
 							getGame();
-						}else{
-							$.unblockUI();
+						}else if(data.status === 'complete'){
 							// update game ui
-							console.log(pollCounter);
-							console.log(data);
+							clearTimeout(timeout);
+							$('#game_id').val(data.game_id);
+							loadDebate();
+						}else if(data.queue){
+							// set the created queue_id to params
+							params.queue_id = data.queue.queue_id;
+							$('#cancelSearch h1').html('Searching for a game...');
+							getGame();
 						}
 					}else{
-						clearTimeout(timeout);
+						$('#game').unblock();
 						pollCounter = 0;
 						app.dMessage('Data', data);
 					}
 				}
 			});
-		}, 5000);
+		};
+		// if this is the first time called immediately excute ajax
+		if (params.counter === 0){
+			$('#cancelSearch h1').html('Submitting your parameters...');
+			$('#game').block({message: $('#cancelSearch'), css:{ width: '275px'}});
+			game();
+		} else {
+			// if polling
+			timeout = setTimeout(game, 5000);
+		}
 	}
+
 
 	// set up parameter form validation
 	$('#gameParameters').validate({
 		submitHandler: function(){
-			info = app.getCookie('user');
 			params = $(this.currentForm).serializeForm();
-			params.user_id = info.user_id;
+			params.user_id = user.user_id;
 			params.function = 'GG';
 			params.counter = pollCounter;
+			openAccordionPanel('next');
 			getGame();
 		},
 		rules: {
@@ -122,6 +151,151 @@ require([
 			paramQuestions: "You must choose a question",
 			timeLimit: 'You must choose a time limit',
 			wager: 'You must choose a wager'
+		}
+	});
+
+	function submitGame(){
+		data.function = 'SUG';
+		app.dMessage('Submitting Game', data);
+		$.ajax({
+			url: app.engine,
+			data: data,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'Game Submission',
+			success: function(data){
+				if (!data.error){
+					// build vote form
+					$.each(data.users, function(){
+						if ($(this).user_id === user.user_id){
+							// append input control at start of form
+							 $("<input type='radio' />")
+								.attr("id", "commentRdo")
+								.attr("name", "commentRdo")
+								.val($(this).username)
+								.prependTo("#debateVote");
+						}
+					});
+					
+					// show vote/hide game
+					toggleGame();
+				}else{
+					app.dMessage(data.error, data.stm);
+				}
+			}
+		});
+	}
+
+	function toggleGame(){
+		$('#debate, #debateResults').toggle();
+	}
+
+	/**
+	 * Game Clock instantiation
+	 * @type {FlipClock}
+	 */
+		gameClock = $('#game_timer').FlipClock({
+			autoStart: false,
+			countdown: true,
+			clockFace: 'MinuteCounter',
+			stop: function(){
+				data = $('#gameUI').serializeForm();
+				data.user_id = user.user_id;
+				submitGame(data);
+			}
+		});
+	/**
+	 *  Wait Clock instantiation
+	 * @type {FlipClock}
+	 */
+		waitClock = $('#wait_timer').FlipClock(10,{
+			autoStart: false,
+			countdown: true,
+			clockFace: 'MinuteCounter',
+			stop: function(){
+				$.unblockUI();
+				gameClock.start();
+			}
+		});
+
+	function loadDebate(){
+		$('#game').unblock();
+		// // show timer
+		// $(".countdown_timer").show();
+
+		//set game criteria
+		var q_text = $('#paramQuestions :selected').text();
+		q_text += "\n (Wager: " + $('#wager :selected').text() + ")";
+		$("#question").html(q_text).wrap('<pre />');
+
+		// set clock based on time limit parameter
+		min = paramMeta.getTimeById($('#timeLimit').val());
+		gameClock.setTime(min);
+		$.blockUI({message: $('#gameWait'), css:{ width: '305px'}});
+		waitClock.start();
+	}
+
+	$('#cancel').click(function(){
+		$('#game').unblock();
+		openAccordionPanel('last');
+		params.function = 'CG';
+		params.id = 'cancelGame';
+		$.ajax({
+			url: app.engine,
+			data: params,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'Game Cancellation',
+			success: function(data){
+				// cancel poll
+				clearTimeout(timeout);
+				if (data.error === undefined){
+					func = function(){
+						params.counter = pollCounter = 0;
+						$(this).dialog('close');
+					};
+					msgOpt = {
+						buttons: {
+							Yes: function(){
+								getGame();
+								func();
+							},
+							No: func
+						}
+					};
+					app.dMessage(
+						"Alert",
+						'Cancellation Confirmed<p>Retry?</p>',
+						msgOpt
+					);
+				}else{
+					app.dMessage(data.error, data.stm);
+				}
+			}
+		});
+	});
+
+	function openAccordionPanel(position) {
+	    var current = app.accordion.accordion("option","active");
+	        maximum = app.accordion.find("h3").length;
+		if (position === 'next'){
+	        position = current+1 === maximum ? 0 : current+1;
+		}else{
+	        position = current-1 < 0 ? 0 : current-1;
+		}
+	    app.accordion.accordion("option","active",position);
+	}
+
+	$('#debateVote').validate({
+		submitHandler: function(){
+			data = $(this.currentForm).serializeForm();
+			app.dMessage('Data', data);
+		},
+		rules: {
+			commentRdo: 'required'
+		},
+		messages: {
+			commentRdo: "You must vote for a comment"
 		}
 	});
 

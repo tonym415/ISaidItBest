@@ -6,21 +6,17 @@ import os
 import sys
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
-import lib.db2
+from lib.Entity import Entity
 
 
-class Game(object):
+class Game(Entity):
 
     """ for category"""
     """ initalize User object """
-    _cnx = None
     _context = [__name__ == "__main__"]
 
     def __init__(self, *userInfo, **kwargs):
-        self._cnx = lib.db2.get_connection()
-        # default cursor if different cursor options are necessary another
-        # will be instantiated
-        self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
+        super(Game, self).__init__()
         for dictionary in userInfo:
             for key in dictionary:
                 setattr(self, "user_" + key, dictionary[key])
@@ -33,15 +29,29 @@ class Game(object):
                 for k, v in self.__dict__.items()
                 if k.startswith('user')}
 
+    def removeFromQueue(self):
+        """ add user params to queue"""
+        query = ("UPDATE game_queue SET active = 0 WHERE queue_id = %(queue_id)s")
+        params = self.sanitizeParams()
+        return self.executeModifyQuery(query, params)
+
     def addToQueue(self):
         """ add user params to queue"""
+        returnDict = {}
         query = ("INSERT INTO game_queue (user_id, question_id, wager_id, "
                  "time_id) VALUES (%(user_id)s, %(paramQuestions)s, %(wager)s, "
                  "%(timeLimit)s)")
         params = self.sanitizeParams()
-        returnVal = self.executeModifyQuery(query, params)
-        query = ("SELECT * FROM game_queue WHERE queue_id = %s")
-        return self.executeQuery(query, (self.cursor.lastrowid,))
+
+        try:
+            returnVal = self.executeModifyQuery(query, params)
+            query = ("SELECT * FROM game_queue WHERE queue_id = %s")
+            returnDict['queue'] = self.executeQuery(query, (self.cursor.lastrowid,))[0]
+        except Exception as e:
+            returnDict['error'] = "{}".format(e)
+            returnDict['stm'] = self.cursor.statement
+
+        return returnDict
 
     def getPlayerQueue(self):
         """ get all user in queue ready for game """
@@ -60,7 +70,7 @@ class Game(object):
         params = self.sanitizeParams()
         query = ("SELECT queue_id, user_id FROM game_queue WHERE question_id = "
                  "%(paramQuestions)s and wager_id = %(wager)s and time_id = "
-                 "%(timeLimit)s limit 0, 3")
+                 "%(timeLimit)s and active = 1 limit 0, 3")
         return self.executeQuery(query, params, True)
 
     def getGameID(self):
@@ -69,26 +79,50 @@ class Game(object):
         return self.executeQuery(query, ())[0]['game_id']
 
     def getGame(self):
-        # set game_id
-        g_id = self.getGameID()
+        # game id
+        g_id = None
+
+        # return object
+        returnDict = {'game_id': g_id}
 
         # get queued users
         users = self.getQueuedUsers()
 
-        # move users from queue to game
-        for qUser in users:
-            qUser['game_id'] = g_id
-            # update queue
-            query = ("UPDATE game_queue SET active = 0 WHERE "
-                     "queue_id = %(queue_id)s")
-            self.executeModifyQuery(query, qUser)
+        if len(users) >= 3:
+            # set game_id
+            g_id = self.getGameID()
 
-            # update game
-            query = ("INSERT INTO game (user_id, game_id) VALUES "
-                     "(%(user_id)s, %(game_id)s)")
-            self.executeModifyQuery(query, qUser)
+            returnDict['game_id'] = g_id
+            returnDict['users'] = []
+            # move users from queue to game
+            for qUser in users:
+                qUser['game_id'] = g_id
+                # update queue
+                query = ("UPDATE game_queue SET active = 0 WHERE "
+                         "queue_id = %(queue_id)s")
+                self.executeModifyQuery(query, qUser)
 
-        return {'game_id': g_id}
+                # update game
+                query = ("INSERT INTO game (user_id, game_id) VALUES "
+                         "(%(user_id)s, %(game_id)s)")
+                self.executeModifyQuery(query, qUser)
+
+                # get user info
+                query = ("SELECT username FROM users where user_id = %(user_id)s")
+                returnDict['users'].append(self.executeQuery(query, qUser))
+
+        return returnDict
+
+    def submitThoughts(self):
+        params = self.sanitizeParams()
+        query = ("UPDATE game SET thoughts = %(thoughts)s, active = 0 WHERE "
+                 "user_id = %(user_id)s and game_id = %(game_id)s")
+        self.executeModifyQuery(query, params)
+
+        # get all comments for the game
+        query = ("SELECT user_id, username, thoughts FROM game INNER JOIN users "
+                 "USING(user_id) WHERE game_id = %(game_id)s")
+        return self.executeQuery(query, params)
 
     def getMetaData(self):
         """ get metadata """
@@ -99,35 +133,6 @@ class Game(object):
         returnObj['wagers'] = self.executeQuery(query, ())
         return returnObj
 
-    def executeModifyQuery(self, query, params):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            self._cnx.commit()
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
-
-        return returnDict
-
-    def executeQuery(self, query, params, returnEmpty=False):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            if self.cursor.rowcount > 0:
-                returnDict = self.cursor.fetchall()
-            elif returnEmpty:
-                returnDict = {}
-            else:
-                raise Exception("%s yields %s" %
-                                (self.cursor.statement.replace('\n', ' ')
-                                 .replace('            ', ''), self.cursor.rowcount))
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
-
-        return returnDict
-
 if __name__ == "__main__":
     info = {
         'id': 'gameParameters',
@@ -137,10 +142,12 @@ if __name__ == "__main__":
         'wager': '1',
         'user_id': '52',
         'function': 'GG',
+        'queue_id': '1',
+        'game_id': '1',
         'counter': '2'
     }
     """ modify user information for testing """
     # info['stuff'] = "stuff"
 
-    # print(Game(info).addToQueue())
-    print(Game(info).getQueuedUsers())
+    # print(Game(info).submitThoughts())
+    # print(Game(info).getGame())

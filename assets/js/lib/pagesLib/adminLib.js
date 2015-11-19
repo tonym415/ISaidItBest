@@ -1,16 +1,8 @@
 define(['jquery', 'app'], function($, app) {
-    var formManager;
-    app.createMsgBox();
-
-    // // validator methods
-    // $.validator.addMethod("selectNotEqual", function(value, element, param) {
-    //     return param != value;
-    // });
-
     /*
     * multi-form managment object
     */
-    formManager = {
+    var formManager = {
         "createCategory" :{
             abbr: "CC",
             desc: "Create Category",

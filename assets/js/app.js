@@ -41,15 +41,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		setTheme();
 		this.createNavBar();
 
-		// initialize universal messagebox
-		this.createMsgBox();
-
 		// page specific initialization
 		switch (page) {
 			case 'game':
 				// load category selectmenu
 				this.getCategories();
-				$("#accordion").accordion({ heightStyle: 'content', collapsable: true});
+				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
+				$("#debateResults").toggle();
 				$(".sel").selectmenu({ width: 200 });
 				// create counter for sub-category templates
 				$('#subCatTemplate').data("tempCount",0);
@@ -102,10 +100,6 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			// logSpan = "<span ><a href='javascript:void(0)'>Logout?</a></span>";
 			$("#navDiv").append(userSpan).append(logSpan);
 		}
-		// universal messagbox
-		$('body').after('<div id="dialog-message" title=""></div>');
-		$('#dialog-message').append("<p id='message-content'></p>");
-
 	};
 
 	function logout(){
@@ -117,28 +111,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		});
 	}
 
-	function createMsgBox(element){
-		var mbox = $('#dialog-message').dialog({
-			autoResize: true,
-			autoOpen: false,
-			dialogClass: 'no-close',
-			modal: true,
-			open: function(){
-				icon = '<span class="ui-icon ui-icon-circle-zoomout" style="float:left; margin:0 7px 5px 0;"></span>';
-				$(this).parent().find("span.ui-dialog-title").prepend(icon);
-			},
-			buttons: {
-				Ok: function(){ $(this).dialog("close"); }
-			}
-	    });
-		this.mBox = mbox;
-	}
-
-
-
-
 	var loginNavBar = function(){
-
 		for(var key in navPages){
 			// the following line is necessary for production
 			// it is comment now for testing purposes only
@@ -232,8 +205,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	 	return $.cookie(name);
 	 }
 
-	 function pprint(str){
-	 	return "<pre>" + JSON.stringify(str, null, 2) + "</pre>";
+	 function pprint(obj){
+	 	return "<pre>" + JSON.stringify(obj, null, 2) + "</pre>";
 	 }
 
 	/**
@@ -465,11 +438,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		setTheme: setTheme,
 		prettyPrint: pprint,
 		logout: logout,
-		createMsgBox: createMsgBox,
 		getCategories: getCategories,
 		loadCategories: loadCategories,
 		getCatQuestions: getCatQuestions,
-		dMessage : function(title, message){
+		dMessage : function(title, message, options){
 			app = this;
 			title = (title === undefined) ? "Error" : title;
 			if (message !== undefined){
@@ -478,9 +450,30 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			}else{
 				message = "";
 			}
-			app.mBox.dialog('option','title', title);
-			$('#message-content').html(message);
-			app.mBox.dialog('open');
+			defaultOpts = {
+				autoResize: true,
+				dialogClass: 'no-close',
+				modal: true,
+			    title: title,
+				open: function(){
+					icon = '<span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 5px 0;"></span>';
+					$(this).parent().find("span.ui-dialog-title").prepend(icon);
+				   var markup = message;
+				   $(this).html(markup);
+				},
+			   buttons: {
+				   Ok: function () {
+					   $(this).dialog("close");
+				   }
+			   }
+		    };
+			settings = defaultOpts;
+			if (options) settings = $.extend({}, defaultOpts, options);
+
+			// app.mBox.dialog('option','title', title);
+			// $('#message-content').html(message);
+			// app.mBox.dialog('open');
+			$('<div />').dialog(settings);
 		},
 		getTheme: function(){
 			$.cookie.json = true;
@@ -534,41 +527,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 				return params;
 			},
-		/**
-		 * loads the debate parameters, generates time clock, disables parameter selection and starts the debate
-		 * @param  {object} data Parameters for the debate
-		 */
-		loadDebate : function(data){
-				if (!data) { return data; }
-			 	$(".countdown_timer").hide();
-			 	$("#debate").hide();
-				$("#ui-id-1").addClass('ui-state-disabled');
-				$("#ui-id-2").click();
-				// TODO: notify user of submission status (success/fail)
-				$("#successNotice").fadeIn(1000, function(){
-					// notify user of the search for a game
-					 $("#searchingNotice").fadeIn(1000,function(){
-						$("#game").addClass("searching");
-						// $("#game").append("<img id='searchImg' src='/assets/images/search1.gif' />");
-						$("#successNotice").fadeOut(5000,function(){
-							// when the success notice fades
-							$("#searchingNotice").hide();
-							$("#game").removeClass("searching");
-							$("#searchImg").remove();
-						 	$("#debate").show();
-						 	$(".countdown_timer").show();
-						 	//set game criteria
-						 	var q_text = params.subCategory_text + "\n (Wager: " + params.wager_text + ")";
-						 	$("#question").html(q_text).wrap('<pre />');
-						 	// set clock based on time limit parameter
-						 	min = params.timeLimit * 60;
-						 	clock.setTime(min);
-						 	clock.start();
-						});
-					});
-				});
 
-			},
 		subCheck:function(element){
 			app = this;
 			if (element === undefined) return false;

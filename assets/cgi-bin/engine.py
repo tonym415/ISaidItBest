@@ -84,7 +84,7 @@ def validateUser(fs):
         u = User(fs)
         valid_user = u.isValidUser()
         if valid_user:
-            user_info = u.getUser()
+            user_info = u.getUserByName()
 
             # do not send back hashed password
             del user_info[0]['password']
@@ -189,16 +189,19 @@ def getCategoryQuestionsByID(fs):
 def gameFunctions(fs):
     returnObj = {}
     if 'id' in fs:
+        # id tells what sub function to perform
         if fs['id'] == 'gameParameters':
+            # counter = 0 indicates first time submitting params
             if fs['counter'] == '0':
                 returnObj = Game(fs).addToQueue()
             else:
+                # counter > 0 indicates checking for game
                 # get players from queue
                 data = Game(fs).getGame()
                 # send return data
-                returnObj['data'] = data
+                returnObj = data
 
-                if len(data) >= 3:
+                if data['game_id']:
                     # if queue properly populated
                     returnObj['status'] = 'complete'
                 else:
@@ -206,13 +209,22 @@ def gameFunctions(fs):
                     returnObj['status'] = 'pending'
         elif fs['id'] in ['getMetaData']:
             returnObj = Game(fs).getMetaData()
+        elif fs['id'] in ['cancelGame']:
+            # cancel game search
+            returnObj = Game(fs).removeFromQueue()
+        elif fs['id'] in ['gameUI']:
+            # submit game
+            returnObj['users'] = Game(fs).submitThoughts()
 
     returnJson(returnObj)
 
 
 def profileUpdate(fs):
     returnObj = {}
-    returnObj['file'] = User(fs).profileUpdate()
+    if fs['id']:
+        returnObj['data'] = User(fs).profileUpdate()
+    else:
+        returnObj['file'] = User(fs).profileAvatar()
     returnJson(returnObj)
 
 
@@ -244,13 +256,13 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName in ["GMD", "GG"]:
+    elif funcName in ["GMD", "GG", "CG"]:
         globals()['gameFunctions'](fStor)
     elif funcName in ["CU"]:
         globals()['contactUs'](fStor)
     elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)
-    elif funcName in ["PU"]:
+    elif funcName in ["PU", "UUI"]:
         globals()['profileUpdate'](fStor)
     else:
         globals()['showParams'](fStor)
@@ -273,7 +285,7 @@ def main():
                       p_paramCategory="1",
                       paramQuestions="8",
                       timeLimit="1",
-                      wager="17",
+                      wager="1",
                       user_id="52",
                       function="GG",
                       counter="2")
