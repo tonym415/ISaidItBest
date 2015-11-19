@@ -58,8 +58,9 @@ class Entity(object):
         maxnamesize = 0
         for coldesc in self.cursor.description:
             coldesc = list(coldesc)
-            # coldesc[2:6] = []
+            coldesc[2:6] = []
             columns.append(coldesc[0])
+            # columns.append(coldesc)
             namesize = len(coldesc[0])
             if namesize > maxnamesize:
                 maxnamesize = namesize

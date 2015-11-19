@@ -17,7 +17,6 @@ class User(Entity):
 
     """ for User"""
     """ initalize User object """
-    _cnx = None
     _context = [__name__ == "__main__"]
 
     def __init__(self, *userInfo, **kwargs):

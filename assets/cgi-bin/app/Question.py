@@ -5,22 +5,17 @@ The Question class is used to handle all functions related to the Question table
 import os
 import sys
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+from lib.Entity import Entity
 
-import lib.db2
 
-
-class Question(object):
+class Question(Entity):
 
     """ for category"""
     """ initalize User object """
-    _cnx = None
     _context = [__name__ == "__main__"]
 
     def __init__(self, *userInfo, **kwargs):
-        self._cnx = lib.db2.get_connection()
-        # default cursor if different cursor options are necessary another
-        # will be instantiated
-        self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
+        super(Question, self).__init__()
         for dictionary in userInfo:
             for key in dictionary:
                 setattr(self, "user_" + key, dictionary[key])
@@ -117,32 +112,6 @@ class Question(object):
             """
         return self.executeQuery(query, ())
 
-    def executeModifyQuery(self, query, params):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            self._cnx.commit()
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
-
-        return returnDict
-
-    def executeQuery(self, query, params):
-        returnDict = {}
-        try:
-            self.cursor.execute(query, params)
-            if self.cursor.rowcount > 0:
-                returnDict = self.cursor.fetchall()
-            # else:
-            #     raise Exception("%s yields %s" %
-            #                     (self.cursor.statement.replace('\n', ' ')
-            #                      .replace('            ', ''), self.cursor.rowcount))
-        except Exception as e:
-            returnDict['error'] = "{}".format(e)
-            returnDict['stm'] = self.cursor.statement
-
-        return returnDict
 
 if __name__ == "__main__":
     info = {
