@@ -7,7 +7,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 	var user = app.getCookie('user');
 	if (user !== undefined){
 		// if same session USERNAME should be set
-		name = user.USERNAME;
+		name = user.username;
 		if (name === 'undefined') {
 			// if coming from registration page
 			name = user.username;
@@ -17,15 +17,14 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 	}
 
 	var valHandler = function(){
-		user = $("#username").val();
-		pass = $("#password").val();
-		data = {'function': 'VU', 'username': user, 'password': pass};
+		formData = $('form').serializeForm();
+		formData.function = 'VU';
 
 		// validate user
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
 			desc: 'Login',
-			data: data,
+			data: formData,
 			type: "POST",
 			url: app.engine
 		})

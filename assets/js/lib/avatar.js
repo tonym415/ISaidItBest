@@ -1,9 +1,8 @@
-require(['jquery','domReady!'], function($){
+define(['jquery','domReady!'], function($){
 // Required for drag and drop file access
 jQuery.event.props.push('dataTransfer');
 
 // IIFE to prevent globals
-(function() {
 
   var Resample = (function (canvas) {
 
@@ -207,9 +206,5 @@ jQuery.event.props.push('dataTransfer');
     }
 
   }
-
-  Avatar.init();
-
-})();
-
+  return Avatar;
 });

@@ -201,16 +201,19 @@ require([
 		 	type: 'POST',
 			success: function(result){
 				if (result.data !== undefined){
+					avInit = false;
 					$.each(result.data, function(key, value){
 						// element = $("input[name='" + key + "']");
 						if (key === 'avatar'){
 							avatar_file = value;
 							initAvatar();
+							avInit = true;
 						}else{
 							element = $("#" + key);
 							if (element.length > 0){ element.val(value); }
 						}
 					});
+					if (!avInit) initAvatar();
 				}
 			}
 		});

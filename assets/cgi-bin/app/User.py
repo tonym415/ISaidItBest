@@ -134,14 +134,33 @@ class User(Entity):
                      "FROM  users INNER JOIN roles USING(role_id) WHERE 1")
             return self.executeQuery(query, ())
 
-    def getUserByName(self, meta=False):
+    def getUserCookie(self):
         params = self.sanitizeParams()
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
-        query = ("SELECT u.user_id, first_name, username, role "
-                 "last_name, email, credit, wins, losses, paypal_account, "
-                 "u.created, password, active FROM users u LEFT JOIN roles r "
+        query = ("SELECT u.user_id, username, role FROM users u LEFT JOIN roles r "
                  "USING(role_id) LEFT JOIN users_metadata m ON u.user_id=m.user_id "
+                 "WHERE u.active = 1 AND u.username = %(username)s AND "
+                 "meta_name = 'theme'")
+
+        retDict = self.executeQuery(query, params)[0]
+        # get metadata along with basic data
+        query = ("SELECT meta_name, data FROM users_metadata WHERE user_id = "
+                 "%(user_id)s AND meta_name IN ('avatar','theme')")
+        metaList = self.executeQuery(query, retDict)
+        for rec in metaList:
+            retDict[rec['meta_name']] = rec['data']
+
+        return [retDict]
+
+    def getUserByName(self, meta=False):
+        """ get user information by name """
+        # if no user is found by the given name return empty dictionary
+        params = self.sanitizeParams()
+        query = ("SELECT  u.user_id, first_name, username, role, password, "
+                 "last_name, email, credit, wins, losses, paypal_account, "
+                 "u.created, active FROM users u LEFT JOIN roles r USING(role_id) "
+                 "LEFT JOIN users_metadata m ON u.user_id=m.user_id "
                  "WHERE u.active = 1 AND u.username = %(username)s AND "
                  "meta_name = 'theme'")
 
@@ -247,7 +266,7 @@ class User(Entity):
         if info:
             userInfo = info
         else:
-            userInfo = self.getUserByName()[0]
+            userInfo = self.getUserByName()
 
         if 'error' in userInfo:
             validUser = False
@@ -346,14 +365,15 @@ class User(Entity):
 
 
 if __name__ == "__main__":
-    info = {"last_name": "Moses",
-            "first_name": "Antonio",
-            "email": "tonym415@gmail",
-            "theme": "hot-sneaks",
-            "paypal_account": "tonym415",
-            "user_id": "36",
-            "bio": "Me Stuff",
-            "id": "profile"}
+    info = {}
+    # info = {"last_name": "Moses",
+    #         "first_name": "Antonio",
+    #         "email": "tonym415@gmail",
+    #         "theme": "hot-sneaks",
+    #         "paypal_account": "tonym415",
+    #         "user_id": "36",
+    #         "bio": "Me Stuff",
+    #         "id": "profile"}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
     # info = {"confirm_password": "password", "first_name":
     #         "Antonio", "paypal_account": "tonym415", "password":
@@ -361,7 +381,7 @@ if __name__ == "__main__":
     #         "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
-    info['username'] = "tonym415"
+    info['username'] = "user"
     info['password'] = "password"
 
     """ remove  from data dict """
@@ -371,5 +391,5 @@ if __name__ == "__main__":
 
     # print(User(info).updateUser())
     u = User(u_info)
-    # print(u.profileUpdate())
-    print(u.getUserByName(True))
+    # print(u.isValidUser())
+    print(u.getUserCookie())

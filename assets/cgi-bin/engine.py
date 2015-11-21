@@ -26,6 +26,7 @@ FSTOR = None
 
 
 def logAction(fs):
+    l = {}
     if 'page' in fs.keys():
         l = Log(fs).getAllLogs()
     elif 'user_id' in fs.keys():
@@ -77,6 +78,19 @@ def submitUserInfo(fs):
         returnObj['error'] = uInfo['message']
 
     returnJson(returnObj)
+
+
+def userFunctions(fs):
+    """ test function for class functionality (not needed for production) """
+    user_info = {}
+    if "id" in fs:
+        if fs['id'] == 'login':
+            """ create a json object noting user_info """
+            valid_user = User(fs).isValidUser()
+            if valid_user:
+                user_info = User(fs).getUserCookie()
+
+    returnJson(user_info)
 
 
 def validateUser(fs):
@@ -253,7 +267,7 @@ def doFunc(fStor):
     elif funcName in ["GAU"]:
         globals()['getAllUsers'](fStor)
     elif funcName in ["VU"]:
-        globals()['validateUser'](fStor)
+        globals()['userFunctions'](fStor)
     elif funcName in ["SUI", "UU"]:
         globals()['submitUserInfo'](fStor)
     elif funcName in ["TD"]:
