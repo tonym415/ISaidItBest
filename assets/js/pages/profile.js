@@ -4,26 +4,27 @@
 require([
 	'jquery',
 	'app',
+	// 'avatar',
 	'validate',
 	'jqueryUI',
 	'steps',
 	'additional_methods',
-	'upload'
-	], function($, app){
+	// 'upload',
+	'fileInput',
+	'bootstrap'
+	], function($, app, Avatar){
 	// page set up
 	app.init('profile');
 	var user = app.getCookie('user');
+	var avatar_file;
+	var default_avatar = 'assets/css/images/anon_user.png';
 
 	disabled_fields = ['username', 'created'];
 	$.each(disabled_fields, function(idx, value){
 		$("input[name='" + value + "']").attr("disabled", true);
 	});
 
-	$('#uploader').fileupload();
-
 	function updateUserInfo(data){
-		app.dMessage('Data', data);
-		console.log(data);
 		$.ajax({
 			url: app.engine,
 			data: data,
@@ -34,43 +35,25 @@ require([
 				app.dMessage('data', data);
 			}
 		});
-
 	}
 
-	var valHandler = function(){
-		formData = $(this.currentForm).serializeForm();
-		formData['function'] = "UUI";
+	function getProfileData(){
+		formData = $('form').serializeForm();
+		// filesList = ($('#avatar').val() !== "") ? $('#avatar')[0].files : null;
+		// formData.file = filesList;
+		formData.function = "UP";
 		formData.user_id = user.user_id;
+
 		// sanitize data
 		if (formData.origpassword === "" && formData.newpassword === "" && formData.confirmpassword === ""){
 			delete formData.origpassword;
 			delete formData.newpassword;
 			delete formData.confirmpassword;
 		}
-		updateUserInfo(formData);
+		return formData;
+	}
 
-		// upload avatar
-		if ($('#uploader').val() !== ""){
-			filesList = $('#uploader')[0].files;
-
-			$('#uploader').fileupload({
-				dataType: 'json',
-				url: app.engine + "?function=PU",
-				function: 'Avatar Upload',
-				done: function(e, data){
-					$.each(data.result, function(index, file){
-						$('<p/>').text(file.name).appendTo('#uploader');
-					});
-				}
-			});
-
-			$('#uploader').fileupload('add', {files: filesList});
-		}
-	};
-
-
-
-// validate signup form on keyup and submit
+	// validate signup form on keyup and submit
 	$("form").steps({
 		headerTag: 'h1',
 		bodyTag: 'fieldset',
@@ -92,11 +75,6 @@ require([
 	            $(".body:eq(" + newIndex + ") label.error", form).remove();
 	            $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
 	        }
-
-	        // if (newIndex == 2) { Avatar.init(); return true; }
-
-	        // bypass validation (DEBUG)
-			// return true;
 
 	        // Disable validation on fields that are disabled or hidden.
 	        form.validate().settings.ignore = ":disabled,:hidden";
@@ -123,7 +101,16 @@ require([
 		        form.submit();
 		    }
 	 }).validate({
-		submitHandler: valHandler,
+		submitHandler: function(){
+			// if avatar chosen...
+			if ($('#uploader').val() !== ""){
+				// upload form avatar...
+				$('#avatar').fileinput('upload');
+			}else{
+				// manually upload form
+				updateUserInfo(getProfileData());
+			}
+		},
 		rules: {
 			first_name: "required",
 			last_name: "required",
@@ -206,19 +193,57 @@ require([
 
 // ...more page set up
 // load form
-	data = app.getCookie("user");
-	if (data !== undefined){
-		$.each(data, function(key, value){
-			element = $("input[name='" + key + "']");
-			if (element.length > 0){ element.val(value); }
+	(function(){
+		fdata = {'function': 'GUP', 'id':'getUser', 'user_id': user.user_id };
+		$.ajax({
+			url: app.engine,
+			data: fdata,
+		 	type: 'POST',
+			success: function(result){
+				if (result.data !== undefined){
+					$.each(result.data, function(key, value){
+						// element = $("input[name='" + key + "']");
+						if (key === 'avatar'){
+							avatar_file = value;
+							initAvatar();
+						}else{
+							element = $("#" + key);
+							if (element.length > 0){ element.val(value); }
+						}
+					});
+				}
+			}
+		});
+	})();
+
+	function initAvatar(){
+		var imgFile = (avatar_file) ? '/assets/avatars/' + avatar_file : default_avatar;
+		$('#avatar').fileinput({
+			showPreview: true,
+			uploadUrl: app.engine,
+			uploadExtraData: getProfileData,
+			overwriteInitial: true,
+			maxFileSize: 1500,
+			showClose: false,
+			showCaption: false,
+			browseLabel: ' ',
+			removeLabel: ' ',
+			browseIcon: '<i class="glyphicon glyphicon-folder-open"></i>',
+			removeIcon: '<i class="glyphicon glyphicon-remove"></i>',
+			removeTitle: 'Cancel or reset changes',
+			elErrorContainer: '#kv-avatar-errors',
+			msgErrorClass: 'alert alert-block alert-danger',
+			defaultPreviewContent: '<img src="' + imgFile + '" alt="Your Avatar" style="width:160px">',
+			layoutTemplates: {main2: '{preview}  {remove} {browse}'},
+			allowedFileExtensions: ["jpg", "png", "gif"]
 		});
 	}
 
 	current_theme = (app.getTheme() === undefined) ? app.defaultTheme : app.getTheme();
-	var selector = "#themes option[value='" + current_theme + "']";
+	var selector = "#theme option[value='" + current_theme + "']";
 	if (current_theme !== undefined) {  $(selector).prop('selected', true);}
 
-	$('#themes').selectmenu({
+	$('#theme').selectmenu({
 		width: 200,
 		change: function(){
 			app.setTheme($(this).val());
@@ -229,6 +254,4 @@ require([
 		$(this).parent().parent().siblings().slideToggle('slow');
 	}).parent().parent().siblings().hide();
 
-	// run avatar setup
-	require(['avatar']);
 });

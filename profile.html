@@ -3,10 +3,27 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Member Profile</title>
         <link rel="stylesheet" href="assets/css/screen.css">
         <link rel="stylesheet" href="assets/css/plugins/jquery-steps.css">
+        <link rel="stylesheet" href="assets/css/file_input.css">
         <link rel="stylesheet" href="assets/css/styles.css">
+        <style>
+            /* FileInput css */
+            .kv-avatar .file-preview-frame,.kv-avatar .file-preview-frame:hover {
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                text-align: center;
+            }
+            .kv-avatar .file-input {
+                display: table-cell;
+                max-width: 220px;
+            }
+        </style>
     </head>
     <body class='ui-widget-header'>
         <center><h1>Member Profile</h1></center>
@@ -15,12 +32,12 @@
             <fieldset>
                 <p>
                     <label for="created">Member Since:</label>
-                    <input type="text" name="created" required aria-required="true">
+                    <input type="text" name="created" id="created" required>
                 </p>
                 <p>
                     <label for="username">Username:</label>
-                    <input type="text" name="username" required aria-required="true">
-                    <br /><span id='username_availability_result'></span>
+                    <input type="text" name="username" id="username" required>
+                    <input type="hidden" name="user_id" id="user_id">
                 </p>
                 <p>
                     <fieldset name='changePassword' class="pass">
@@ -30,12 +47,12 @@
                                 Change Password
                             </label>
                         </legend>
-                        <label for="origpassword">Old Password:</label>   <!--should this be in encrypted format.-->
-                        <input type="origpassword" name="origpassword" required aria-required="true"> <!--it has input type password-->
-                        <label for="newpassword">New Password:</label>   <!--should this be in encrypted format.-->
-                        <input type="newpassword" name="newpassword" required aria-required="true"> <!--it has input type password-->
-                        <label for="confirmpassword">Confirm Password:</label>   <!--should this be in encrypted format.-->
-                        <input type="confirmpassword" name="confirmpassword" required aria-required="true"> <!--it has input type password-->
+                        <label for="origpassword">Old Password:</label>
+                        <input type="origpassword" name="origpassword" id="origpassword" required>
+                        <label for="newpassword">New Password:</label>
+                        <input type="newpassword" name="newpassword" id="newpassword" required>
+                        <label for="confirmpassword">Confirm Password:</label>
+                        <input type="confirmpassword" name="confirmpassword" id="confirmpassword" required>
                     </fieldset>
                 </p>
                 <!-- <p>
@@ -63,15 +80,15 @@
             <fieldset>
             <p>
                 <label for="first_name">First Name:</label>
-                <input type="text" name="first_name" required  aria-required="true">
+                <input type="text" name="first_name" id="first_name" required>
             </p>
             <p>
                 <label for="last_name">Last Name:</label>
-                <input type="text" name="last_name" required  aria-required="true">
+                <input type="text" name="last_name" id="last_name" required>
                 </p>
                 <p>
                 <label for="email">Email:</label>
-                <input type="email" name="email" required aria-required="true">
+                <input type="email" name="email" id="email" required>
             </p>
             </fieldset>
 
@@ -79,12 +96,12 @@
             <fieldset>
                 <p>
                     <label for="paypal_account">Paypal Account Name:</label>
-                    <input type="text" name="paypal_account" required aria-required="true">
+                    <input type="text" name="paypal_account" id="paypal_account" required>
                 </p>
 
                 <p>
-                    <label id="themes_label" for="themes">Change Theme:</label><br />
-                    <select id="themes" name="themes">
+                    <label id="themes_label" for="theme">Change Theme:</label><br />
+                    <select id="theme" name="theme">
                         <option value='base'>Base</option>
                         <option value='black-tie'>Black Tie</option>
                         <option value='blitzer'>Blitzer</option>
@@ -112,16 +129,23 @@
                         <option value='vader'>Vader</option>
                     </select>
                 </p>
+
                 <p>
-                    <label for='bio'>Bio:</label>
-                    <textarea id='bio' name='bio' cols="50" rows="5"></textarea>
-                </p>
-                <p>
-                    <label for="profile-avatar">Avatar:</label>
+                    <div id="kv-avatar-errors" class="center-block" style="width:800px;display:none"></div>
+                    <div class="kv-avatar block" style="width:80px">
+                        <label class='control-label' for='avatar'>Avatar:</label><br />
+                        <input id="avatar" name="avatar" type="file">
+                    </div>
+
+                    <!-- <label for="profile-avatar">Avatar:</label>
                     <div class='profile-avatar-wrap'>
                         <img src="assets/css/images/anon_user.png" class="profile-avatar" id="profile-avatar" alt='Image for profile'>
                         <input type="file" id='uploader' name='uploader' />
-                    </div>
+                    </div> -->
+                </p>
+                <p>
+                    <label for='bio'>Bio:</label><br />
+                    <textarea id='bio' name='bio' cols="50" rows="5"></textarea>
                 </p>
             </fieldset>
         </form>

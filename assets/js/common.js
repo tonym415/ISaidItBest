@@ -39,6 +39,11 @@ requirejs.config({
 		avatar: 'lib/avatar',
 		tooltipster: 'lib/jquery.tooltipster',
 		upload: 'lib/jquery.fileupload',
+		bootstrap : [
+			// '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min',
+			'lib/bootstrap'
+		],
+		fileInput : 'lib/fileinput.min',
 		jqGrid: [
 			// '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/i18n/grid.locale-en',
 			'lib/grid.locale-en'
@@ -71,6 +76,9 @@ requirejs.config({
 		},
 		upload: {
 			deps: ['jquery', 'jqueryUI']
+		},
+		bootstrap: {
+			deps: ['jquery']
 		}
 		// additional_methods: {
 		// 	deps:['validate']

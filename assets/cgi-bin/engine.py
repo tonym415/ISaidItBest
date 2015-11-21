@@ -21,6 +21,9 @@ from app.Game import *
 
 cgitb.enable()
 
+# global fieldstorage object
+FSTOR = None
+
 
 def logAction(fs):
     if 'page' in fs.keys():
@@ -52,7 +55,7 @@ def returnJson(data, toJSON=True):
 
 
 def showParams(fs):
-    returnJson(fs)
+    returnJson({'funcParams': fs})
 
 
 def getAllUsers(fs):
@@ -219,18 +222,19 @@ def gameFunctions(fs):
     returnJson(returnObj)
 
 
-def profileUpdate(fs):
+def profileFunctions(fs):
     returnObj = {}
-    if fs['id']:
-        returnObj['data'] = User(fs).profileUpdate()
-    else:
-        returnObj['file'] = User(fs).profileAvatar()
+    if 'id' in fs.keys():
+        if fs['id'] == 'profile':
+            returnObj['data'] = User(fs).profileUpdate(FSTOR)
+        elif fs['id'] == 'getUser':
+            returnObj['data'] = User(fs).getUserByID(True)
     returnJson(returnObj)
 
 
 def doFunc(fStor):
     """ Deciphers function to run based on POSTed parameters
-        Excutes the desired function with appropriate parameters
+        Executes the desired function with appropriate parameters
     """
     fStor = cgiFieldStorageToDict(fStor)
     funcName = fStor['function']
@@ -262,8 +266,8 @@ def doFunc(fStor):
         globals()['contactUs'](fStor)
     elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)
-    elif funcName in ["PU", "UUI"]:
-        globals()['profileUpdate'](fStor)
+    elif funcName in ['GUP', "UP", "UP"]:
+        globals()['profileFunctions'](fStor)
     else:
         globals()['showParams'](fStor)
 
@@ -278,17 +282,18 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    info = {'id': 'deleteCategory', 'd_Category': 3,
-            'd_parentCategoryChk': 'on', 'd_subCategory[]': 4, 'd_subCategory[]': 19}
+    # form = formMockup(id="gameParameters",
+    #                   p_paramCategory="1",
+    #                   paramQuestions="8",
+    #                   timeLimit="1",
+    #                   wager="1",
+    #                   user_id="52",
+    #                   function="GG",
+    #                   counter="2")
 
-    form = formMockup(id="gameParameters",
-                      p_paramCategory="1",
-                      paramQuestions="8",
-                      timeLimit="1",
-                      wager="1",
-                      user_id="52",
-                      function="GG",
-                      counter="2")
+    form = formMockup(function="GUP",
+                      id="getUser",
+                      user_id="36")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",
@@ -297,9 +302,9 @@ def main():
     doFunc(form)
 
 if "REQUEST_METHOD" in os.environ:
-    fs = cgi.FieldStorage()
-    if 'function' in fs.keys():
+    FSTOR = cgi.FieldStorage()
+    if 'function' in FSTOR.keys():
         # run function depending on given values
-        doFunc(fs)
+        doFunc(FSTOR)
 else:
     main()

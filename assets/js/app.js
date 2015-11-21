@@ -182,7 +182,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	 function setTheme(theme){
 	 	// if no theme sent set default
-	 	var cook_theme = $.cookie('theme');
+	 	var cook_theme;
+		uObj = getCookie('user');
+		if (typeof(uObj) !== "undefined") cook_theme = uObj.theme;
+
 	 	if (theme === undefined){
 	 		theme = (cook_theme === undefined) ? defaultTheme : cook_theme;
  		}

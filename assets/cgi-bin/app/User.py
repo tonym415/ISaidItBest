@@ -134,26 +134,49 @@ class User(Entity):
                      "FROM  users INNER JOIN roles USING(role_id) WHERE 1")
             return self.executeQuery(query, ())
 
-    def getUserByName(self):
+    def getUserByName(self, meta=False):
+        params = self.sanitizeParams()
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
-        query = """SELECT  user_id ,  first_name , last_name , email ,
-                username, credit, wins, losses, paypal_account , password,
-                created, role,  active  FROM  users JOIN roles USING(role_id) WHERE username = %s"""
-        return self.executeQuery(query, (self.user_username,))
+        query = ("SELECT u.user_id, first_name, username, role "
+                 "last_name, email, credit, wins, losses, paypal_account, "
+                 "u.created, password, active FROM users u LEFT JOIN roles r "
+                 "USING(role_id) LEFT JOIN users_metadata m ON u.user_id=m.user_id "
+                 "WHERE u.active = 1 AND u.username = %(username)s AND "
+                 "meta_name = 'theme'")
 
-    def getUserByID(self):
+        retDict = self.executeQuery(query, params)[0]
+        if meta:
+            # get metadata along with basic data
+            query = ("SELECT meta_name, data FROM users_metadata "
+                     "WHERE user_id = %(user_id)s")
+            metaList = self.executeQuery(query, params)
+            for rec in metaList:
+                retDict[rec['meta_name']] = rec['data']
+
+        return retDict
+
+    def getUserByID(self, meta=False):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         params = self.sanitizeParams()
-        query = ("SELECT data as theme, meta_name as dataType, username, role "
-                 " FROM users u LEFT JOIN roles r USING(role_id) "
-                 "LEFT JOIN users_metadata m ON u.user_id=m.user_id")
-        # query = ("SELECT  user_id ,  first_name , last_name , email , "
-        #          "username, credit, wins, losses, paypal_account , password, "
-        #          "created, role,  active  FROM  users JOIN roles USING(role_id) "
-        #          "WHERE user_id = %(user_id)s")
-        return self.executeQuery(query, params)
+        query = ("SELECT  u.user_id, first_name, username, role "
+                 "last_name, email, credit, wins, losses, paypal_account, "
+                 "u.created, active FROM users u LEFT JOIN roles r USING(role_id) "
+                 "LEFT JOIN users_metadata m ON u.user_id=m.user_id "
+                 "WHERE u.active = 1 AND u.user_id = %(user_id)s AND "
+                 "meta_name = 'theme'")
+
+        retDict = self.executeQuery(query, params)[0]
+        if meta:
+            # get metadata along with basic data
+            query = ("SELECT meta_name, data FROM users_metadata "
+                     "WHERE user_id = %(user_id)s")
+            metaList = self.executeQuery(query, params)
+            for rec in metaList:
+                retDict[rec['meta_name']] = rec['data']
+
+        return retDict
 
     def updateUser(self):
         """ update user info """
@@ -206,13 +229,19 @@ class User(Entity):
             uid = self.cursor.lastrowid
             # add user_id to current instance
             setattr(self, "user_user_id", uid)
-            returnObj = self.getUser()
+
+            obj = {'user_id': uid, 'data': 'redmond', 'meta_name': 'theme'}
+            # insert default theme for user
+            query = ("INSERT INTO users_metadata (user_id, meta_name, data) "
+                     " VALUES (%(user_id)s, %(meta_name)s, %(data)s)")
+            self.executeModifyQuery(query, obj)
+            returnObj = self.getUserByID()
         except lib.db2._connector.IntegrityError as err:
             returnObj['message'] = "Error: {}".format(err)
 
         return returnObj
 
-    def isValidUser(self, info):
+    def isValidUser(self, info=None):
         """ determine if user is valid based on username/password """
         # userInfo should be provided by calling function
         if info:
@@ -238,17 +267,33 @@ class User(Entity):
          """
         return (0, 1)[self.cursor.rowcount > 0]
 
-    def profileAvatar(self):
-        params = self.sanitizeParams()
-        fileContents = params['uploader']
-        s = io.BytesIO()
-        s.write(fileContents)
-        return s.getvalue()
-
-    def profileUpdate(self):
+    def profileUpdate(self, FIELDSTORE):
         # get column names for user table
         userCols = self.getColNames('users')
         params = self.sanitizeParams()
+
+        # handle avatar
+        if 'avatar' in FIELDSTORE.keys() and FIELDSTORE['avatar'].filename:
+
+            fileItem = FIELDSTORE['avatar']
+            fileName, fileExt = os.path.splitext(fileItem.filename)
+            try:  # Windows needs stdio set for binary mode.
+                import msvcrt
+                msvcrt.setmode(0, os.O_BINARY)  # stdin  = 0
+                msvcrt.setmode(1, os.O_BINARY)  # stdout = 1
+            except ImportError:
+                pass
+
+            # strip leading path from file name to avoid directory traversal attacks
+            # fname = os.path.basename(fileitem.filename)
+            # create filename based on user_id and string
+            fname = params['user_id'] + "_avatar" + fileExt.lower()
+            # build absolute path to files directory
+            base_path = os.path.dirname(__file__)
+            dir_path = os.path.abspath(os.path.join(base_path, '..', '..', 'avatars'))
+
+            open(os.path.join(dir_path, fname), 'wb').write(fileItem.file.read())
+            message = 'The file "%s" was uploaded successfully' % fname
 
         # delete extraneous key
         del params['id']
@@ -267,9 +312,14 @@ class User(Entity):
         for k in params.keys():
             metaObj = {}
             if k not in userCols:
+                if k == 'file_id':
+                    continue
                 metaObj['user_id'] = params['user_id']
                 metaObj['meta_name'] = k
-                metaObj['data'] = params[k]
+                if k == 'avatar':
+                    metaObj['data'] = fname
+                else:
+                    metaObj['data'] = params[k]
                 metaCols.append(metaObj)
 
         retVal = {}
@@ -299,7 +349,7 @@ if __name__ == "__main__":
     info = {"last_name": "Moses",
             "first_name": "Antonio",
             "email": "tonym415@gmail",
-            "themes": "hot-sneaks",
+            "theme": "hot-sneaks",
             "paypal_account": "tonym415",
             "user_id": "36",
             "bio": "Me Stuff",
@@ -311,8 +361,8 @@ if __name__ == "__main__":
     #         "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
-    # info['username'] = "bob"
-    # info['password'] = "userpass"
+    info['username'] = "tonym415"
+    info['password'] = "password"
 
     """ remove  from data dict """
     u_info = {i: info[i]
@@ -322,4 +372,4 @@ if __name__ == "__main__":
     # print(User(info).updateUser())
     u = User(u_info)
     # print(u.profileUpdate())
-    print(u.getUserByID())
+    print(u.getUserByName(True))
