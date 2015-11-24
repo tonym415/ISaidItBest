@@ -3,10 +3,32 @@
 <head>
 	<title>Administration Page</title>
 	<link rel="stylesheet" href="assets/css/plugins/ui.jqgrid.css">
-	<link rel="stylesheet" href="assets/css/screen.css">
+	<!-- <link rel="stylesheet" href="assets/css/screen.css"> -->
 	<link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class='ui-widget-content'>
+	<header role="banner" class="ui-widget-header">
+		<div id="cd-logo">
+			<a href="http://ISaidItBest.ddns.net">
+				<img src="assets/css/images/debate.png" alt="Logo">
+			</a>
+		</div>
+		<center>
+		<nav class="main-nav ">
+			<ul class='ui-widget-default'>
+				<li id='home'><a href='index.html'>Home</a></li>
+				<li id='game'><a href='game.html'>Game</a></li>
+				<li id='registration'><a href='signup.html'>Registration</a></li>
+				<li id='feedback'><a href='contact.html'>Feedback</a></li>
+				<li id='profile'><a href='profile.html'>Profile</a></li>
+				<li id='admin'><a href='admin.html'>Admin</a></li>
+				<li id='logout'><a class="logout ui-state-default" href="#0">Log Out</a></li>
+				<li><a class="cd-signin" href="#0">Sign in</a></li>
+				<li><a class="cd-signup" href="#0">Sign up</a></li>
+			</ul>
+		</nav>
+		</center>
+	</header>
 	<center> <h1>"I Said It Best" Administration</h1> </center>
 			<div id="tabs"><!-- Begin Tab Container -->
 				<ul>

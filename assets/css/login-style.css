@@ -1,4 +1,4 @@
-/* -------------------------------- 
+/* --------------------------------
 
 Primary style
 
@@ -14,12 +14,12 @@ html * {
   box-sizing: border-box;
 }
 
-body {
+/*body {
   font-size: 100%;
   font-family: "PT Sans", sans-serif;
   color: #505260;
   background-color: white;
-}
+}*/
 
 a {
   color: #2f889a;
@@ -39,15 +39,14 @@ input::-ms-clear, textarea::-ms-clear {
   display: none;
 }
 
-/* -------------------------------- 
+/* --------------------------------
 
-Main components 
+Main components
 
 -------------------------------- */
 header[role=banner] {
   position: relative;
   height: 50px;
-  /*background: #343642;*/
 }
 header[role=banner] #cd-logo {
   float: left;
@@ -94,7 +93,6 @@ header[role=banner]::after {
   margin-right: 5%;
   width: 44px;
   height: 100%;
-  /*background: url("../img/cd-icon-menu.svg") no-repeat center center;*/
   cursor: pointer;
 }
 .main-nav ul {
@@ -121,7 +119,7 @@ header[role=banner]::after {
   line-height: 50px;
   padding-left: 5%;
   background: #292a34;
-  border-top: 1px solid #3b3d4b;
+  /*border-top: 1px solid #3b3d4b;*/
   color: #FFF;
 }
 @media only screen and (min-width: 768px) {
@@ -170,13 +168,13 @@ header[role=banner]::after {
     border-radius: 50em;
     border: 1px solid rgba(255, 255, 255, 0.6);
     /*background: #2f889a;*/
-    border: none;
+    /*border: none;*/
   }
 }
 
-/* -------------------------------- 
+/* --------------------------------
 
-xsigin/signup popup 
+xsigin/signup popup
 
 -------------------------------- */
 .cd-user-modal {

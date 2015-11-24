@@ -5,8 +5,9 @@
  */
 define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], function($){
 	var objCategories = {};
-	var defaultTheme = 'excite-bike';
+	var defaultTheme = 'ui-lightness';
 	var app_engine = "/assets/cgi-bin/engine.py";
+	var default_avatar = 'assets/css/images/anon_user.png';
 
 	var navPages = {
 			'home' : 'index.html',
@@ -31,7 +32,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	});
 
 	var init = function(page){
-		if (page !== 'home' && page !== 'registration'){
+		if (page !== 'home' && page !== 'contact'){
 			// if not logged in send to login page
 			user = this.getCookie('user');
 			if (user === undefined) window.location.assign(this.pages.home);
@@ -39,16 +40,19 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 		//  Initalize app setup functions
 		setTheme();
-		this.createNavBar();
+		this.navBar(page);
 
 		// page specific initialization
 		switch (page) {
+			case 'home':
+				$("#reset-tab").toggle();
+				break;
 			case 'game':
+				$(".sel").selectmenu({ width: 200 });
 				// load category selectmenu
 				this.getCategories();
 				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
 				$("#debateResults").toggle();
-				$(".sel").selectmenu({ width: 200 });
 				// create counter for sub-category templates
 				$('#subCatTemplate').data("tempCount",0);
 				break;
@@ -69,7 +73,12 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		this.logout();
 	};
 
-	var navBar = function(){
+	function getAvatar(){
+		info = getCookie('user');
+		return (info.avatar) ? '/assets/avatars/' + info.avatar : default_avatar;
+	}
+
+	var navBar = function(page){
 		// logged in user
 		$.cookie.json = true;
 		info = $.cookie('user');
@@ -86,43 +95,65 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				if (key == 'registration') continue;
 			}
 			// main in progress so dont clutter
-			if (key == 'main') continue;
+			// if (key == 'main') continue;
 
 			// add pages to header
 			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
 			$('#navBar').append(listItem);
 		}
 
+		if (page === 'home') return false;
 		if (info){
-			userSpan = "<span style='right:0; position:absolute;'>Welcome, <a href='" + navPages.profile + "'> " + info.username + "</a></span>";
-			// $("#navDiv").append(userSpan);
-			logSpan = "<div id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></div>";
-			// logSpan = "<span ><a href='javascript:void(0)'>Logout?</a></span>";
-			$("#navDiv").append(userSpan).append(logSpan);
+			userSpan = "<span id='welcome' class='right'>Welcome, <a href='" +  navPages.profile + "'>";
+			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar_icon'></a></span>";
+			userSpan += "<br /><span><img src='/assets/css/images/trans1.png' class='rating right'></span>";
+			$("#navDiv").after(userSpan);
+			logSpan = "<span id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></span>";
+			$("#welcome").after(logSpan);
 		}
 	};
 
+
 	function logout(){
 		app = this;
-		$('#logout a').on('click', function(e){
+		$('.logout').on('click', function(e){
 			e.preventDefault();
 			$.removeCookie('user');
 			window.location.assign(app.pages.home);
 		});
 	}
 
-	var loginNavBar = function(){
+	var loginNavBar = function(page){
+		// logged in user
+		$.cookie.json = true;
+		info = $.cookie('user');
 		for(var key in navPages){
-			// the following line is necessary for production
-			// it is comment now for testing purposes only
-			// TODO: uncomment line below
-			// if (key == 'profile') continue;
-			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
-			$('.main-nav ul').append($(listItem));
+			// don't show links if not logged in
+			if (info === undefined){
+				if (key == 'profile') $('#' + key).toggle();
+				if (key == 'admin')  $('#' + key).toggle();
+				if (key == 'game')  $('#' + key).toggle();
+			}else{
+				// don't show admin to reg user
+				if (key == 'admin' && info.role == 'user')  $('#' + key).toggle();
+				if (key == 'registration')  $('#' + key).toggle();
+			}
 		}
 
-		$('.main-nav ul').append('<li><a class="cd-signin" href="#0">Sign in</a></li>').addClass('ui-state.default');
-		$('.main-nav ul').append('<li><a class="cd-signup" href="#0">Sign up</a></li>').addClass('ui-state.default');
+		if (info){
+			// hide signin/signup
+			$('.cd-signin, .cd-signup').toggle();
+			// if (page === 'home') return false;
+			userSpan = "<span id='welcome' class='ui-widget'>Welcome, " + info.username + "  <a href='" +  navPages.profile + "'>";
+			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar_icon'></a></span>";
+			userSpan += "<br /><span class='skill_level ui-widget'>Level:<img src='/assets/css/images/trans1.png' class=''></span>";
+			$("header").after(userSpan);
+
+			// show skills
+			this.showSkills(info.w, info.l);
+		}else{
+			$('.logout').toggle();
+		}
 	};
 
 	var loading = function(msg){
@@ -134,6 +165,15 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	var unloading = $.unblockUI;
 
+	var showSkills = function(wins, losses){
+		sumGames = wins + losses;
+		winPct = wins / sumGames;
+		winPct = (isNaN(winPct)) ? 0 : winPct;
+		rate_level = parseInt(Math.ceil(winPct * 11));
+		rate_class = 'star' + rate_level;
+		$('.skill_level img').addClass(rate_class);
+	};
+
 	$(document)
 		.ajaxStart(function(event, xhr, options) {
 	    	loading();
@@ -143,6 +183,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			if (options.function === undefined){
 				// if (options.desc === undefined) return false;
 				user = getCookie("user");
+				if (typeof(options.data) === 'object') options.data = JSON.stringify(options.data);
 				data = {
 					'function': 'LOG',
 					'user_id': (user === undefined) ? 0 : user.user_id,
@@ -177,6 +218,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	 function setCookie(name, data){
 	 	$.cookie.json = true;
 	 	$.removeCookie(name);
+
+		// remove default theme and use user theme
+		if (name == 'user') $.removeCookie('theme');
+
 	 	$.cookie(name, data);
 	 }
 
@@ -433,10 +478,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		isEmpty: isEmpty,
 		setCookie: setCookie,
 		getCookie: getCookie,
-		createNavBar: navBar,
-		// createNavBar: loginNavBar,
-		createLoginNavBar: loginNavBar,
+		showSkills: showSkills,
 		showLoading: loading,
+		navBar: loginNavBar,
 		hideLoading: unloading,
 		setTheme: setTheme,
 		prettyPrint: pprint,
@@ -444,6 +488,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		getCategories: getCategories,
 		loadCategories: loadCategories,
 		getCatQuestions: getCatQuestions,
+		getAvatar: getAvatar,
 		dMessage : function(title, message, options){
 			app = this;
 			title = (title === undefined) ? "Error" : title;

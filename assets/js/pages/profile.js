@@ -16,8 +16,7 @@ require([
 	// page set up
 	app.init('profile');
 	var user = app.getCookie('user');
-	var avatar_file;
-	var default_avatar = 'assets/css/images/anon_user.png';
+
 
 	disabled_fields = ['username', 'created'];
 	$.each(disabled_fields, function(idx, value){
@@ -32,7 +31,8 @@ require([
 			dataType: 'json',
 			desc: 'Update Profile',
 			success: function(data){
-				app.dMessage('data', data);
+				if (data.data === "Success")
+				app.dMessage(data.data, "Profile successfully saved!");
 			}
 		});
 	}
@@ -83,8 +83,7 @@ require([
 	        return form.valid();
 	    },
 	    onStepChanged: function (event, currentIndex, priorIndex) { },
-	    onFinishing: function (event, currentIndex)
-	    {
+	    onFinishing: function (event, currentIndex) {
 	        var form = $(this);
 
 	        // Disable validation on fields that are disabled.
@@ -103,7 +102,8 @@ require([
 	 }).validate({
 		submitHandler: function(){
 			// if avatar chosen...
-			if ($('#uploader').val() !== ""){
+			uLoad = $('.file-input-ajax-new').val();
+			if (uLoad === undefined){
 				// upload form avatar...
 				$('#avatar').fileinput('upload');
 			}else{
@@ -191,6 +191,17 @@ require([
 		}
 	});
 
+	$('#uploader')
+		.on('fileuploaderror', function(event, data, previewId, index) {
+			var form = data.form, files = data.files, extra = data.extra,
+			    response = data.response, reader = data.reader;
+				app.dMessage("Error", response);
+		})
+		.on('fileuploaded', function(event, data, previewId, index) {
+		   var form = data.form, files = data.files, extra = data.extra,
+		    response = data.response, reader = data.reader;
+		    app.dMessage("Success", extra.bdInteli + " " +  response.uploaded);
+		});
 // ...more page set up
 // load form
 	(function(){
@@ -205,24 +216,29 @@ require([
 					$.each(result.data, function(key, value){
 						// element = $("input[name='" + key + "']");
 						if (key === 'avatar'){
-							avatar_file = value;
 							initAvatar();
-							avInit = true;
 						}else{
 							element = $("#" + key);
 							if (element.length > 0){ element.val(value); }
 						}
 					});
 					if (!avInit) initAvatar();
+
+					// handle rating indicator
+					wins = result.data.wins;
+					losses = result.data.losses;
+					app.showSkills(wins, losses);
+
 				}
 			}
 		});
 	})();
 
 	function initAvatar(){
-		var imgFile = (avatar_file) ? '/assets/avatars/' + avatar_file : default_avatar;
+		avInit = true;
 		$('#avatar').fileinput({
 			showPreview: true,
+			uploadAsync: true,
 			uploadUrl: app.engine,
 			uploadExtraData: getProfileData,
 			overwriteInitial: true,
@@ -236,7 +252,7 @@ require([
 			removeTitle: 'Cancel or reset changes',
 			elErrorContainer: '#kv-avatar-errors',
 			msgErrorClass: 'alert alert-block alert-danger',
-			defaultPreviewContent: '<img src="' + imgFile + '" alt="Your Avatar" style="width:160px">',
+			defaultPreviewContent: '<img src="' + app.getAvatar() + '" alt="Your Avatar" class="avatar">',
 			layoutTemplates: {main2: '{preview}  {remove} {browse}'},
 			allowedFileExtensions: ["jpg", "png", "gif"]
 		});

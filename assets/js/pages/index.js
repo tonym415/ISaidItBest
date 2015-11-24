@@ -2,7 +2,7 @@
 	Handles js interaction for the login page
  */
 define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate, app){
-	app.init('home');
+	// app.init('home');
 
 	var user = app.getCookie('user');
 	if (user !== undefined){
@@ -17,7 +17,7 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 	}
 
 	var valHandler = function(){
-		formData = $('form').serializeForm();
+		formData = $('#login').serializeForm();
 		formData.function = 'VU';
 
 		// validate user
@@ -74,5 +74,4 @@ define(['jquery', 'validate', 'app', 'jqueryUI', 'cookie'], function($, validate
 			}
 		}
 	});
-	$("<p> If you are not already a member...<a href='" + app.pages.registration + "''>Sign up!</a></p>").appendTo("center");
 });

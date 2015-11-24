@@ -176,7 +176,7 @@ require([
 								.prependTo("#debateVote");
 						}
 					});
-					
+
 					// show vote/hide game
 					toggleGame();
 				}else{

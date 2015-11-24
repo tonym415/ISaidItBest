@@ -3,7 +3,7 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
-	app.init('registration');
+	// app.init('registration');
 
 	/**
 	 *  Submits an ajax call to send signup info to the database
@@ -30,7 +30,9 @@ require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
 				});
 			}else{
 				app.setCookie('user', data);
-				window.location.assign(app.pages.home);
+				$('.modal-container')
+					.tabs({ active: 0}) // show login with username filled in
+					.dialog('open');
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
@@ -43,58 +45,46 @@ var valHandler = function(){
 };
 
 	// wizardify form and set up validation
-	$('form').steps({
-		headerTag: 'h1',
-		bodyTag: 'fieldset',
-		transitionEffect: 'slideLeft',
-		stepsOrientation: 'vertical',
-		onStepChanging: function (event, currentIndex, newIndex) {
-	        // Always allow going backward even if the current step contains invalid fields!
-	        if (currentIndex > newIndex)
-	        {
-	            return true;
-	        }
-
-	        var form = $(this);
-
-	        // Clean up if user went backward before
-	        if (currentIndex < newIndex)
-	        {
-	            // To remove error styles
-	            $(".body:eq(" + newIndex + ") label.error", form).remove();
-	            $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
-	        }
-
-	        // Disable validation on fields that are disabled or hidden.
-	        form.validate().settings.ignore = ":disabled,:hidden";
-
-	        // Start validation; Prevent going forward if false
-	        return form.valid();
-	    },
-	    onStepChanged: function (event, currentIndex, priorIndex) { },
-	    onFinishing: function (event, currentIndex)
-	    {
-	        var form = $(this);
-
-	        // Disable validation on fields that are disabled.
-	        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
-	        form.validate().settings.ignore = ":disabled";
-
-	        // Start validation; Prevent form submission if false
-	        return form.valid();
-	    },
-	    onFinished: function (event, currentIndex) {
+	$('#signup')
+		.steps({
+			headerTag: 'h1',
+			bodyTag: 'fieldset',
+			transitionEffect: 'slideLeft',
+			stepsOrientation: 'vertical',
+			onStepChanging: function (event, currentIndex, newIndex) {
+		        // Always allow going backward even if the current step contains invalid fields!
+		        if (currentIndex > newIndex) return true;
 		        var form = $(this);
 
-		        // Submit form input
-		        form.submit();
-		    }
-		}).validate({
+		        // Clean up if user went backward before
+		        if (currentIndex < newIndex) {
+		            // To remove error styles
+		            $(".body:eq(" + newIndex + ") label.error", form).remove();
+		            $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
+		        }
+
+		        // Disable validation on fields that are disabled or hidden.
+		        form.validate().settings.ignore = ":disabled,:hidden";
+
+		        // Start validation; Prevent going forward if false
+		        return form.valid();
+		    },
+		    onStepChanged: function (event, currentIndex, priorIndex) { },
+		    onFinishing: function (event, currentIndex) {
+		        var form = $(this);
+
+		        // Disable validation on fields that are disabled.
+		        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
+		        form.validate().settings.ignore = ":disabled";
+
+		        // Start validation; Prevent form submission if false
+		        return form.valid();
+		    },
+		    onFinished: function (event, currentIndex) {$(this).submit();}
+		})
+		.validate({
 			debug: true,
 			submitHandler: valHandler,
-			// errorPlacement: function(error, element){
-			// 	element.after(error);
-			// },
 			rules: {
 				first_name: "required",
 				last_name: "required",
@@ -109,7 +99,7 @@ var valHandler = function(){
 				confirm_password: {
 					required: true,
 					minlength: 5,
-					equalTo: $("input[name='password'")
+					equalTo: $("#signup #password")
 				},
 				email: {
 					required: true,
@@ -141,15 +131,15 @@ var valHandler = function(){
 					email: "Your email address must be in the format of name@domain.com"
 				}
 			}
-	});
+		});
 
 	//clear availibility validations
-	$("input[name='username']").on('blur', function(){
+	$("#signup #username").on('blur', function(){
         $('#username_availability_result').empty();
     });
 
 	// check username availability
-	$("input[name='username']").on('keyup', function(){
+	$("#signup #username").on('keyup', function(){
 		username = $(this).val();
 		minChars = 3;
 		// if the input is the correct length check for availability
@@ -177,5 +167,4 @@ var valHandler = function(){
 		}
 	});
 
-	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center");
 });

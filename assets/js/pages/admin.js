@@ -9,7 +9,7 @@ require([
 	'jqueryUI',
 	'validate',
 	'livequery',
-	], function(app, lib, jqGrid){
+	], function( app, lib, jqGrid){
 	// page setup
 	app.init('admin');
 

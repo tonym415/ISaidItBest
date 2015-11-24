@@ -138,7 +138,7 @@ class User(Entity):
         params = self.sanitizeParams()
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
-        query = ("SELECT u.user_id, username, role FROM users u LEFT JOIN roles r "
+        query = ("SELECT u.user_id, username, role, wins as w, losses as l FROM users u LEFT JOIN roles r "
                  "USING(role_id) LEFT JOIN users_metadata m ON u.user_id=m.user_id "
                  "WHERE u.active = 1 AND u.username = %(username)s AND "
                  "meta_name = 'theme'")

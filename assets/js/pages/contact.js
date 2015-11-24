@@ -65,5 +65,4 @@ var valHandler = function(){
 			}
 		}
 	});
-	$("<p> If you already have and account...<a href='" + app.pages.home + "''>Login!</a></p>").appendTo("center");
 });

@@ -2,31 +2,46 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
-	app.createLoginNavBar()
-	$("input[type=submit]").button();
+	app.init('home');
 
-	$("#reset-tab").toggle()
-	$(".modal-container").tabs().dialog({
-		appendTo: "body",
-		modal: true,
-		width: 750,
-		height: 550
-	});
+	$(".modal-container")
+		.tabs({
+			beforeActivate: function(event, ui){
+				// if going from reset password to signup...
+				if (ui.newPanel[0].id === 'signup-tab'){
+					// reset signup tab to prevent...weirdness
+					if ($('#reset-tab').is(':visible')) toggleSignIn();
+				}
+			}
+		})
+		.dialog({
+			resizable: false,
+			autoOpen: false,
+			closeOnEscape: true,
+			dialogClass: 'no-close',
+			modal: true,
+			width: 'auto',
+			height: 'auto',
+			buttons: {
+				Close: function () {
+					$(this).dialog("close");
+				}
+			}
+		});
 
 	$('.main-nav').on('click',function(event){
-		index = ($(event.target).is('.cd-signup')) ? 1 : 0;
-		$('.modal-container').tabs({ active: index });
+		signup = $(event.target).is('.cd-signup');
+		signin = $(event.target).is('.cd-signin');
+		if (signup || signin){
+			index = (signup) ? 1 : 0;
+			$('.modal-container')
+				.tabs({ active: index })
+				.dialog('open')
+				.siblings('div.ui-dialog-titlebar').remove();
+		}
 	});
-	// $("a[href='#login-tab'], a[href='#signup-tab']").click(function(event){
-	// 	event.preventDefault();
-	// 	var index = $('.modal-container ul').index($(this));
 
-	// })
+	$('.cd-form-bottom-message').click(toggleSignIn);
 
-	$("#signup").steps({
-		headerTag: 'h1',
-		bodyTag: 'fieldset',
-		transitionEffect: 'slideLeft',
-		stepsOrientation: 'vertical'
-	})	
+	function toggleSignIn(){ $("#login-tab, #reset-tab").toggle();}
 });
