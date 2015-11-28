@@ -22,8 +22,8 @@
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
 				<li id='logout'><a class="logout ui-state-default" href="#0">Log Out</a></li>
-				<li><a class="cd-signin" href="#0">Sign in</a></li>
-				<li><a class="cd-signup" href="#0">Sign up</a></li>
+				<li><a class="cd-signin ui-state-default" href="#0">Sign in</a></li>
+				<li><a class="cd-signup ui-state-default" href="#0">Sign up</a></li>
 			</ul>
 		</nav>
 		</center>
@@ -61,26 +61,29 @@
 			<div id='game_messages'></div>
 		</div>
 		<h3>Debate Game</h3>
-		<div id="game">
+		<div id="game_panel">
 			<div class="center" id="debate">
-			<div class='countdown_timer' id='game_timer'></div>
-				<h3 id="question">...</h3>
+			<div class='countdown_timer game_clock' id='game_timer'></div>
+				<h3 id="question"></h3>
 				<form id='gameUI'>
 					<fieldset>
-						<legend>Debate</legend>
-							<p><label for="thoughts">Thoughts:</label></p>
-							<p><textarea rows="4" cols="50" id="thoughts" name="thoughts"></textarea> </p>
+						<legend>What do you think?</legend>
+							<div id='players' class='debatePlayers'>Players</div>
+							<p>
+								<label for="thoughts">Thoughts:</label>
+								<textarea rows="15" cols="68" id="thoughts" name="thoughts"></textarea>
+							</p>
 							<p><input type='hidden' id='game_id' name='game_id'/></p>
-							<p><input type="submit" value='Submit Thoughts' /></p>
 					</fieldset>
 				</form>
+							<p><input type="submit" value='Submit Thoughts' form='gameUI'/></p>
 			</div>
-			<div id='debateResults'>
-			<form id='debateVote'>
+			<div class='debateVote hidden'>
+				<form id='debateVote'>
 					<fieldset>
-						<legend>Debate Results</legend>
-							<p><input type='hidden' id='result_game_id' name='result_game_id'/></p>
-							<p><input type="submit" value='Vote' /></p>
+						<h2>Who said it best?</h2>
+						<h3>(Select a comment)</h3>
+							<p><input type="submit" id='btnVote' value='Vote' /></p>
 					</fieldset>
 				</form>
 			</div>
@@ -111,8 +114,11 @@
 </div>
 
 <div id="cancelSearch" style="display:none; cursor: default">
+	<center>
         <h1>Searching for your game...</h1>
+		<img src='/assets/css/images/search1.gif' class='avatar' style="height:250px;width:200px" /><br />
         <input type="button" id="cancel" value="cancel" />
+	</center>
 </div>
 </body>
 <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>

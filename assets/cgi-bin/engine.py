@@ -89,7 +89,10 @@ def userFunctions(fs):
             valid_user = User(fs).isValidUser()
             if valid_user:
                 user_info = User(fs).getUserCookie()
-
+        elif fs['id'] == 'profile':
+            user_info = User(fs).getUserCookie()
+        elif fs['id'] == 'tr':
+            user_info = User(fs).getUserTrackRecord()
     returnJson(user_info)
 
 
@@ -266,7 +269,7 @@ def doFunc(fStor):
         globals()['getCategories']()
     elif funcName in ["GAU"]:
         globals()['getAllUsers'](fStor)
-    elif funcName in ["VU"]:
+    elif funcName in ["VU", 'TRU', "GCU"]:
         globals()['userFunctions'](fStor)
     elif funcName in ["SUI", "UU"]:
         globals()['submitUserInfo'](fStor)
@@ -274,7 +277,7 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName in ["GMD", "GG", "CG"]:
+    elif funcName in ["GMD", "GG", "CG", "SUG"]:
         globals()['gameFunctions'](fStor)
     elif funcName in ["CU"]:
         globals()['contactUs'](fStor)
@@ -296,18 +299,18 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    # form = formMockup(id="gameParameters",
-    #                   p_paramCategory="1",
-    #                   paramQuestions="8",
-    #                   timeLimit="1",
-    #                   wager="1",
-    #                   user_id="52",
-    #                   function="GG",
-    #                   counter="2")
+    form = formMockup(id="gameParameters",
+                      p_paramCategory="1",
+                      paramQuestions="8",
+                      timeLimit="2",
+                      wager="1",
+                      user_id="36",
+                      function="GG",
+                      counter="2")
 
-    form = formMockup(function="GUP",
-                      id="getUser",
-                      user_id="36")
+    # form = formMockup(function="GUP",
+    #                   id="getUser",
+    #                   user_id="36")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

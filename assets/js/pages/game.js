@@ -17,6 +17,11 @@ require([
 		var user,
 			timeout,
 			params,
+			divVotePrefix = 'comment_',
+			onStateClass = "ui-state-highlight",
+			offStateClass = "ui-widget-content",
+			disableStateClass = "ui-state-disabled",
+			gameSubmitted = false,
 			paramMeta = {},
 			pollCounter = 0;
 
@@ -103,6 +108,21 @@ require([
 							// update game ui
 							clearTimeout(timeout);
 							$('#game_id').val(data.game_id);
+							$.each(data.users, function(){
+								$('<div />')
+									.attr({
+										id: this.username
+									})
+									.appendTo('#players');
+								$('<img  />')
+									.attr({
+										class: 'avatar',
+										src: app.getAvatar(this.avatar),
+										title: this.username
+									})
+									.appendTo('#' + this.username);
+								$('<br />').appendTo('#players');
+							});
 							loadDebate();
 						}else if(data.queue){
 							// set the created queue_id to params
@@ -111,9 +131,9 @@ require([
 							getGame();
 						}
 					}else{
-						$('#game').unblock();
+						$('#game_panel').unblock();
 						pollCounter = 0;
-						app.dMessage('Data', data);
+						// app.dMessage('Data', data);
 					}
 				}
 			});
@@ -121,7 +141,8 @@ require([
 		// if this is the first time called immediately excute ajax
 		if (params.counter === 0){
 			$('#cancelSearch h1').html('Submitting your parameters...');
-			$('#game').block({message: $('#cancelSearch'), css:{ width: '275px'}});
+			openAccordionPanel('next');
+			$('#game_panel').block({message: $('#cancelSearch'), css:{ width: '275px'}});
 			game();
 		} else {
 			// if polling
@@ -137,7 +158,6 @@ require([
 			params.user_id = user.user_id;
 			params.function = 'GG';
 			params.counter = pollCounter;
-			openAccordionPanel('next');
 			getGame();
 		},
 		rules: {
@@ -153,10 +173,45 @@ require([
 			wager: 'You must choose a wager'
 		}
 	});
+	// validation for debate game ui
+	$('#gameUI').validate({
+		submitHandler: function(){
+			data = $(this.currentForm).serializeForm();
+			data.user_id = user.user_id;
+			submitGame(data);
+			gameClock.stop();
+		}
+	});
 
-	function submitGame(){
+	// validation for voting form
+	$('#debateVote').validate({
+		submitHandler: function(){
+			selectedComment = $('#selectable').find('li').hasClass(onStateClass);
+			if (selectedComment){
+					selectedComment =  $('#selectable').find('li.ui-state-highlight');
+					idText = selectedComment.children().prop('id');
+					vote_id = parseInt(idText.substring(divVotePrefix.length));
+			}else{
+				app.dMessage("Error", "You must select a comment.");
+				return false;
+			}
+			data = $(this.currentForm).serializeForm();
+			data.game_id = $('#game_id').val();
+			data.vote_id = vote_id;
+			app.dMessage('Data', data);
+		},
+		rules: {
+			commentRdo: 'required'
+		},
+		messages: {
+			commentRdo: "You must vote for a comment"
+		}
+	});
+
+	function submitGame(data){
+		gameSubmitted = true;
 		data.function = 'SUG';
-		app.dMessage('Submitting Game', data);
+		// app.dMessage('Submitting Game', data);
 		$.ajax({
 			url: app.engine,
 			data: data,
@@ -165,20 +220,58 @@ require([
 			desc: 'Game Submission',
 			success: function(data){
 				if (!data.error){
+					// show vote/hide game
+					toggleGame();
+
 					// build vote form
+					$('#btnVote').before('<ul id="selectable" >');
+					counter = 0;
 					$.each(data.users, function(){
-						if ($(this).user_id === user.user_id){
-							// append input control at start of form
-							 $("<input type='radio' />")
-								.attr("id", "commentRdo")
-								.attr("name", "commentRdo")
-								.val($(this).username)
-								.prependTo("#debateVote");
+						if (3 == counter++ ) return false;
+						$('#debateVote ul').append(
+							$('<li />')
+								.append(
+									$('<div id="' + divVotePrefix + this.user_id + '" />').append(
+										$('<img class="avatar" src=' + app.getAvatar(this.avatar) + " />"),
+										$('<div />')
+											.addClass('votequote')
+											.text(this.thoughts),
+										$('<cite />').text(this.username)
+									)
+								)
+								.addClass(offStateClass)
+								.addClass('selectable')
+							);
+					});
+
+					// create selectable and disable current user as selection
+					$('#selectable').selectable({
+						filter:'li.selectable',
+						selected: function(event, ui){
+							// deselect selection if selected previously
+							if ($.inArray('ui-state-active', ui.selected.classList) > -1){
+								$(ui.selected).addClass(offStateClass).removeClass(onStateClass);
+							}else{
+								$( ".ui-selected", this ).each(function() {
+									// current user cannot vote for themselves
+									selectedId = $(this).children().prop('id').substring(divVotePrefix.length);
+									if (parseInt(selectedId) === user.user_id){
+										app.dMessage("Illegal Action", "You cannot vote for yourself!");
+									}else{
+										$(this).removeClass(offStateClass).addClass(onStateClass);
+									}
+						        });
+							}
+							$('li.selectable').not(".ui-selected").not(disableStateClass).each(function() {
+								$(this).removeClass(onStateClass).addClass(offStateClass);
+							});
 						}
 					});
 
-					// show vote/hide game
-					toggleGame();
+					// disable current user comment from selection
+					$('#' + divVotePrefix + user.user_id).parent()
+						.removeClass(offStateClass)
+						.addClass(disableStateClass);
 				}else{
 					app.dMessage(data.error, data.stm);
 				}
@@ -187,7 +280,7 @@ require([
 	}
 
 	function toggleGame(){
-		$('#debate, #debateResults').toggle();
+		$('#debate, .debateVote').toggle();
 	}
 
 	/**
@@ -201,7 +294,7 @@ require([
 			stop: function(){
 				data = $('#gameUI').serializeForm();
 				data.user_id = user.user_id;
-				submitGame(data);
+				if (!gameSubmitted) submitGame(data);
 			}
 		});
 	/**
@@ -219,14 +312,16 @@ require([
 		});
 
 	function loadDebate(){
-		$('#game').unblock();
-		// // show timer
-		// $(".countdown_timer").show();
+		$('#game_panel').unblock();
 
 		//set game criteria
-		var q_text = $('#paramQuestions :selected').text();
-		q_text += "\n (Wager: " + $('#wager :selected').text() + ")";
-		$("#question").html(q_text).wrap('<pre />');
+		$("#question")
+			.html($('#paramQuestions :selected').text())
+			.append(
+				$('<h5>')
+					.html("(Wager: " + $('#wager :selected').text() + ")")
+			);
+
 
 		// set clock based on time limit parameter
 		min = paramMeta.getTimeById($('#timeLimit').val());
@@ -236,7 +331,7 @@ require([
 	}
 
 	$('#cancel').click(function(){
-		$('#game').unblock();
+		$('#game_panel').unblock();
 		openAccordionPanel('last');
 		params.function = 'CG';
 		params.id = 'cancelGame';
@@ -286,18 +381,6 @@ require([
 	    app.accordion.accordion("option","active",position);
 	}
 
-	$('#debateVote').validate({
-		submitHandler: function(){
-			data = $(this.currentForm).serializeForm();
-			app.dMessage('Data', data);
-		},
-		rules: {
-			commentRdo: 'required'
-		},
-		messages: {
-			commentRdo: "You must vote for a comment"
-		}
-	});
 
 	// load question box with values based on category/subcategory
 	function primeQBox(catID){

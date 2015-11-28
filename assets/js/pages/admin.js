@@ -245,7 +245,7 @@ require([
 	userGrid = $("#userGrid").jqGrid(lib.getGrid("#userGrid"));
 
 	logGrid.jqGrid('navGrid', '#logPager', { search: true, edit: false, add: false, del: false, refresh: true },{},{},{},{multipleSearch: true, showQuery: true});
-	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: true, add: false, del: true, refresh: true },{height: 320, reloadAfterSubmit: true},{},{height: 320, reloadAfterSubmit: true},{multipleSearch: true, showQuery: true});
+	userGrid.jqGrid('navGrid', '#userPager', { search: true, edit: true, add: false, del: true, refresh: true },{height: 380, reloadAfterSubmit: true},{},{height: 320, reloadAfterSubmit: true},{multipleSearch: true, showQuery: true});
 
 	(function grpLog(){
 		var colModel = $('#logGrid')[0].p.colModel;

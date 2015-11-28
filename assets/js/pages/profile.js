@@ -30,11 +30,36 @@ require([
 			type: 'POST',
 			dataType: 'json',
 			desc: 'Update Profile',
-			success: function(data){
-				if (data.data === "Success")
-				app.dMessage(data.data, "Profile successfully saved!");
+			success: function(result){
+				if (result.data === "Success")
+				msgOpt = {
+						buttons: {
+							Ok: function(){
+								updateCookie(data);
+								$(this).dialog('close');
+							}
+						}
+					};
+				app.dMessage(result.data, "Profile successfully saved!", msgOpt);
 			}
 		});
+	}
+
+	// update user cookie
+	function updateCookie(data){
+		data.function = 'GCU';
+		data.username = $('#username').val();
+		$.ajax({
+			desc: 'Get Cookie',
+			data: data,
+			type: "POST",
+			url: app.engine
+		})
+		.done(function(result){
+			// create cookie using user info
+			app.setCookie('user', result[0]);
+			window.location.assign(app.pages.profile);
+        });
 	}
 
 	function getProfileData(){
@@ -106,6 +131,7 @@ require([
 			if (uLoad === undefined){
 				// upload form avatar...
 				$('#avatar').fileinput('upload');
+				window.location.assign(app.pages.profile);
 			}else{
 				// manually upload form
 				updateUserInfo(getProfileData());
@@ -223,12 +249,6 @@ require([
 						}
 					});
 					if (!avInit) initAvatar();
-
-					// handle rating indicator
-					wins = result.data.wins;
-					losses = result.data.losses;
-					app.showSkills(wins, losses);
-
 				}
 			}
 		});

@@ -12,11 +12,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	var navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
-			'registration': 'signup.html',
 			'contact': 'contact.html',
 			'profile': 'profile.html',
-			'admin': 'admin.html',
-			'main': 'main.html'
+			'admin': 'admin.html'
 		};
 
 	$.fn.tooltipster('setDefaults',{
@@ -32,6 +30,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	});
 
 	var init = function(page){
+		this.currentPage = page;
 		if (page !== 'home' && page !== 'contact'){
 			// if not logged in send to login page
 			user = this.getCookie('user');
@@ -39,7 +38,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		}
 
 		//  Initalize app setup functions
-		setTheme();
+		this.setTheme();
 		this.navBar(page);
 
 		// page specific initialization
@@ -73,9 +72,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		this.logout();
 	};
 
-	function getAvatar(){
-		info = getCookie('user');
-		return (info.avatar) ? '/assets/avatars/' + info.avatar : default_avatar;
+	function getAvatar(avFilespec){
+		if (avFilespec === undefined){
+			info = getCookie('user');
+			return (info.avatar) ? '/assets/avatars/' + info.avatar : default_avatar;
+		}else{
+			return (avFilespec !== "") ? '/assets/avatars/' + avFilespec : default_avatar;
+		}
 	}
 
 	var navBar = function(page){
@@ -125,8 +128,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	var loginNavBar = function(page){
 		// logged in user
-		$.cookie.json = true;
-		info = $.cookie('user');
+		info = this.getCookie('user');
 		for(var key in navPages){
 			// don't show links if not logged in
 			if (info === undefined){
@@ -144,16 +146,42 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			// hide signin/signup
 			$('.cd-signin, .cd-signup').toggle();
 			// if (page === 'home') return false;
-			userSpan = "<span id='welcome' class='ui-widget'>Welcome, " + info.username + "  <a href='" +  navPages.profile + "'>";
-			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar_icon'></a></span>";
-			userSpan += "<br /><span class='skill_level ui-widget'>Level:<img src='/assets/css/images/trans1.png' class=''></span>";
+			userSpan = "<span id='welcome' class='ui-widget'>Welcome, <a href='" +  navPages.profile + "'>   "  + info.username  ;
+			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar'></a>";
+			userSpan += "<br /><span class='skill_level ui-widget'><span class='skill_level_text'>Level</span>:<img src='/assets/css/images/trans1.png' class=''></span></span>";
 			$("header").after(userSpan);
 
 			// show skills
-			this.showSkills(info.w, info.l);
+			this.showSkills();
 		}else{
 			$('.logout').toggle();
 		}
+	};
+
+	var showSkills = function(){
+		user = this.getCookie('user');
+		data = {};
+		data.user_id = user.user_id;
+		data.id = 'tr';
+		data.function = 'TRU';
+		$.ajax({
+			desc: 'Get TrackRecord',
+			data: data,
+			type: "POST",
+			url: app_engine
+			})
+			.done(function(data, textStatus, jqXHR){
+				data = data[0];
+				wins = data.wins;
+				losses = data.losses;
+				sumGames = wins + losses;
+				winPct = wins / sumGames;
+				winPct = (isNaN(winPct)) ? 0 : winPct;
+				rate_level = parseInt(Math.ceil(winPct * 10));
+				rate_class = 'star' + rate_level;
+				$('.skill_level img').removeClass().addClass(rate_class);
+				$('.skill_level_text').html(getLevelName(winPct * 100));
+		});
 	};
 
 	var loading = function(msg){
@@ -165,14 +193,20 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	var unloading = $.unblockUI;
 
-	var showSkills = function(wins, losses){
-		sumGames = wins + losses;
-		winPct = wins / sumGames;
-		winPct = (isNaN(winPct)) ? 0 : winPct;
-		rate_level = parseInt(Math.ceil(winPct * 11));
-		rate_class = 'star' + rate_level;
-		$('.skill_level img').addClass(rate_class);
-	};
+	function getLevelName(val){
+		var lvlName = 'Level';
+		if (val.between(0, 10)) lvlName = "Blowhard";
+		if (val.between(11, 20)) lvlName = "Bigmouth";
+		if (val.between(21, 30)) lvlName = "Conversationalist";
+		if (val.between(31, 40)) lvlName = "Commentator";
+		if (val.between(41, 50)) lvlName = "Scholar";
+		if (val.between(51, 60)) lvlName = "Lecturer";
+		if (val.between(61, 70)) lvlName = "Advocate";
+		if (val.between(71, 80)) lvlName = "Orator";
+		if (val.between(81, 90)) lvlName = "Elocutionist";
+		if (val.between(91, 100)) lvlName = "Rhetorician";//"Master Debater";
+		return lvlName;
+	}
 
 	$(document)
 		.ajaxStart(function(event, xhr, options) {
@@ -364,6 +398,14 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	};
 
 	/**
+	 * Check if a number is in between min and max
+	 * @return {Boolean} Boolean
+	 */
+	 Number.prototype.between = function(min, max){
+		 return this.valueOf() >= min && this.valueOf() <= max;
+	 };
+
+	/**
 	 * Capitalizes string
 	 * @return {String} capitalized string
 	 */
@@ -517,65 +559,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		    };
 			settings = defaultOpts;
 			if (options) settings = $.extend({}, defaultOpts, options);
-
-			// app.mBox.dialog('option','title', title);
-			// $('#message-content').html(message);
-			// app.mBox.dialog('open');
 			$('<div />').dialog(settings);
 		},
 		getTheme: function(){
 			$.cookie.json = true;
 			current_theme =  $.cookie('theme');
-			return current_theme;
+			return (current_theme === undefined) ? this.defaultTheme : current_theme;
 		},
-		/**
-		 * @descriptions Gathers all parameters for the debate and puts them in given format
-		 * @method
-		 * @return {Object} parameters in an object ready for cgi consumption
-		 */
-		submitParameters : function(){
-				validParams = true;
-				params = {"function": "LCQ"};
-				errorMessage = "";
-				$("select").each(function(){
-					selectedValue = $(this).val();
-					id = $(this).context.id;
-					selectedText = $(this).find(":selected").text();
-					// test for valid parameter values
-					// TODO: Add jquery validator
-					if (selectedValue == "---"){
-						errorMessage += "<br /> " + id.capitlize() + ": "  + selectedText;
-						validParams = false;
-						return;
-					}else{
-						id = $(this).context.id;
-						params[id] = selectedValue;
-						params[id + "_text"] = selectedText;
-					}
-				});
-
-				if (!validParams){
-					// debug statment
-					console.log(params);
-					$('#game_messages').html(errorMessage);
-					errorTitle = "Invalid parameters: \n";
-					$('#game_messages').dialog({ title: errorTitle, autoOpen: true, modal: true});
-					return false;
-				}
-
-				// send data to serverside script
-				$.ajax({
-					contentType: "application/x-www-form-urlencoded; charset=utf-8",
-					data: params,
-					type: "POST",
-					url: this.engine
-				})
-				.done( function(result) { /*console.log("success"); console.log(result)*/})
-				.fail( function(request, error) { console.log("Error"); console.log(request);});
-
-				return params;
-			},
-
 		subCheck:function(element){
 			app = this;
 			if (element === undefined) return false;

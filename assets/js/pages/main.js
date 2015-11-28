@@ -3,7 +3,7 @@
  */
 require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 	app.init('home');
-
+	// TODO: add fuctionality for lost password form
 	$(".modal-container")
 		.tabs({
 			beforeActivate: function(event, ui){
@@ -15,8 +15,10 @@ require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 			}
 		})
 		.dialog({
-			resizable: false,
+			// resizable: false,
+			autoResize: true,
 			autoOpen: false,
+			minHeight: "auto",
 			closeOnEscape: true,
 			dialogClass: 'no-close',
 			modal: true,
@@ -43,5 +45,5 @@ require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 
 	$('.cd-form-bottom-message').click(toggleSignIn);
 
-	function toggleSignIn(){ $("#login-tab, #reset-tab").toggle();}
+	function toggleSignIn(){ $("#login-tab, #reset-tab").toggle(); }
 });

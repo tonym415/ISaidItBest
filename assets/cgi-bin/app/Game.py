@@ -87,7 +87,6 @@ class Game(Entity):
 
         # get queued users
         users = self.getQueuedUsers()
-
         if len(users) >= 3:
             # set game_id
             g_id = self.getGameID()
@@ -100,7 +99,7 @@ class Game(Entity):
                 # update queue
                 query = ("UPDATE game_queue SET active = 0 WHERE "
                          "queue_id = %(queue_id)s")
-                self.executeModifyQuery(query, qUser)
+                # self.executeModifyQuery(query, qUser)
 
                 # update game
                 query = ("INSERT INTO game (user_id, game_id) VALUES "
@@ -108,21 +107,40 @@ class Game(Entity):
                 self.executeModifyQuery(query, qUser)
 
                 # get user info
-                query = ("SELECT username FROM users where user_id = %(user_id)s")
-                returnDict['users'].append(self.executeQuery(query, qUser))
+                query = ("SELECT username FROM users WHERE user_id = %(user_id)s ")
+                user = self.executeQuery(query, qUser)[0]
+                query = ("SELECT data as avatar FROM users_metadata WHERE "
+                         "user_id = %(user_id)s AND meta_name = 'avatar'")
+                data = self.executeQuery(query, qUser, True)
+                if data:
+                    user['avatar'] = data[0]['avatar']
+                else:
+                    user['avatar'] = ""
+                returnDict['users'].append(user)
 
         return returnDict
 
     def submitThoughts(self):
         params = self.sanitizeParams()
-        query = ("UPDATE game SET thoughts = %(thoughts)s, active = 0 WHERE "
+        query = ("UPDATE game SET thoughts = %(thoughts)s WHERE "
                  "user_id = %(user_id)s and game_id = %(game_id)s")
         self.executeModifyQuery(query, params)
 
         # get all comments for the game
         query = ("SELECT user_id, username, thoughts FROM game INNER JOIN users "
                  "USING(user_id) WHERE game_id = %(game_id)s")
-        return self.executeQuery(query, params)
+        playerResponses = self.executeQuery(query, params)
+
+        # get user avatars
+        for uinfo in playerResponses:
+            query = ("SELECT data FROM users_metadata WHERE meta_name = 'avatar' and user_id = %(user_id)s")
+            data = self.executeQuery(query, uinfo, True)
+            if data:
+                uinfo['avatar'] = data[0]['data']
+            else:
+                uinfo['avatar'] = ""
+
+        return playerResponses
 
     def getMetaData(self):
         """ get metadata """
@@ -134,20 +152,25 @@ class Game(Entity):
         return returnObj
 
 if __name__ == "__main__":
+    # info = {
+    #     'id': 'gameUI',
+    #     'thoughts': 'whatever',
+    #     'game_id': '1',
+    #     'user_id': '36'
+    # }
     info = {
         'id': 'gameParameters',
         'p_paramCategory': '1',
         'paramQuestions': '8',
-        'timeLimit': '1',
+        'timeLimit': '2',
         'wager': '1',
-        'user_id': '52',
+        'user_id': '36',
         'function': 'GG',
-        'queue_id': '1',
-        'game_id': '1',
-        'counter': '2'
+        'counter': '0'
     }
     """ modify user information for testing """
     # info['stuff'] = "stuff"
 
+    # print(Game(info).addToQueue())
+    print(Game(info).getGame())
     # print(Game(info).submitThoughts())
-    # print(Game(info).getGame())

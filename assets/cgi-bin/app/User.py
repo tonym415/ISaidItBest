@@ -138,7 +138,7 @@ class User(Entity):
         params = self.sanitizeParams()
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
-        query = ("SELECT u.user_id, username, role, wins as w, losses as l FROM users u LEFT JOIN roles r "
+        query = ("SELECT u.user_id, username, role FROM users u LEFT JOIN roles r "
                  "USING(role_id) LEFT JOIN users_metadata m ON u.user_id=m.user_id "
                  "WHERE u.active = 1 AND u.username = %(username)s AND "
                  "meta_name = 'theme'")
@@ -196,6 +196,13 @@ class User(Entity):
                 retDict[rec['meta_name']] = rec['data']
 
         return retDict
+
+    def getUserTrackRecord(self):
+        """ get user win/loss information """
+        # if no user is found by the given name return empty dictionary
+        params = self.sanitizeParams()
+        query = ("SELECT  wins, losses FROM users WHERE user_id = %(user_id)s")
+        return self.executeQuery(query, params)
 
     def updateUser(self):
         """ update user info """
@@ -366,14 +373,14 @@ class User(Entity):
 
 if __name__ == "__main__":
     info = {}
-    # info = {"last_name": "Moses",
-    #         "first_name": "Antonio",
-    #         "email": "tonym415@gmail",
-    #         "theme": "hot-sneaks",
-    #         "paypal_account": "tonym415",
-    #         "user_id": "36",
-    #         "bio": "Me Stuff",
-    #         "id": "profile"}
+    info = {"last_name": "Moses",
+            "first_name": "Antonio",
+            "email": "tonym415@gmail",
+            "theme": "hot-sneaks",
+            "paypal_account": "tonym415",
+            "user_id": "36",
+            "bio": "Me Stuff",
+            "id": "profile"}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
     # info = {"confirm_password": "password", "first_name":
     #         "Antonio", "paypal_account": "tonym415", "password":
@@ -381,8 +388,8 @@ if __name__ == "__main__":
     #         "Moses", "username": "tonym415"}
 
     """ modify user information for testing """
-    info['username'] = "user"
-    info['password'] = "password"
+    # info['username'] = "user"
+    # info['password'] = "password"
 
     """ remove  from data dict """
     u_info = {i: info[i]
@@ -392,4 +399,4 @@ if __name__ == "__main__":
     # print(User(info).updateUser())
     u = User(u_info)
     # print(u.isValidUser())
-    print(u.getUserCookie())
+    print(u.getUserTrackRecord())
