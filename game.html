@@ -5,6 +5,7 @@
 	<link rel="stylesheet" href="assets/css/plugins/flipclock.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 </head>
 <body class="ui-widget-content">
 	<header role="banner" class="ui-widget-header">
@@ -28,8 +29,9 @@
 		</nav>
 		</center>
 	</header>
-<center>
+<!-- <center> -->
 	<h1>Game Selection</h1>
+
 	<div id="accordion">
 		<h3>Parameter Selection</h3>
 		<div id="paramDiv">
@@ -37,8 +39,8 @@
 				<p>
 					<label for='p_paramCategory'>Category</label>
 					<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
-					<label for='p_paramCategoryChk'>Sub?</label>
-					<input id='p_paramCategoryChk' name='p_paramCategoryChk' type='checkbox' />
+					<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
+					<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
 				</p>
 				<p>
 					<label for="paramQuestions">Category questions</label>
@@ -56,13 +58,14 @@
 					<select id="wager" name="wager" class="sel" required>
 					</select>
 				</p>
+			<center><input type="submit" value="Submit Parameters" form='gameParameters'></center>
 			</form>
-					<input type="submit" value="Submit Parameters" form='gameParameters'>
-			<div id='game_messages'></div>
+			<!-- <div id='game_messages'></div> -->
 		</div>
 		<h3>Debate Game</h3>
 		<div id="game_panel">
-			<div class="center" id="debate">
+			<center>
+			<div id="debate">
 			<div class='countdown_timer game_clock' id='game_timer'></div>
 				<h3 id="question"></h3>
 				<form id='gameUI'>
@@ -75,8 +78,8 @@
 							</p>
 							<p><input type='hidden' id='game_id' name='game_id'/></p>
 					</fieldset>
-				</form>
 							<p><input type="submit" value='Submit Thoughts' form='gameUI'/></p>
+				</form>
 			</div>
 			<div class='debateVote hidden'>
 				<form id='debateVote'>
@@ -87,33 +90,34 @@
 					</fieldset>
 				</form>
 			</div>
+		</center>
 		</div>
 	<h3>Pre Game</h3>
-	<div>
-		<object width="600" height="430"><param name="movie" value="http://www.fupa.com/games/bricks.swf"></param><embed src="http://www.fupa.com/games/bricks.swf" type="application/x-shockwave-flash" width="600" height="430"></embed></object><br/><a href="http://www.fupa.com/">Find more free online flash games at Fupa.com</a>
+	<div class='center'>
+		<object width="600" height="430"><param name="movie" value="http://www.fupa.com/games/bricks.swf"></param><embed src="http://www.fupa.com/games/bricks.swf" type="application/x-shockwave-flash" width="600" height="430"></embed></object><p><a href="http://www.fupa.com/">Find more free online flash games at Fupa.com</a></p>
 	</div>
 </div>
 </center>
-<div id='subCatTemplate' style='display:none'>
+<div id='subCatTemplate' class='hidden'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category:</label>
 		<select id='temp_subCategory' name='temp_subCategory' >
 			<option value="">None</option>
 		</select>
-		<label for='temp_CategoryChk'>Sub?</label>
-		<input id='temp_CategoryChk' type='checkbox' />
+		<label for='temp_CategoryChk' class='subCheck'>Sub?</label>
+		<input id='temp_CategoryChk' type='checkbox' class='subCheck'/>
 		<div class="clear"></div>
 		<span errorfor="temp_subCategory"></span>
 	</p>
 </div>
-<div id='gameWait'style="display:none" class='ui-widget-content'>
+<div id='gameWait' class='hidden ui-widget-content'>
 	<center>
 		Your game will start in 10 seconds...
 		<div id='wait_timer' class='countdown_timer'></div>
 	</center>
 </div>
 
-<div id="cancelSearch" style="display:none; cursor: default">
+<div id="cancelSearch" class='hidden'>
 	<center>
         <h1>Searching for your game...</h1>
 		<img src='/assets/css/images/search1.gif' class='avatar' style="height:250px;width:200px" /><br />

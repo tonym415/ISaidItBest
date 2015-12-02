@@ -107,7 +107,14 @@ require([
 	        // Start validation; Prevent going forward if false
 	        return form.valid();
 	    },
-	    onStepChanged: function (event, currentIndex, priorIndex) { },
+	    onStepChanged: function (event, currentIndex, priorIndex) {
+			// remove .clearfix class (bad css effect)
+			$('.content .clearfix').each(function(){
+				if(!$(this).parent().hasClass('[class^=file]')){
+					$(this).removeClass('clearfix');
+				}
+			});
+		},
 	    onFinishing: function (event, currentIndex) {
 	        var form = $(this);
 

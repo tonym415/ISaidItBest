@@ -227,6 +227,23 @@ def gameFunctions(fs):
                 else:
                     # if queue not properly populated
                     returnObj['status'] = 'pending'
+        elif fs['id'] == 'debateVote':
+            # counter = 0 indicates first time submitting params
+            if fs['counter'] == '0':
+                returnObj = Game(fs).submitVote()
+            else:
+                # counter > 0 indicates checking for game
+                # get players from queue
+                data = Game(fs).getWinner()
+                # send return data
+                returnObj = data
+
+                if data['winner']:
+                    # if queue properly populated
+                    returnObj['status'] = 'complete'
+                else:
+                    # if queue not properly populated
+                    returnObj['status'] = 'pending'
         elif fs['id'] in ['getMetaData']:
             returnObj = Game(fs).getMetaData()
         elif fs['id'] in ['cancelGame']:
@@ -277,7 +294,7 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName in ["GMD", "GG", "CG", "SUG"]:
+    elif funcName in ["GMD", "GG", "CG", "SUG", "SVG"]:
         globals()['gameFunctions'](fStor)
     elif funcName in ["CU"]:
         globals()['contactUs'](fStor)

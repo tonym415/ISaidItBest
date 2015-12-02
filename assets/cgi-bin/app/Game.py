@@ -78,6 +78,9 @@ class Game(Entity):
         query = ("SELECT COALESCE(MAX(game_id), 1) as game_id FROM game WHERE 1")
         return self.executeQuery(query, ())[0]['game_id']
 
+    def submitVote(self):
+        pass
+
     def getGame(self):
         # game id
         g_id = None
@@ -128,7 +131,7 @@ class Game(Entity):
 
         # get all comments for the game
         query = ("SELECT user_id, username, thoughts FROM game INNER JOIN users "
-                 "USING(user_id) WHERE game_id = %(game_id)s")
+                 "USING(user_id) WHERE game_id = %(game_id)s and thoughts IS NOT NULL")
         playerResponses = self.executeQuery(query, params)
 
         # get user avatars

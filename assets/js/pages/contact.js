@@ -4,6 +4,7 @@
 require(['jquery','app' , 'validate','jqueryUI'], function($, app){
 	app.init('contact');
 
+	//TODO: catagorize feedback
 	/**
 	 *  Submits an ajax call to send signup info to the database
 	 *

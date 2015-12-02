@@ -6,8 +6,17 @@ body {
     font-size: initial !important;
 }
 
+h1, h2, h3, h4, h5 {
+    text-align: center;
+}
 fieldset {
     border: 0;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 cite {
@@ -182,16 +191,33 @@ fieldset p {
 }*/
 
 input.checkbox { border: none }
-form  { display: table; border-spacing: 2px 2px; width: 100%;   }
-p     { display: table-row ;  }
-label { display: table-cell ; }
-input { display: table-cell ; }
-select { display: table-cell; }
+form  { display: table; border-spacing: 20px 0.5em; width: 90%; table-layout: fixed; }
+p     { display: table-row-group ; }
+p input[type='submit']{
+    caption-side: bottom;
+    display: table-caption;
+    text-align: center;
+    width: 100%;
+}
+label { display: table-cell ;  }
+input {
+    display: table-cell ;
+    /*text-align: center;
+    vertical-align: middle;*/
+}
+select, .ui-selectmenu-button {
+    display: table-cell ;
+ }
 textarea {
     display: table-cell;
     vertical-align: top;
 }
-
+.sel {
+    width: 60%;
+}
+.subCheck, label[for*='Chk'], input[name*='Chk']{
+    float:right;
+}
 /* wizard overrides */
 .wizard .content {
     min-height: 300px;
@@ -200,8 +226,8 @@ textarea {
 .wizard .content > .body {
     width: 100%;
     height: auto;
-    padding: 50px;
-    position: relative;
+    /*padding: 50px;
+    position: relative;*/
 }
 
 /* skill_level styling */
@@ -218,67 +244,56 @@ img {
 .star0 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 0 no-repeat;
 }
 .star1 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 10% no-repeat;
 }
 .star2 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 20% no-repeat;
 }
 .star3 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 30% no-repeat;
 }
 .star4 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 40% no-repeat;
 }
 .star5 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 50% no-repeat;
 }
 .star6 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 60% no-repeat;
 }
 .star7 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 70% no-repeat;
 }
 .star8 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 80% no-repeat;
 }
 .star9 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 90% no-repeat;
 }
 .star10 {
     width: 83px;
     height: 15px;
-    margin-left: 5px;
     background: url('/assets/css/images/stars_small.gif') 0 100% no-repeat;
 }
 
@@ -341,7 +356,7 @@ img {
 }
 #welcome .avatar {
     position: absolute;
-    margin-left: 30px;
+    margin-left: 60px;
 }
 
 /* nav styles */
@@ -416,6 +431,7 @@ header[role=banner]::after {
   }
   .main-nav li {
     display: inline-block;
+    list-style-type: none;
     margin-left: 1em;
   }
   .main-nav li:nth-last-child(2) {

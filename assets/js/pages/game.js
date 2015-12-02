@@ -183,31 +183,6 @@ require([
 		}
 	});
 
-	// validation for voting form
-	$('#debateVote').validate({
-		submitHandler: function(){
-			selectedComment = $('#selectable').find('li').hasClass(onStateClass);
-			if (selectedComment){
-					selectedComment =  $('#selectable').find('li.ui-state-highlight');
-					idText = selectedComment.children().prop('id');
-					vote_id = parseInt(idText.substring(divVotePrefix.length));
-			}else{
-				app.dMessage("Error", "You must select a comment.");
-				return false;
-			}
-			data = $(this.currentForm).serializeForm();
-			data.game_id = $('#game_id').val();
-			data.vote_id = vote_id;
-			app.dMessage('Data', data);
-		},
-		rules: {
-			commentRdo: 'required'
-		},
-		messages: {
-			commentRdo: "You must vote for a comment"
-		}
-	});
-
 	function submitGame(data){
 		gameSubmitted = true;
 		data.function = 'SUG';
@@ -279,6 +254,74 @@ require([
 		});
 	}
 
+	// comment polling
+	function commentPoll(){
+
+	}
+
+	// validation for voting form
+	$('#debateVote').validate({
+		submitHandler: function(){
+			selectedComment = $('#selectable').find('li').hasClass(onStateClass);
+			if (selectedComment){
+					selectedComment =  $('#selectable').find('li.ui-state-highlight');
+					idText = selectedComment.children().prop('id');
+					vote_id = parseInt(idText.substring(divVotePrefix.length));
+			}else{
+				app.dMessage("Error", "You must select a comment.");
+				return false;
+			}
+			//gather data
+			data = $(this.currentForm).serializeForm();
+			data.game_id = $('#game_id').val();
+			data.function = 'SVG';
+			data.counter = pollCounter = 0;
+			data.vote_id = vote_id;
+			submitVote(data);
+			// app.dMessage('Data', data);
+		}
+	});
+
+	function submitVote(data){
+		// create ajax poll
+		vote = function(){
+			$.ajax({
+				data: data,
+				url: app.engine,
+				type: 'POST',
+				dataType: 'json',
+				desc: 'Vote Submission',
+				global: false,
+				success: function(data){
+					if (pollCounter <= 4){
+						pollCounter++;
+						params.counter = pollCounter;
+						if (data.status === 'pending'){
+							submitVote();
+						}else if(data.status === 'complete'){
+							// update game ui
+							clearTimeout(timeout);
+							loadWinner(data);
+						}
+					}else{
+						$('#game_panel').unblock();
+						pollCounter = 0;
+						app.dMessage('Data', data);
+					}
+				}
+			});
+		};
+		// if this is the first time called immediately excute ajax
+		if (data.counter === 0){
+			$('#cancelSearch h1').html('Processing votes...');
+			$('#game_panel').block({message: $('#cancelSearch'), css:{ width: '275px'}});
+			vote();
+		} else {
+			// if polling
+			timeout = setTimeout(vote, 5000);
+		}
+	}
+
 	function toggleGame(){
 		$('#debate, .debateVote').toggle();
 	}
@@ -314,7 +357,7 @@ require([
 	function loadDebate(){
 		$('#game_panel').unblock();
 
-		//set game criteria
+		//set game title(question)/wager
 		$("#question")
 			.html($('#paramQuestions :selected').text())
 			.append(
@@ -390,7 +433,7 @@ require([
 		$(q_select)
 			.empty()
 			.selectmenu('destroy')
-			.selectmenu({width: 200, style: 'dropdown'})
+			.selectmenu({width: '100%', style: 'dropdown'})
 			.append(new Option("None", ""));
 
 		// retrieve and load questions for selected id

@@ -47,7 +47,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$("#reset-tab").toggle();
 				break;
 			case 'game':
-				$(".sel").selectmenu({ width: 200 });
+				$(".sel").selectmenu({ width: '80%' });
 				// load category selectmenu
 				this.getCategories();
 				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
