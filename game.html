@@ -65,38 +65,42 @@
 		<h3>Debate Game</h3>
 		<div id="game_panel">
 			<center>
-			<div id="debate">
-			<div class='countdown_timer game_clock' id='game_timer'></div>
-				<h3 id="question"></h3>
-				<form id='gameUI'>
-					<fieldset>
-						<legend>What do you think?</legend>
-							<div id='players' class='debatePlayers'>Players</div>
-							<p>
-								<label for="thoughts">Thoughts:</label>
-								<textarea rows="15" cols="68" id="thoughts" name="thoughts"></textarea>
-							</p>
-							<p><input type='hidden' id='game_id' name='game_id'/></p>
-					</fieldset>
-							<p><input type="submit" value='Submit Thoughts' form='gameUI'/></p>
-				</form>
-			</div>
-			<div class='debateVote hidden'>
-				<form id='debateVote'>
-					<fieldset>
-						<h2>Who said it best?</h2>
-						<h3>(Select a comment)</h3>
-							<p><input type="submit" id='btnVote' value='Vote' /></p>
-					</fieldset>
-				</form>
-			</div>
-		</center>
+				<div id="debate">
+				<div class='countdown_timer game_clock' id='game_timer'></div>
+					<h3 id="question"></h3>
+					<form id='gameUI'>
+						<fieldset>
+							<legend>What do you think?</legend>
+								<div id='players' class='debatePlayers'>Players</div>
+								<p>
+									<label for="thoughts">Thoughts:</label>
+									<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
+								</p>
+								<p><input type='hidden' id='game_id' name='game_id'/></p>
+								<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
+						</fieldset>
+					</form>
+				</div>
+				<div class='debateVote hidden'>
+					<form id='debateVote'>
+						<fieldset>
+							<h2>Who said it best?</h2>
+							<h3>(Select a comment)</h3>
+								<p class="submit"><input type="submit" id='btnVote' value='Vote' /></p>
+						</fieldset>
+					</form>
+				</div>
+			</center>
 		</div>
-	<h3>Pre Game</h3>
-	<div class='center'>
-		<object width="600" height="430"><param name="movie" value="http://www.fupa.com/games/bricks.swf"></param><embed src="http://www.fupa.com/games/bricks.swf" type="application/x-shockwave-flash" width="600" height="430"></embed></object><p><a href="http://www.fupa.com/">Find more free online flash games at Fupa.com</a></p>
+		<h3>Game Results</h3>
+		<div id="results_panel" class='center'>
+			<h2 id='results_title'>Results:</h2>
+		</div>
+		<h3>Pre Game</h3>
+		<div class='center'>
+			<object width="600" height="430"><param name="movie" value="http://www.fupa.com/games/bricks.swf"></param><embed src="http://www.fupa.com/games/bricks.swf" type="application/x-shockwave-flash" width="600" height="430"></embed></object><p><a href="http://www.fupa.com/">Find more free online flash games at Fupa.com</a></p>
+		</div>
 	</div>
-</div>
 </center>
 <div id='subCatTemplate' class='hidden'>
 	<p>

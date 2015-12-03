@@ -191,12 +191,15 @@ fieldset p {
 }*/
 
 input.checkbox { border: none }
-form  { display: table; border-spacing: 20px 0.5em; width: 90%; table-layout: fixed; }
-p     { display: table-row-group ; }
-p input[type='submit']{
+form  { display: table; border-spacing: 20px 0.5em; width: 90%;}
+p     { display: table-row-group ; }*/
+p.submit {
     caption-side: bottom;
     display: table-caption;
     text-align: center;
+}
+input[type='submit']{
+    display: inline-block;
     width: 100%;
 }
 label { display: table-cell ;  }

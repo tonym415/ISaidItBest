@@ -54,6 +54,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$("#debateResults").toggle();
 				// create counter for sub-category templates
 				$('#subCatTemplate').data("tempCount",0);
+
+				// disable game until params established
+				$("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
+				// hide result pane till necessary
+				$('h3:contains("Game Results")').toggle();
+
+				$("h3:contains('Pre Game')").toggle();
 				break;
 			case 'admin':
 				// load category selectmenu
@@ -548,13 +555,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				open: function(){
 					icon = '<span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 5px 0;"></span>';
 					$(this).parent().find("span.ui-dialog-title").prepend(icon);
-				   var markup = message;
-				   $(this).html(markup);
+					var markup = message;
+					$(this).html(markup);
 				},
 			   buttons: {
-				   Ok: function () {
+				    Ok: function () {
 					   $(this).dialog("close");
-				   }
+				    }
 			   }
 		    };
 			settings = defaultOpts;

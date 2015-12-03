@@ -227,23 +227,42 @@ def gameFunctions(fs):
                 else:
                     # if queue not properly populated
                     returnObj['status'] = 'pending'
-        elif fs['id'] == 'debateVote':
-            # counter = 0 indicates first time submitting params
-            if fs['counter'] == '0':
-                returnObj = Game(fs).submitVote()
-            else:
-                # counter > 0 indicates checking for game
-                # get players from queue
-                data = Game(fs).getWinner()
-                # send return data
-                returnObj = data
+        elif fs['id'] == 'commentPoll':
+            # get comments from players from game
+            data = Game(fs).getComments()
+            totPlayers = Game(fs).getTotalPlayers()
 
-                if data['winner']:
+            # send return data
+            returnObj['users'] = data
+            returnObj['pending'] = totPlayers - len(data)
+            if not data or len(data) < totPlayers:  # if no data returned
+                # if queue not properly populated
+                returnObj['status'] = 'pending'
+            else:
                     # if queue properly populated
-                    returnObj['status'] = 'complete'
-                else:
-                    # if queue not properly populated
-                    returnObj['status'] = 'pending'
+                returnObj['status'] = 'complete'
+        elif fs['id'] == 'votePoll':
+            # total number of players in the game
+            totPlayers = Game(fs).getTotalPlayers()
+
+            # get votes from players from game
+            data = Game(fs).getVotes()
+
+            # send return data
+            returnObj['users'] = data
+            returnObj['pending'] = totPlayers - len(data)
+            if not data or len(data) < totPlayers:  # if no data returned
+                # if queue not properly populated
+                returnObj['status'] = 'pending'
+            else:
+                # if queue properly populated
+                returnObj['status'] = 'complete'
+                # end game
+                Game(fs).endGame()
+
+        elif fs['id'] == 'debateVote':
+            # submit vote
+            returnObj = Game(fs).submitVote()
         elif fs['id'] in ['getMetaData']:
             returnObj = Game(fs).getMetaData()
         elif fs['id'] in ['cancelGame']:
@@ -251,7 +270,7 @@ def gameFunctions(fs):
             returnObj = Game(fs).removeFromQueue()
         elif fs['id'] in ['gameUI']:
             # submit game
-            returnObj['users'] = Game(fs).submitThoughts()
+            returnObj = Game(fs).submitThoughts()
 
     returnJson(returnObj)
 
@@ -294,7 +313,7 @@ def doFunc(fStor):
         globals()['testDep'](fStor)
     elif funcName in ["UAC"]:
         globals()['userAvailabilityCheck'](fStor)
-    elif funcName in ["GMD", "GG", "CG", "SUG", "SVG"]:
+    elif funcName in ["GMD", "GG", "CG", "SUG", "SVG", "GCG", "GVG"]:
         globals()['gameFunctions'](fStor)
     elif funcName in ["CU"]:
         globals()['contactUs'](fStor)
@@ -316,18 +335,19 @@ def cgiFieldStorageToDict(fieldstorage):
 
 def main():
     """ Self test this module using hardcoded data """
-    form = formMockup(id="gameParameters",
-                      p_paramCategory="1",
-                      paramQuestions="8",
-                      timeLimit="2",
-                      wager="1",
-                      user_id="36",
-                      function="GG",
-                      counter="2")
+    # form = formMockup(id="gameParameters",
+    #                   p_paramCategory="1",
+    #                   paramQuestions="8",
+    #                   timeLimit="2",
+    #                   wager="1",
+    #                   user_id="36",
+    #                   function="GG",
+    #                   counter="2")
 
-    # form = formMockup(function="GUP",
-    #                   id="getUser",
-    #                   user_id="36")
+    form = formMockup(function="GVG",
+                      id="votePoll",
+                      game_id="1",
+                      counter='0')
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

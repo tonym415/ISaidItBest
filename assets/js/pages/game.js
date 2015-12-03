@@ -16,6 +16,7 @@ require([
 		// game parameters global var
 		var user,
 			timeout,
+			timeLeft = 0,
 			params,
 			divVotePrefix = 'comment_',
 			onStateClass = "ui-state-highlight",
@@ -110,9 +111,7 @@ require([
 							$('#game_id').val(data.game_id);
 							$.each(data.users, function(){
 								$('<div />')
-									.attr({
-										id: this.username
-									})
+									.attr({ id: this.username })
 									.appendTo('#players');
 								$('<img  />')
 									.attr({
@@ -132,8 +131,32 @@ require([
 						}
 					}else{
 						$('#game_panel').unblock();
+						clearTimeout(timeout);
 						pollCounter = 0;
-						// app.dMessage('Data', data);
+						app.dMessage(
+							"Alert",
+							'<h2>Game Not Found</h2><p>Retry?</p>',
+							{
+								buttons: {
+									Yes: function(){
+										$('#game_panel').block({
+											message: $('#cancelSearch'),
+											css:{ width: '275px'}
+										});
+										getGame();
+										$(this).dialog('close');
+									},
+									No: function(){
+										cancelGame();
+										// enable/disable appropriate panels
+										toggleParams();
+										// go back to parameters
+										openAccordionPanel('last');
+										$(this).dialog('close');
+									}
+								}
+							}
+						);
 					}
 				}
 			});
@@ -141,6 +164,10 @@ require([
 		// if this is the first time called immediately excute ajax
 		if (params.counter === 0){
 			$('#cancelSearch h1').html('Submitting your parameters...');
+
+			// enable/disable appropriate panels
+			toggleParams();
+
 			openAccordionPanel('next');
 			$('#game_panel').block({message: $('#cancelSearch'), css:{ width: '275px'}});
 			game();
@@ -179,6 +206,9 @@ require([
 			data = $(this.currentForm).serializeForm();
 			data.user_id = user.user_id;
 			submitGame(data);
+			// get the time left on the clock to know
+			// how long to wait for other users
+			timeLeft = gameClock.getTime().time;
 			gameClock.stop();
 		}
 	});
@@ -193,70 +223,136 @@ require([
 			type: 'POST',
 			dataType: 'json',
 			desc: 'Game Submission',
-			success: function(data){
-				if (!data.error){
-					// show vote/hide game
-					toggleGame();
-
-					// build vote form
-					$('#btnVote').before('<ul id="selectable" >');
-					counter = 0;
-					$.each(data.users, function(){
-						if (3 == counter++ ) return false;
-						$('#debateVote ul').append(
-							$('<li />')
-								.append(
-									$('<div id="' + divVotePrefix + this.user_id + '" />').append(
-										$('<img class="avatar" src=' + app.getAvatar(this.avatar) + " />"),
-										$('<div />')
-											.addClass('votequote')
-											.text(this.thoughts),
-										$('<cite />').text(this.username)
-									)
-								)
-								.addClass(offStateClass)
-								.addClass('selectable')
-							);
-					});
-
-					// create selectable and disable current user as selection
-					$('#selectable').selectable({
-						filter:'li.selectable',
-						selected: function(event, ui){
-							// deselect selection if selected previously
-							if ($.inArray('ui-state-active', ui.selected.classList) > -1){
-								$(ui.selected).addClass(offStateClass).removeClass(onStateClass);
-							}else{
-								$( ".ui-selected", this ).each(function() {
-									// current user cannot vote for themselves
-									selectedId = $(this).children().prop('id').substring(divVotePrefix.length);
-									if (parseInt(selectedId) === user.user_id){
-										app.dMessage("Illegal Action", "You cannot vote for yourself!");
-									}else{
-										$(this).removeClass(offStateClass).addClass(onStateClass);
-									}
-						        });
-							}
-							$('li.selectable').not(".ui-selected").not(disableStateClass).each(function() {
-								$(this).removeClass(onStateClass).addClass(offStateClass);
-							});
-						}
-					});
-
-					// disable current user comment from selection
-					$('#' + divVotePrefix + user.user_id).parent()
-						.removeClass(offStateClass)
-						.addClass(disableStateClass);
+			success: function(result){
+				if (!result.error){
+					// reset counter for other uses
+					pollCounter = 0;
+					commentPoll();
 				}else{
-					app.dMessage(data.error, data.stm);
+					app.dMessage(result.error, result.stm);
 				}
 			}
 		});
 	}
 
+	function getCommentPollData(){
+		return {
+			"function" : "GCG", // Get 	Comments from Game
+			'id' : 'commentPoll',
+			'game_id' : $('#game_id').val(),
+			'counter' : pollCounter
+		};
+	}
+
 	// comment polling
 	function commentPoll(){
+		opts = {
+			getData: getCommentPollData,
+			desc: 'Comment Polling',
+			strPending: 'Waiting on comments from {0} players ...',
+			completeFunc: displayComments,
+			strInitial: 'Gathering player comments...'
+		};
+		poller(opts);
+	}
 
+	function poller(options){
+		data = options.getData();
+		// create ajax poll
+		ajaxCall = function(){
+			$.ajax({
+				data: data,
+				url: app.engine,
+				type: 'POST',
+				dataType: 'json',
+				desc: options.desc,
+				global: false,
+				success: function(results){
+					if (pollCounter <= 400){
+						pollCounter++;
+						data.counter = pollCounter;
+						if (!results.status){ app.dMessage(data.error, data.stm);}
+						if (results.status === 'pending'){
+							// update ui continue polling
+							$('#game_panel').unblock();
+							msg = $.validator.format(options.strPending, [results.pending]);
+							$('#game_panel').block({message: msg, css:{ width: '275px'}});
+							poller(options);
+						}else if(results.status === 'complete'){
+							// update game ui
+							clearTimeout(timeout);
+							options.completeFunc(results.users);
+							$('#game_panel').unblock();
+						}
+					}else{
+						$('#game_panel').unblock();
+						pollCounter = 0;
+						app.dMessage('Data', data);
+					}
+				}
+			});
+		};
+		// if this is the first time called immediately excute ajax
+		if (data.counter === 0){
+			$('#game_panel').block({message: options.strInitial, css:{ width: '275px'}});
+			ajaxCall();
+		} else {
+			// if polling
+			timeout = setTimeout(ajaxCall, 5000);
+		}
+	}
+
+	function displayComments(users){
+		// show vote/hide game
+		toggleGame();
+
+		// build vote form
+		$('#btnVote').before('<ul id="selectable" >');
+		$.each(users, function(){
+			$('#debateVote ul').append(
+				$('<li />')
+					.append(
+						$('<div id="' + divVotePrefix + this.user_id + '" />').append(
+							$('<img class="avatar" src=' + app.getAvatar(this.avatar) + " />"),
+							$('<div />')
+								.addClass('votequote')
+								.text(this.thoughts),
+							$('<cite />').text(this.username)
+						)
+					)
+					.addClass(offStateClass)
+					.addClass('selectable')
+				);
+		});
+
+		// create selectable and disable current user as selection
+		$('#selectable').selectable({
+			filter:'li.selectable',
+			selected: function(event, ui){
+				// deselect selection if selected previously
+				if ($.inArray(onStateClass, ui.selected.classList) > -1){
+					$(ui.selected).addClass(offStateClass).removeClass(onStateClass);
+				}else{
+					$( ".ui-selected", this ).each(function() {
+						// current user cannot vote for themselves
+						selectedId = $(this).children().prop('id').substring(divVotePrefix.length);
+						if (parseInt(selectedId) === user.user_id){
+							app.dMessage("Illegal Action", "You cannot vote for yourself!");
+						}else{
+							$(this).removeClass(offStateClass).addClass(onStateClass);
+						}
+					});
+				}
+				$('li.selectable').not(".ui-selected").not(disableStateClass).each(function() {
+					$(this).removeClass(onStateClass).addClass(offStateClass);
+				});
+			}
+		});
+
+		// disable current user comment from selection
+		$('#' + divVotePrefix + user.user_id).parent()
+			.removeClass(offStateClass)
+			.addClass(disableStateClass);
 	}
 
 	// validation for voting form
@@ -276,6 +372,7 @@ require([
 			data.game_id = $('#game_id').val();
 			data.function = 'SVG';
 			data.counter = pollCounter = 0;
+			data.user_id = user.user_id;
 			data.vote_id = vote_id;
 			submitVote(data);
 			// app.dMessage('Data', data);
@@ -283,43 +380,68 @@ require([
 	});
 
 	function submitVote(data){
-		// create ajax poll
-		vote = function(){
-			$.ajax({
-				data: data,
-				url: app.engine,
-				type: 'POST',
-				dataType: 'json',
-				desc: 'Vote Submission',
-				global: false,
-				success: function(data){
-					if (pollCounter <= 4){
-						pollCounter++;
-						params.counter = pollCounter;
-						if (data.status === 'pending'){
-							submitVote();
-						}else if(data.status === 'complete'){
-							// update game ui
-							clearTimeout(timeout);
-							loadWinner(data);
-						}
-					}else{
-						$('#game_panel').unblock();
-						pollCounter = 0;
-						app.dMessage('Data', data);
-					}
+		$.ajax({
+			url: app.engine,
+			data: data,
+			type: 'POST',
+			dataType: 'json',
+			desc: 'Vote Submission',
+			success: function(result){
+				if (!result.error){
+					// reset counter for other uses
+					pollCounter = 0;
+					votePoll();
+				}else{
+					app.dMessage(result.error, result.stm);
 				}
-			});
+			}
+		});
+	}
+
+	function getVotePollData(){
+		return {
+			"function" : "GVG", // Get 	votes from Game
+			'id' : 'votePoll',
+			'game_id' : $('#game_id').val(),
+			'counter' : pollCounter
 		};
-		// if this is the first time called immediately excute ajax
-		if (data.counter === 0){
-			$('#cancelSearch h1').html('Processing votes...');
-			$('#game_panel').block({message: $('#cancelSearch'), css:{ width: '275px'}});
-			vote();
-		} else {
-			// if polling
-			timeout = setTimeout(vote, 5000);
+	}
+	// comment polling
+	function votePoll(){
+		opts = {
+			getData: getVotePollData,
+			desc: 'Vote Polling',
+			strPending: 'Waiting on votes from {0} players ...',
+			completeFunc: loadWinner,
+			strInitial: 'Gathering player votes...'
+		};
+		poller(opts);
+	}
+
+	function loadWinner(users){
+		// disable game, enable parameter selection
+		toggleParams();
+
+		// show results
+		if (!$('h3:contains("Game Results")').is(':visible')){
+			$('h3:contains("Game Results")').toggle();
 		}
+		$('h3:contains("Game Results")').click();
+			$('#results_title')
+				.after(
+					$('<span />')
+						.text(app.prettyPrint(users))
+						.wrap('<div />')
+				);
+
+		app.dMessage("Winner", users);
+	}
+
+	function toggleParams(){
+		// disable/enable params
+		$('h3:contains("Parameter Selection")').toggleClass('ui-state-disabled');
+		// disable/enable game
+		$('h3:contains("Debate Game")').toggleClass('ui-state-disabled');
 	}
 
 	function toggleGame(){
@@ -334,10 +456,12 @@ require([
 			autoStart: false,
 			countdown: true,
 			clockFace: 'MinuteCounter',
-			stop: function(){
-				data = $('#gameUI').serializeForm();
-				data.user_id = user.user_id;
-				if (!gameSubmitted) submitGame(data);
+			callbacks: {
+				stop: function(){
+					data = $('#gameUI').serializeForm();
+					data.user_id = user.user_id;
+					if (!gameSubmitted) submitGame(data);
+				}
 			}
 		});
 	/**
@@ -348,13 +472,16 @@ require([
 			autoStart: false,
 			countdown: true,
 			clockFace: 'MinuteCounter',
-			stop: function(){
-				$.unblockUI();
-				gameClock.start();
+			callbacks: {
+				stop: function(){
+					$.unblockUI();
+					gameClock.start();
+				}
 			}
 		});
 
 	function loadDebate(){
+		// disable waiting message
 		$('#game_panel').unblock();
 
 		//set game title(question)/wager
@@ -375,43 +502,48 @@ require([
 
 	$('#cancel').click(function(){
 		$('#game_panel').unblock();
+		// enable/disable appropriate panels
+		toggleParams();
 		openAccordionPanel('last');
+		cancelGame().success(function(data){
+			// cancel poll
+			clearTimeout(timeout);
+			if (!data.error){
+				func = function(){
+					params.counter = pollCounter = 0;
+					$(this).dialog('close');
+				};
+				msgOpt = {
+					buttons: {
+						Yes: function(){
+							getGame();
+							func();
+						},
+						No: func
+					}
+				};
+				app.dMessage(
+					"Alert",
+					'Cancellation Confirmed<p>Retry?</p>',
+					msgOpt
+				);
+			}else{
+				app.dMessage(data.error, data.stm);
+			}
+		});
+	});
+
+	function cancelGame(callback){
 		params.function = 'CG';
 		params.id = 'cancelGame';
-		$.ajax({
+		return $.ajax({
 			url: app.engine,
 			data: params,
 			type: 'POST',
 			dataType: 'json',
-			desc: 'Game Cancellation',
-			success: function(data){
-				// cancel poll
-				clearTimeout(timeout);
-				if (data.error === undefined){
-					func = function(){
-						params.counter = pollCounter = 0;
-						$(this).dialog('close');
-					};
-					msgOpt = {
-						buttons: {
-							Yes: function(){
-								getGame();
-								func();
-							},
-							No: func
-						}
-					};
-					app.dMessage(
-						"Alert",
-						'Cancellation Confirmed<p>Retry?</p>',
-						msgOpt
-					);
-				}else{
-					app.dMessage(data.error, data.stm);
-				}
-			}
+			desc: 'Game Cancellation'
 		});
-	});
+	}
 
 	function openAccordionPanel(position) {
 	    var current = app.accordion.accordion("option","active");

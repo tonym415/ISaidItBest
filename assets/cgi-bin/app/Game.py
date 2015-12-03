@@ -68,7 +68,7 @@ class Game(Entity):
     def getQueuedUsers(self):
         """ get available user in queue """
         params = self.sanitizeParams()
-        query = ("SELECT queue_id, user_id FROM game_queue WHERE question_id = "
+        query = ("SELECT queue_id, game_id, user_id FROM game_queue WHERE question_id = "
                  "%(paramQuestions)s and wager_id = %(wager)s and time_id = "
                  "%(timeLimit)s and active = 1 limit 0, 3")
         return self.executeQuery(query, params, True)
@@ -79,7 +79,36 @@ class Game(Entity):
         return self.executeQuery(query, ())[0]['game_id']
 
     def submitVote(self):
-        pass
+        params = self.sanitizeParams()
+        query = ("UPDATE game SET hasVoted = 1 WHERE "
+                 "user_id = %(user_id)s and game_id = %(game_id)s")
+        self.executeModifyQuery(query, params)
+
+        query = ("UPDATE game SET votes = votes + 1 WHERE "
+                 "user_id = %(vote_id)s and game_id = %(game_id)s")
+        self.executeModifyQuery(query, params)
+        return {"status": "Success"}
+
+    def getVotes(self):
+        params = self.sanitizeParams()
+        playerVotes = []
+
+        # get all comments for the game
+        query = ("SELECT user_id, username, votes FROM game INNER JOIN users "
+                 "USING(user_id) WHERE game_id = %(game_id)s AND hasVoted = 1")
+        playerVotes = self.executeQuery(query, params)
+
+        # get user avatars
+        for uinfo in playerVotes:
+            query = (
+                "SELECT data FROM users_metadata WHERE meta_name = 'avatar' "
+                "AND user_id = %(user_id)s")
+            data = self.executeQuery(query, uinfo, True)
+            if data:
+                uinfo['avatar'] = data[0]['data']
+            else:
+                uinfo['avatar'] = ""
+        return playerVotes
 
     def getGame(self):
         # game id
@@ -100,9 +129,9 @@ class Game(Entity):
             for qUser in users:
                 qUser['game_id'] = g_id
                 # update queue
-                query = ("UPDATE game_queue SET active = 0 WHERE "
-                         "queue_id = %(queue_id)s")
-                # self.executeModifyQuery(query, qUser)
+                query = ("UPDATE game_queue SET game_id = %(game_id)s  "
+                         " WHERE queue_id = %(queue_id)s")
+                self.executeModifyQuery(query, qUser)
 
                 # update game
                 query = ("INSERT INTO game (user_id, game_id) VALUES "
@@ -123,11 +152,33 @@ class Game(Entity):
 
         return returnDict
 
+    def endGame(self):
+        params = self.sanitizeParams()
+        query = ("UPDATE game SET active = 0 WHERE "
+                 "game_id = %(game_id)s")
+        self.executeModifyQuery(query, params)
+        query = ("UPDATE game_queue SET active = 0 WHERE "
+                 "game_id = %(game_id)s")
+        self.executeModifyQuery(query, params)
+
+        return {"status": "Success"}
+
     def submitThoughts(self):
         params = self.sanitizeParams()
         query = ("UPDATE game SET thoughts = %(thoughts)s WHERE "
                  "user_id = %(user_id)s and game_id = %(game_id)s")
         self.executeModifyQuery(query, params)
+        return {"status": "Success"}
+
+    def getTotalPlayers(self):
+        params = self.sanitizeParams()
+        query = ("SELECT user_id FROM game  WHERE game_id = %(game_id)s")
+        self.executeQuery(query, params)
+        return self.cursor.rowcount
+
+    def getComments(self):
+        params = self.sanitizeParams()
+        playerResponses = []
 
         # get all comments for the game
         query = ("SELECT user_id, username, thoughts FROM game INNER JOIN users "
@@ -136,13 +187,14 @@ class Game(Entity):
 
         # get user avatars
         for uinfo in playerResponses:
-            query = ("SELECT data FROM users_metadata WHERE meta_name = 'avatar' and user_id = %(user_id)s")
+            query = (
+                "SELECT data FROM users_metadata WHERE meta_name = 'avatar' "
+                "AND user_id = %(user_id)s")
             data = self.executeQuery(query, uinfo, True)
             if data:
                 uinfo['avatar'] = data[0]['data']
             else:
                 uinfo['avatar'] = ""
-
         return playerResponses
 
     def getMetaData(self):
