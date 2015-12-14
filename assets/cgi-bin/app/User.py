@@ -179,7 +179,7 @@ class User(Entity):
         """ get user information by name """
         # if no user is found by the given name return empty dictionary
         params = self.sanitizeParams()
-        query = ("SELECT  u.user_id, first_name, username, role "
+        query = ("SELECT  u.user_id, first_name, username, role, "
                  "last_name, email, credit, wins, losses, paypal_account, "
                  "u.created, active FROM users u LEFT JOIN roles r USING(role_id) "
                  "LEFT JOIN users_metadata m ON u.user_id=m.user_id "
@@ -249,10 +249,9 @@ class User(Entity):
         # hash password
         query_params['password'] = pbkdf2_sha256.encrypt(
             query_params['password'], rounds=200000, salt_size=16)
-
         try:
-            self.executeModifyQuery(query, query_params)
-            uid = self.cursor.lastrowid
+            uid = self.executeModifyQuery(query, query_params)
+            uid = uid['id']
             # add user_id to current instance
             setattr(self, "user_user_id", uid)
 
@@ -262,7 +261,7 @@ class User(Entity):
                      " VALUES (%(user_id)s, %(meta_name)s, %(data)s)")
             self.executeModifyQuery(query, obj)
             returnObj = self.getUserByID()
-        except lib.db2._connector.IntegrityError as err:
+        except self.db2._connector.IntegrityError as err:
             returnObj['message'] = "Error: {}".format(err)
 
         return returnObj
@@ -373,14 +372,14 @@ class User(Entity):
 
 if __name__ == "__main__":
     info = {}
-    info = {"last_name": "Moses",
-            "first_name": "Antonio",
-            "email": "tonym415@gmail",
-            "theme": "hot-sneaks",
-            "paypal_account": "tonym415",
-            "user_id": "36",
-            "bio": "Me Stuff",
-            "id": "profile"}
+    info = {"last_name": "jury",
+            "first_name": "Sam",
+            "email": "sam@gmail",
+            "password": "password",
+            "paypal_account": "sjury",
+            "username": "sam",
+            "function": "SUI",
+            "id": "signup"}
     # """ valid user in db (DO NOT CHANGE: modify below)"""
     # info = {"confirm_password": "password", "first_name":
     #         "Antonio", "paypal_account": "tonym415", "password":
@@ -399,4 +398,4 @@ if __name__ == "__main__":
     # print(User(info).updateUser())
     u = User(u_info)
     # print(u.isValidUser())
-    print(u.getUserTrackRecord())
+    print(u.submitUser())

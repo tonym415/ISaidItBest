@@ -56,7 +56,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$('#subCatTemplate').data("tempCount",0);
 
 				// disable game until params established
-				$("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
+				// $("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
 				// hide result pane till necessary
 				$('h3:contains("Game Results")').toggle();
 
@@ -75,10 +75,40 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		// jquery-fy page with Page Stylings
 		$("input[type=submit]").button();
 
+		this.agreement();
 		// add event listener for logout
 		this.logout();
 	};
 
+	function agreement(){
+		// make sure rules are read before 'agreeing'
+		$('.rules').scroll(function(){
+			if ($(this).scrollTop() + $(this).innerHeight() + 2 >= $(this)[0].scrollHeight){
+				$('#rulesChk').prop('disabled', false);
+				$('#rulesChk').prop('checked', true);
+			}
+		});
+
+		$('.agreement_close').click(function(){
+			event.preventDefault();
+			$.unblockUI();
+		});
+
+		$('.agreement').click(function(){
+			event.preventDefault();
+			// open rules
+			$.blockUI({
+				fadeIn: 1000,
+				css: {
+					top:  ($(window).height() - 500) /2 + 'px',
+	                left: ($(window).width() - 500) /2 + 'px',
+	                width: '500px'
+				},
+				message: $('.agreement_text'),
+				onOverlayClick: $.unblockUI
+			});
+		});
+	}
 	function getAvatar(avFilespec){
 		if (avFilespec === undefined){
 			info = getCookie('user');
@@ -435,9 +465,11 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	 * Converts form data to js object
 	 * @return {formdata} object
 	 */
-	$.fn.serializeForm = function() {
+	$.fn.serializeForm = function(checkAll) {
 	    var o = {"id": this.prop('id')};
-	    var a = this.serializeArray();
+
+	    var a = (checkAll) ? this.serializeAllArray() : this.serializeArray();
+	    // var a = this.serializeArray();
 	    $.each(a, function() {
 	        if (o[this.name] !== undefined) {
 	            if (!o[this.name].push) {
@@ -450,6 +482,18 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	    });
 	    return o;
 	};
+
+	/**
+	 * Converts form data to js object
+	 * @return {formdata} object
+	 */
+	 $.fn.serializeAllArray = function () {
+		return $('input', this);
+		// var disabled = this.find(':input:disabled').removeAttr('disabled');
+		// var serialized = this.serializeArray();
+		// disabled.attr('disabled','disabled');
+	    // return  serialized;
+	 };
 
 	/**
 	 * Converts seconds to HH:MM:SS
@@ -538,6 +582,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		loadCategories: loadCategories,
 		getCatQuestions: getCatQuestions,
 		getAvatar: getAvatar,
+		agreement: agreement,
 		dMessage : function(title, message, options){
 			app = this;
 			title = (title === undefined) ? "Error" : title;

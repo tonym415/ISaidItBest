@@ -19,20 +19,23 @@ require(['jquery','app' ,  'validate','jqueryUI', 'steps'], function($, app){
 		})
 		.done(function(result){
 			if (typeof(result) !== 'object'){
-			 	data = JSON.parse(result)[0];
+			 	result = JSON.parse(result)[0];
 			}
 
 			// internal error handling
-			if (data.error !== undefined){
+			if (result.error !== undefined){
 				var validator = $("#signup").validate();
 				validator.showErrors({
-					"paypal_account": data.error
+					"paypal_account": result.error
 				});
 			}else{
-				app.setCookie('user', data);
+				// set user name to login screen
+				$('#login #username').val(result.username);
+				// show login screen
 				$('.modal-container')
 					.tabs({ active: 0}) // show login with username filled in
 					.dialog('open');
+				$('#login #password').focus();
 			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) { console.log('getJSON request failed! ' + textStatus); })
@@ -77,6 +80,14 @@ var valHandler = function(){
 		        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
 		        form.validate().settings.ignore = ":disabled";
 
+				// check to see if player has read the rules and regulations
+				if ($('#rulesChk').is(':disabled')){
+					app.dMessage("Alert", "You must read the rules and regulations first!");
+					return false;
+				}else{
+					return $('#rulesChk').is(':checked');
+				}
+
 		        // Start validation; Prevent form submission if false
 		        return form.valid();
 		    },
@@ -108,6 +119,16 @@ var valHandler = function(){
 				paypal_account: {
 					required: true,
 					minlength: 2
+				},
+				rulesChk: {
+					required: {
+						depends: function(element){
+							disabled = $('#rulesChk').is(':disabled');
+							checked = $('#rulesChk').is(':checked');
+							// return (!disabled && checked);
+							return false;
+						}
+					}
 				}
 			},
 			messages: {
@@ -129,6 +150,9 @@ var valHandler = function(){
 				email: {
 					required: "Please enter a valid email address",
 					email: "Your email address must be in the format of name@domain.com"
+				},
+				rulesChk: {
+					required: "You must read the rules and regulations first!"
 				}
 			}
 		});

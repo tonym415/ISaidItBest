@@ -13,7 +13,8 @@ class Entity(object):
     _cnx = None
 
     def __init__(self, *info, **kwargs):
-        self._cnx = db2.get_connection()
+        self.db2 = db2
+        self._cnx = self.db2.get_connection()
         self.cursor = self._cnx.cursor(buffered=True, dictionary=True)
         for dictionary in info:
             for key in dictionary:
@@ -24,6 +25,7 @@ class Entity(object):
         try:
             self.cursor.execute(query, params)
             self._cnx.commit()
+            returnDict['id'] = self.cursor.lastrowid
         except Exception as e:
             returnDict['error'] = "{}".format(e)
             returnDict['stm'] = self.cursor.statement

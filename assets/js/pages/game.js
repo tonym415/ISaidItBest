@@ -126,7 +126,8 @@ require([
 						}else if(data.queue){
 							// set the created queue_id to params
 							params.queue_id = data.queue.queue_id;
-							$('#cancelSearch h1').html('Searching for a game...');
+							matchText = 'Please stay with us while Isaiditbest finds you the best match up...';
+							$('#cancelSearch h1').html(matchText);
 							getGame();
 						}
 					}else{

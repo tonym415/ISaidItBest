@@ -49,9 +49,7 @@ requirejs.config({
 			'lib/grid.locale-en'
 			],
 		jqGridSrc: [//'//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.src',
-			'lib/jquery.jqgrid.src'],
-		gridCss: '//cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/css/ui.jqgrid.css'
-
+			'lib/jquery.jqgrid.src']
 	},
 	shim: {
 		jquery: {

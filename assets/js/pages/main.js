@@ -33,6 +33,8 @@ require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 
 	$('.main-nav').on('click',function(event){
 		signup = $(event.target).is('.cd-signup');
+		if (signup) app.agreement();
+		
 		signin = $(event.target).is('.cd-signin');
 		if (signup || signin){
 			index = (signup) ? 1 : 0;

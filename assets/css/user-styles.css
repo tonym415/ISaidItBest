@@ -5,10 +5,45 @@ body {
 	font-family: "Arial";
     font-size: initial !important;
 }
+html, body, #container { height: 98%; }
+body > #container { height: auto; min-height: 98%; }
+#content {
+    padding-bottom: 1em;
+}
+.footer {
+    clear: both;
+    position: relative;
+    z-index: 10;
+    height: 1em;
+    margin-top: 1em;
+}
 
-h1, h2, h3, h4, h5 {
+.agreement_close {
+    float: right;
+}
+.rules {
+    width: 495px;
+    height: 250px;
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+.rules li{
+    text-align: justify;
+}
+
+#rulesChk {
+    float: left;
+}
+
+h1, h2, h3, h4 {
     text-align: center;
 }
+
+h5 {
+    text-align: justify;
+}
+
 fieldset {
     border: 0;
 }
@@ -84,9 +119,15 @@ label .pass {
  }
 
 .game_clock {
-    top: 0;
+    /*top: 0;*/
     position: absolute;
-    padding-left: 50px;
+    padding-left: 25px;
+}
+
+.timer_text {
+    border: 0 !important;
+    position: relative;
+    padding-left: 15px;
 }
 
 .countdown_timer {
@@ -175,7 +216,7 @@ Themeroller styles
 
 .right {
     right: 0;
-    position: absolute;
+    /*position: absolute;*/
 }
 
 /*label {
@@ -304,7 +345,9 @@ img {
 .debatePlayers {
     border: 5px ridge #ccc;
     border-radius: 10px;
-    float: right;
+    right: 50px;
+    position: absolute;
+    /*float: right;*/
     width: 115px;
     height: 320px;
 }
@@ -475,4 +518,8 @@ header[role=banner]::after {
   font-size: 0.875rem;
   line-height: 1.4;
   text-align: center;
+}
+
+.signup_text {
+    font-style: italic;
 }
