@@ -15,7 +15,8 @@ body > #container { height: auto; min-height: 98%; }
     position: relative;
     z-index: 10;
     height: 1em;
-    margin-top: 1em;
+    margin-top: 1.5em;
+    text-align: center;
 }
 
 .agreement_close {

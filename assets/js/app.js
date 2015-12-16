@@ -75,10 +75,50 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		// jquery-fy page with Page Stylings
 		$("input[type=submit]").button();
 
-		this.agreement();
+		// final page setup
 		// add event listener for logout
 		this.logout();
+		this.setFooter();
+		// initialize agreement module
+		this.agreement();
 	};
+
+	function setFooter(){
+		// universal function to create the footer
+		// NOTE: ids/classes are important progmatically (caution when changing)
+
+		// rules div
+		tplRules = "<div class='agreement_text' style='display:none;'> \
+						<div class='rules'> \
+							<h2>Rules and Regulations</h2> \
+							<ol> \
+								<li> \
+									While <b><i>Isaiditbest</b></i> allows great leniency regarding freedom of speech while debating, Isaiditbest reserves the right to suspend or revoke membership to any member for anything that <b><i>Isaiditbest</b></i> determines is hate speech. Similarly, any intimidating language towards other members is also strictly prohibited. By using this website, all users acknowledge that Wesaiditbest retains the right to make these decisions regarding who may debate on our website. \
+								</li> \
+								<li> \
+									Group coordination, where there is a prearranged agreement between multiple members to vote for each other, is strictly prohibited.<br /> \
+									<p> \
+										By using this website, all users acknowledge that any attempt to perform these actions will result in a ban and potential forfeit of remaining credit, which may be used only for the purposes of reimbursing potentially harmed contestants. Any use of this website comes with the knowledge that Isaiditbest retains the right to determine whether group coordination occurred and take these listed actions. Any customers facing potential suspension or credit forfeit will be given a minimum of 72 hours to appeal our decision. By using this website, all users give their consent to <b><i>Isaiditbest</b></i> to determine if group coordination occurred and undertake the actions mentioned in this document. \
+									</p><br /> \
+									<p> \
+										<b><i>Isaiditbest</i></b> retains the right to make any and all decisions regarding who may use this website and all game decisions, including retroactive game decisions in the case that group coordination is believed to have occurred. By signing up and participating in games, I agree to these terms. \
+									</p> \
+								</li> \
+							</ol> \
+							<br> \
+							<p> \
+								<a class='agreement_close' href='#'>Close this dialog</a> \
+							</p> \
+						</div>"
+		txtFooter = "Use of this website constitutes acceptance of the ISaidItBest \
+			<a class=\"agreement\" href=\"#\">Rules Agreement</a>";
+
+		// wrap the content of the body with a container and wrap that with container to accomodate the footer stylings
+		$('body').wrapInner("<div id='content'></div>");
+		$('#content').wrap('<div id="container" />');
+		$('<div class="footer"> </div>').insertAfter('#container');
+		$('.footer').html(txtFooter + tplRules);
+	}
 
 	function agreement(){
 		// make sure rules are read before 'agreeing'
@@ -220,16 +260,6 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$('.skill_level_text').html(getLevelName(winPct * 100));
 		});
 	};
-
-	var loading = function(msg){
-		loadingImg = '<img src="assets/css/images/loading.gif" />';
-		loadingHtml = ' <h1>We are processing your request.  Please be patient.</h1>';
-		msg =  (msg === undefined) ?  loadingImg + loadingHtml : loadingImg + msg;
-		$.blockUI({message: msg});
-	};
-
-	var unloading = $.unblockUI;
-
 	function getLevelName(val){
 		var lvlName = 'Level';
 		if (val.between(0, 10)) lvlName = "Blowhard";
@@ -243,6 +273,22 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		if (val.between(81, 90)) lvlName = "Elocutionist";
 		if (val.between(91, 100)) lvlName = "Rhetorician";//"Master Debater";
 		return lvlName;
+	}
+
+	var loading = function(msg){
+		loadingImg = '<img src="assets/css/images/loading.gif" />';
+		loadingHtml = ' <h3>We are processing your request.  Please be patient.</h3>';
+		msg =  (msg === undefined) ?  loadingImg + loadingHtml : loadingImg + msg;
+		$.blockUI({message: msg});
+	};
+
+	var unloading = function(element){
+		var data = $(window).data();
+
+		if (data['blockUI.isBlocked'] == 1) {
+			$('#content').unblock();
+		}
+		$.unblockUI();
 	}
 
 	$(document)
@@ -583,6 +629,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		getCatQuestions: getCatQuestions,
 		getAvatar: getAvatar,
 		agreement: agreement,
+		setFooter: setFooter,
 		dMessage : function(title, message, options){
 			app = this;
 			title = (title === undefined) ? "Error" : title;
