@@ -24,6 +24,7 @@
 				<li id='feedback'><a href='contact.html'>Feedback</a></li>
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
+				<li id='about'><a href='about.html'>About</a></li>
 				<li id='logout'><a class="logout ui-state-default" href="#0">Log Out</a></li>
 				<li><a class="cd-signin ui-state-default" href="#0">Sign in</a></li>
 				<li><a class="cd-signup ui-state-default" href="#0">Sign up</a></li>
@@ -50,20 +51,22 @@
 
 			<div id="login-tab"> <!-- log in form -->
 				<form id="login">
-                    <fieldset>
-                        <p>
-                            <label for="username">Username:</label>
-                            <input type="text" id="username" name="username" required>
-                        </p>
-                        <p>
-                            <label for="password">  Password:</label>
-                            <input type="password" id="password" name="password" required>
-                        </p>
-						<p>
-							<center><input form='login' type="submit" value="Submit" ></center>
-						</p>
-						<center><p class="cd-form-bottom-message"><a href="#0">Forgot your password?</a></p></center>
-                    </fieldset>
+					<div class="group">
+	                    <fieldset>
+	                        <p>
+	                            <label for="username">Username:</label>
+	                            <input type="text" id="username" name="username" required>
+	                        </p>
+	                        <p>
+	                            <label for="password">  Password:</label>
+	                            <input type="password" id="password" name="password" required>
+	                        </p>
+							<p>
+							</p>
+	                    </fieldset>
+					</div>
+					<p class="submit"><input form='login' type="submit" value="Submit" >
+					<span class="cd-form-bottom-message"><a href="#0">Forgot your password?</a></span/</p>
                 </form>
 
 			</div> <!-- login -->

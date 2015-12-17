@@ -22,6 +22,7 @@
 				<li id='feedback'><a href='contact.html'>Feedback</a></li>
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
+				<li id='about'><a href='about.html'>About</a></li>
 				<li id='logout'><a class="logout ui-state-default" href="#0">Log Out</a></li>
 				<li><a class="cd-signin ui-state-default" href="#0">Sign in</a></li>
 				<li><a class="cd-signup ui-state-default" href="#0">Sign up</a></li>
@@ -35,61 +36,69 @@
 	<div id="accordion">
 		<h3>Parameter Selection</h3>
 		<div id="paramDiv">
-			<p>Select the parameters for thet type of debate you want to have.</p>
+			<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
 			<form id="gameParameters">
-				<p>
-					<label for='p_paramCategory'>Category</label>
-					<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
-					<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
-					<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+				<div class='group'>
+					<p>
+						<label for='p_paramCategory'>Category</label>
+						<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
+						<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
+						<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+					</p>
+					<p>
+						<label for="paramQuestions">Category questions</label>
+						<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required>
+							<option value="">None</option>
+						</select>
+					</p>
+					<p>
+						<label for='timeLimit'>Time Limit (in min)</label>
+						<select id="timeLimit" name="timeLimit" class="sel" required>
+						</select>
+					</p>
+					<p>
+					<label for='wager'>Wager</label>
+						<select id="wager" name="wager" class="sel" required>
+						</select>
+					</p>
+				</div>
+				<p class='submit'>
+					<input type="submit" value="Submit Parameters" form='gameParameters'>
 				</p>
-				<p>
-					<label for="paramQuestions">Category questions</label>
-					<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required>
-						<option value="">None</option>
-					</select>
-				</p>
-				<p>
-					<label for='timeLimit'>Time Limit (in min)</label>
-					<select id="timeLimit" name="timeLimit" class="sel" required>
-					</select>
-				</p>
-				<p>
-				<label for='wager'>Wager</label>
-					<select id="wager" name="wager" class="sel" required>
-					</select>
-				</p>
-			<center><input type="submit" value="Submit Parameters" form='gameParameters'></center>
 			</form>
 		</div>
 		<h3>Debate Game</h3>
 		<div id="game_panel">
 				<div id="debate">
-				<span class='timer_text ui-state-active'>Minutes left to win!</span> <div class='countdown_timer game_clock' id='game_timer'></div>
+				<span class='timer_text ui-state-active no-border'>Minutes left to win!</span> <div class='countdown_timer game_clock' id='game_timer'></div>
 				<center>
 					<h3 id="question"></h3>
 					<form id='gameUI'>
-						<fieldset>
-							<legend>What do you think?</legend>
-								<div id='players' class='debatePlayers'>Players</div>
-								<p>
-									<label for="thoughts">Thoughts:</label>
-									<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
-								</p>
-								<p><input type='hidden' id='game_id' name='game_id'/></p>
-								<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
-						</fieldset>
+						<div class='group'>
+							<fieldset>
+								<legend>What do you think?</legend>
+									<div id='players' class='debatePlayers'>Players</div>
+									<p>
+										<label for="thoughts">Thoughts:</label>
+										<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
+									</p>
+									<p><input type='hidden' id='game_id' name='game_id'/></p>
+							</fieldset>
+						</div>
+						<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
 					</form>
 				</div>
 				<div class='debateVote hidden'>
 					<form id='debateVote'>
-						<fieldset>
-							<h2>Who said it best?</h2>
-							<h5>Vote for another person in your game who you think made the best argument in the time allotted.
-Warning: Failure to vote for another person within the time limit or voting for yourself is an automatic disqualification.
-</h5>
-								<p class="submit"><input type="submit" id='btnVote' value='Vote' /></p>
-						</fieldset>
+						<div class="group">
+							<fieldset>
+								<h2>Who said it best?</h2>
+								<h5>Vote for another person in your game who you think made the best argument in the time allotted.
+	Warning: Failure to vote for another person within the time limit or voting for yourself is an automatic disqualification.
+	</h5>
+							</fieldset>
+						</div>
+						<p class="submit"><input type="submit" id='btnVote' value='Vote' /></p>
 					</form>
 				</div>
 			</center>

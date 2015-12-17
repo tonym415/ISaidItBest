@@ -2,7 +2,7 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
-	app.init('home');
+	var showLogin = app.init('home');
 	// TODO: add fuctionality for lost password form
 	$(".modal-container")
 		.tabs({
@@ -34,7 +34,7 @@ require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 	$('.main-nav').on('click',function(event){
 		signup = $(event.target).is('.cd-signup');
 		if (signup) app.agreement();
-		
+
 		signin = $(event.target).is('.cd-signin');
 		if (signup || signin){
 			index = (signup) ? 1 : 0;
@@ -45,6 +45,14 @@ require(['jquery','app' , 'validate','jqueryUI', 'steps'], function($, app){
 		}
 	});
 
+	// if players is redirected to this page make them login
+	if (showLogin){
+		$('.modal-container')
+			.tabs({ active: 0 })
+			.dialog('open')
+			.siblings('div.ui-dialog-titlebar').remove();
+	}
+	
 	$('.cd-form-bottom-message').click(toggleSignIn);
 
 	function toggleSignIn(){ $("#login-tab, #reset-tab").toggle(); }

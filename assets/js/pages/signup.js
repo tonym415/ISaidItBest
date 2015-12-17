@@ -143,7 +143,7 @@ var valHandler = function(){
 					minlength: "Your password must be at least 5 characters long"
 				},
 				confirm_password: {
-					required: "Please provide a password",
+					required: "Please reenter password from above",
 					minlength: "Your password must be at least 5 characters long",
 					equalTo: "Please enter the same password as above"
 				},

@@ -8,14 +8,48 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	var defaultTheme = 'ui-lightness';
 	var app_engine = "/assets/cgi-bin/engine.py";
 	var default_avatar = 'assets/css/images/anon_user.png';
-
 	var navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
-			'contact': 'contact.html',
+			'feedback': 'contact.html',
 			'profile': 'profile.html',
+			'about': 'about.html',
 			'admin': 'admin.html'
 		};
+
+	var skillLevels = [
+		{
+			"title" : "Blowhard",
+			"description" : "Look who hasn't even won eleven games....."
+		},{
+			"title" : "Bigmouth",
+			"description" : "Get some games under you belt and we'll talk"
+		},{
+			"title" : "Conversationalist",
+			"description" : "Looks like someone is making money"
+		},{
+			"title" : "Commentator",
+			"description" : "Gaining momentum"
+		},{
+			"title" : "Scholar",
+			"description" : "Look who can argue!"
+		},{
+			"title" : "Lecturer",
+			"description" : "Debater Spectacular"
+		},{
+			"title" : "Advocate",
+			"description" : "You know your stuff"
+		},{
+			"title" : "Orator",
+			"description" : "Basically, Winston Churchill."
+		},{
+			"title" : "Elocutionist",
+			"description" : "Straight winning"
+		},{
+			"title" : "Rhetorician",
+			"description" : "Apex"
+		}
+	];
 
 	$.fn.tooltipster('setDefaults',{
 		trigger: 'custom',
@@ -30,11 +64,27 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	});
 
 	var init = function(page){
+		var returnValue,
+			showLogin = false;
 		this.currentPage = page;
-		if (page !== 'home' && page !== 'contact'){
+		// show active page
+		$('.main-nav li').removeClass();
+		$('#' + page).addClass('ui-state-highlight');
+
+		// TODO: allow login and signup to work on all allowedPages
+		// pages allowed to be viewed without logging in
+		allowedPages = ['home', 'feedback', 'about'];
+		// is current page on the VIP list?
+		if (-1 == $.inArray(page, allowedPages) ){
 			// if not logged in send to login page
 			user = this.getCookie('user');
-			if (user === undefined) window.location.assign(this.pages.home);
+			if (user === undefined) window.location.assign(this.pages.home + "?true");
+		}else{
+			// if location is home page after redirection (see above) set value to open login form
+			locParams = window.location;
+			webPage = locParams.pathname.split('/')[1]
+			search = locParams.search.split('?')[1]
+			showLogin = (webPage === this.pages.home && search !== undefined)
 		}
 
 		//  Initalize app setup functions
@@ -45,6 +95,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		switch (page) {
 			case 'home':
 				$("#reset-tab").toggle();
+				returnValue = showLogin;
 				break;
 			case 'game':
 				$(".sel").selectmenu({ width: '80%' });
@@ -79,8 +130,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		// add event listener for logout
 		this.logout();
 		this.setFooter();
+		this.rankInfo();
 		// initialize agreement module
 		this.agreement();
+		return returnValue;
 	};
 
 	function setFooter(){
@@ -117,7 +170,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		$('body').wrapInner("<div id='content'></div>");
 		$('#content').wrap('<div id="container" />');
 		$('<div class="footer"> </div>').insertAfter('#container');
-		$('.footer').html(txtFooter + tplRules);
+		$('.footer').html(txtFooter + tplRules).addClass('ui-widget-content');
 	}
 
 	function agreement(){
@@ -149,6 +202,80 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			});
 		});
 	}
+
+	function showRanking(){
+		if ($('div#ranks').length == 0) {
+			$('.footer')
+				.append(
+					$('<div id="ranks" />')
+						.addClass('hidden')
+						.append(
+							$('<div />')
+								.addClass('center-content')
+								.append('<h1>Rank Description</h1>')
+								.append('<dl />')
+					)
+				)
+
+			$.each(skillLevels,function(idx, value){
+				$('#ranks dl')
+						.append(
+							$('<dt />')
+								.append(
+									$('<img src="/assets/css/images/trans1.png" />')
+										.removeClass()
+										.addClass('star' + (1 + idx))
+									,$('<span>' + value.title + '</span>')
+								)
+						)
+						.append(
+							$('<dd />')
+								.html(value.description)
+						);
+
+			});
+
+			// let the user know that 0 stars and 1/2 star are equal rank
+			$('dt:first')
+				.prepend(
+					$('<img src="/assets/css/images/trans1.png" />')
+						.removeClass()
+						.addClass('star0')
+					,$('<br />')
+				)
+
+
+			$('#ranks')
+				.append("<a class='rank_close' href='#'>Close this dialog</a>");
+
+			$('.rank_close').click(function(){
+				event.preventDefault();
+				$.unblockUI();
+			});
+		}
+		return $('#ranks');
+	}
+
+	function rankInfo(){
+		$('.rankInfo').click(function(){
+			event.preventDefault();
+			// open rules
+			$.blockUI({
+				fadeIn: 1000,
+				css: {
+					top:  ($(window).height() - 500) /2 + 'px',
+	                left: ($(window).width() - 500) /2 + 'px',
+	                width: '500px'
+				},
+				message: showRanking(),
+				onOverlayClick: $.unblockUI
+			});
+		});
+
+
+
+	}
+
 	function getAvatar(avFilespec){
 		if (avFilespec === undefined){
 			info = getCookie('user');
@@ -157,42 +284,6 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			return (avFilespec !== "") ? '/assets/avatars/' + avFilespec : default_avatar;
 		}
 	}
-
-	var navBar = function(page){
-		// logged in user
-		$.cookie.json = true;
-		info = $.cookie('user');
-
-		$('body').prepend('<div id="navDiv">').addClass('ui-widget-header');
-		$('#navDiv').append('<ul id="navBar">').addClass('ui-state-default');
-		for(var key in navPages){
-			// don't show admin to reg user
-			if (info === undefined){
-				if (key == 'profile') continue;
-				if (key == 'admin') continue;
-			}else{
-				if (key == 'admin' && info.role == 'user') continue;
-				if (key == 'registration') continue;
-			}
-			// main in progress so dont clutter
-			// if (key == 'main') continue;
-
-			// add pages to header
-			listItem = "<li><a href='" +  navPages[key] + "'> " + key + "</a></li>";
-			$('#navBar').append(listItem);
-		}
-
-		if (page === 'home') return false;
-		if (info){
-			userSpan = "<span id='welcome' class='right'>Welcome, <a href='" +  navPages.profile + "'>";
-			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar_icon'></a></span>";
-			userSpan += "<br /><span><img src='/assets/css/images/trans1.png' class='rating right'></span>";
-			$("#navDiv").after(userSpan);
-			logSpan = "<span id='logout' style='right:0; position:relative;'><a href='javascript:void(0)'>Logout?</a></span>";
-			$("#welcome").after(logSpan);
-		}
-	};
-
 
 	function logout(){
 		app = this;
@@ -225,7 +316,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			// if (page === 'home') return false;
 			userSpan = "<span id='welcome' class='ui-widget'>Welcome, <a href='" +  navPages.profile + "'>   "  + info.username  ;
 			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar'></a>";
-			userSpan += "<br /><span class='skill_level ui-widget'><span class='skill_level_text'>Level</span>:<img src='/assets/css/images/trans1.png' class=''></span></span>";
+			userSpan += "<br /><span class='skill_level ui-widget'><span class='skill_level_text rankInfo'>Level</span>:<img src='/assets/css/images/trans1.png' class=''></span></span>";
 			$("header").after(userSpan);
 
 			// show skills
@@ -261,18 +352,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		});
 	};
 	function getLevelName(val){
-		var lvlName = 'Level';
-		if (val.between(0, 10)) lvlName = "Blowhard";
-		if (val.between(11, 20)) lvlName = "Bigmouth";
-		if (val.between(21, 30)) lvlName = "Conversationalist";
-		if (val.between(31, 40)) lvlName = "Commentator";
-		if (val.between(41, 50)) lvlName = "Scholar";
-		if (val.between(51, 60)) lvlName = "Lecturer";
-		if (val.between(61, 70)) lvlName = "Advocate";
-		if (val.between(71, 80)) lvlName = "Orator";
-		if (val.between(81, 90)) lvlName = "Elocutionist";
-		if (val.between(91, 100)) lvlName = "Rhetorician";//"Master Debater";
-		return lvlName;
+		// get the index of the skill level name
+		idx = val % 100 / 10 | 0;
+		return skillLevels[idx].title;
 	}
 
 	var loading = function(msg){
@@ -604,6 +686,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
               this.defaultShowErrors();
           }
 	});
+
+
 	/** return the app object with var/functions built in */
 	return {
 		init: init,
@@ -630,6 +714,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		getAvatar: getAvatar,
 		agreement: agreement,
 		setFooter: setFooter,
+		rankInfo: rankInfo,
 		dMessage : function(title, message, options){
 			app = this;
 			title = (title === undefined) ? "Error" : title;

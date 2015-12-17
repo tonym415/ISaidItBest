@@ -2,7 +2,7 @@
 	Handles js interaction for the signup page
  */
 require(['jquery','app' , 'validate','jqueryUI'], function($, app){
-	app.init('contact');
+	app.init('feedback');
 
 	//TODO: catagorize feedback
 	/**

@@ -4,9 +4,16 @@ body {
     padding: 0;
 	font-family: "Arial";
     font-size: initial !important;
+    border: 0 !important;
 }
+
 html, body, #container { height: 98%; }
 body > #container { height: auto; min-height: 98%; }
+
+.no-border {
+    border: 0 !important;
+}
+
 #content {
     padding-bottom: 1em;
 }
@@ -17,6 +24,20 @@ body > #container { height: auto; min-height: 98%; }
     height: 1em;
     margin-top: 1.5em;
     text-align: center;
+}
+dt {
+	font-weight: bold;
+    font-style: italic;
+}
+dd {
+    padding-bottom: 10px;
+}
+dt img {
+    padding-right: 10px;
+}
+#rank {
+    overflow-y: scroll;
+    height: 250px;
 }
 
 .agreement_close {
@@ -126,7 +147,6 @@ label .pass {
 }
 
 .timer_text {
-    border: 0 !important;
     position: relative;
     padding-left: 15px;
 }
@@ -231,24 +251,32 @@ fieldset p {
     clear: both;
     padding: 5px;
 }*/
-
-input.checkbox { border: none }
-form  { display: table; border-spacing: 20px 0.5em; width: 90%;}
-p     { display: table-row-group ; }*/
+.center-content {
+    margin: 0 auto;
+    width: 70%;
+    text-align: justify;
+}
+.about > p {
+    text-indent: 30pt;
+}
 p.submit {
     caption-side: bottom;
     display: table-caption;
     text-align: center;
 }
-input[type='submit']{
-    display: inline-block;
-    width: 100%;
+input.checkbox { border: none }
+form  { display: table; border-spacing: 20px 0.5em; width: 90%;}
+.group {
+    display: table-row-group;
 }
+p     {
+    display: table-row;
+    padding: 0.1px;
+}
+
 label { display: table-cell ;  }
 input {
     display: table-cell ;
-    /*text-align: center;
-    vertical-align: middle;*/
 }
 select, .ui-selectmenu-button {
     display: table-cell ;
@@ -280,6 +308,7 @@ textarea {
     padding-left: 15px;
     position: absolute;
 }
+
 
 img {
     vertical-align: middle;
@@ -480,6 +509,7 @@ header[role=banner]::after {
     display: inline-block;
     list-style-type: none;
     margin-left: 1em;
+    height: 5px;
   }
   .main-nav li:nth-last-child(2) {
     margin-left: 2em;
@@ -512,6 +542,7 @@ header[role=banner]::after {
   text-align: center;
   font-style: italic;
   font-size: 0.875rem;
+  bottom: 5px;
 }
 .cd-form-message {
   padding: 1.4em 1.4em 0;
