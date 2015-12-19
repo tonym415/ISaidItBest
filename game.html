@@ -2,12 +2,23 @@
 <html>
 <head>
 	<title>Game Page</title>
+	<link rel="shortcut icon" href="/assets/debate.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="assets/css/plugins/flipclock.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<!-- You can use Open Graph tags to customize link previews.
+   Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
+   <meta property="og:url"           content="http://10.0.0.7:8181/game.html" />
+   <meta property="og:type"          content="website" />
+   <meta property="og:title"         content="ISaidItBest" />
+   <meta property="og:site_name"     content="ISaidItBest" />
+   <meta property="og:description"   content="Finally, a website that proves you won the argument. Debate other people, so that you can win money and brag to your friends." />
+   <meta property="og:image:url"     content="http://isaiditbest.ddns.net/assets/css/images/rsz_debate.png" />
+   <meta property="fb:app_id"        content='1518603065100165' />
 </head>
 <body class="ui-widget-content">
+	<div id="fb-root"></div>
 	<header role="banner" class="ui-widget-header">
 		<div id="cd-logo">
 			<a href="http://ISaidItBest.ddns.net">
@@ -19,7 +30,7 @@
 			<ul class='ui-widget-default'>
 				<li id='home'><a href='index.html'>Home</a></li>
 				<li id='game'><a href='game.html'>Game</a></li>
-				<li id='feedback'><a href='contact.html'>Feedback</a></li>
+				<li id='feedback'><a href='feedback.html'>Feedback</a></li>
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
 				<li id='about'><a href='about.html'>About</a></li>
@@ -30,7 +41,7 @@
 		</nav>
 		</center>
 	</header>
-<!-- <center> -->
+
 	<h1>Game Selection</h1>
 
 	<div id="accordion">
@@ -105,7 +116,14 @@
 		</div>
 		<h3>Game Results</h3>
 		<div id="results_panel" class='center'>
-			<h2 id='results_title'>Results:</h2>
+			<center>
+				<div class='center-content'>
+					<div id='results_footer' class='resultsfooter'></div>
+				</div>
+				<div style="padding: 10px;">
+					<div class="fb-share-button" data-href="http://ISaidItBest.ddns.net/game.html" data-layout="button"></div>
+				</div>
+			</center>
 		</div>
 		<h3>Pre Game</h3>
 		<div class='center'>
@@ -131,7 +149,11 @@
 		<div id='wait_timer' class='countdown_timer'></div>
 	</center>
 </div>
-
+<div class="center-content" style="display:flex;">
+	<input type='button' value='Load Data' id='LD'/><br>
+	<input type='button' value='Toggle Game/Vote' id='TGV'/><br>
+	<input type='button' value='Toggle Winner' id='TW'/>
+</div>
 <div id="cancelSearch" class='hidden'>
 	<center>
         <h1>Searching for your game...</h1>

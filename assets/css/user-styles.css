@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
 	font-family: "Arial";
-    font-size: initial !important;
+    font-size: 85% !important;
     border: 0 !important;
 }
 
@@ -24,7 +24,25 @@ body > #container { height: auto; min-height: 98%; }
     height: 1em;
     margin-top: 1.5em;
     text-align: center;
+    border: 0 !important;
 }
+
+.footer a {
+    color: initial;
+}
+.resultsfooter {
+    clear: both;
+    position: relative;
+    z-index: 10;
+    height: 3em;
+    margin-top: 5em;
+    text-align: center;
+}
+
+.winnerDiv {
+    padding: 50px;
+}
+
 dt {
 	font-weight: bold;
     font-style: italic;
@@ -140,6 +158,24 @@ label .pass {
     padding-left: 15px;
  }
 
+ #welcome img {
+     padding-left: 10px;
+ }
+ *,
+ *:before,
+ *:after {
+   -webkit-box-sizing: content-box;
+      -moz-box-sizing: content-box;
+           box-sizing: content-box;
+ }
+
+ .container .row *,
+ .container .row *:before,
+ .container .row *:after {
+   -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+           box-sizing: border-box;
+ }
 .game_clock {
     /*top: 0;*/
     position: absolute;
@@ -259,9 +295,9 @@ fieldset p {
 .about > p {
     text-indent: 30pt;
 }
-p.submit {
+form p.submit {
     caption-side: bottom;
-    display: table-caption;
+    display: table-caption !important;
     text-align: center;
 }
 input.checkbox { border: none }
@@ -269,9 +305,9 @@ form  { display: table; border-spacing: 20px 0.5em; width: 90%;}
 .group {
     display: table-row-group;
 }
-p     {
-    display: table-row;
-    padding: 0.1px;
+form p     {
+    display: table-row !important;
+    padding: 0.1px !important;
 }
 
 label { display: table-cell ;  }
@@ -377,9 +413,8 @@ img {
     border-radius: 10px;
     right: 50px;
     position: absolute;
-    /*float: right;*/
     width: 115px;
-    height: 320px;
+    /*height: 320px;*/
 }
 
 .userComment {
@@ -419,23 +454,65 @@ img {
   display: inline;
 }
 
-
 /* avatar styling */
 .avatar_icon {
     width: 50px;
     height: 50px;
 }
-
+.avatar_large {
+    width: 200px;
+    height: 200px;
+    vertical-align: top;
+}
+.avatar_small {
+    width: 20px;
+    height: 20px;
+}
 .avatar {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
 }
 #welcome .avatar {
     position: absolute;
     margin-left: 60px;
 }
 
+/* Facebook Styling */
+.loginButtonWrapper {
+    width: 33% !important;
+}
+.groupSeparator > p:before, .groupSeparator > p:after{
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 38%;
+    background: rgba(0,0,0, 0.2);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5)
+}
+
+.groupSeparatorWrapper {
+    transition: opacity .5s linear;
+}
+
+.groupSeparator {
+    display: block;
+}
+
+.groupSeparatorWrapper .groupSeparator p:before {
+    margin-right: 10px;
+}
+.groupSeparatorWrapper .groupSeparator p:after {
+    margin-left: 10px;
+}
+
 /* nav styles */
+.pageLinks {
+    border-radius: 5px;
+    padding: 5px;
+    height: auto !important;
+}
 header[role=banner] {
   position: relative;
   height: 50px;
@@ -470,10 +547,10 @@ header[role=banner]::after {
 }
 @media only screen and (min-width: 768px) {
   header[role=banner] {
-    height: 80px;
+    /*height: 60px;*/
   }
   header[role=banner] #cd-logo {
-    margin: 20px 0 0 5%;
+    /*margin: 20px 0 0 5%;*/
     -webkit-transform: scale(1);
     -moz-transform: scale(1);
     -ms-transform: scale(1);
@@ -496,7 +573,7 @@ header[role=banner]::after {
     -ms-transform: translateY(0);
     -o-transform: translateY(0);
     transform: translateY(0);
-    line-height: 80px;
+    margin-top: 10px !important;
   }
   .main-nav ul.is-visible {
     -webkit-transform: translateY(0);

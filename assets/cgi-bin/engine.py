@@ -17,6 +17,7 @@ from app.User import *
 from app.Category import *
 from app.Question import *
 from app.Game import *
+from app.Feedback import *
 
 
 cgitb.enable()
@@ -122,38 +123,61 @@ def userAvailabilityCheck(fs):
     returnJson(availability)
 
 
-def contactUs(fs):
+def feedback(fs):
     """ send user responses to admin """
-    try:
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
+    returnVal = {}
+    if "id" in fs:
+        if fs['id'] == 'frmFeedback':
+            try:
+                import smtplib
+                from email.mime.multipart import MIMEMultipart
+                from email.mime.text import MIMEText
 
-        fromaddr = fs.get('email')
-        toaddr = 'tonym415@gmail.com'
-        msg = MIMEMultipart()
-        msg['From'] = fromaddr
-        msg['To'] = toaddr
-        msg['Subject'] = "User Concerns from %s" % fs.get('name')
+                # fromaddr = fs.get('email')
+                # toaddr = 'tonym415@gmail.com'
+                # msg = MIMEMultipart()
+                # msg['From'] = fromaddr
+                # msg['To'] = toaddr
+                # msg['Subject'] = "User Concerns from %s" % fs.get('name')
+                #
+                # body = fs.get('message')
+                # msg.attach(MIMEText(body, 'plain'))
 
-        body = fs.get('message')
-        msg.attach(MIMEText(body, 'plain'))
+                fromaddr = fs.get('email')
+                category = fs.get('category')
+                name = fs.get('name')
+                msgBody = fs.get('message')
 
-        server = smtplib.SMTP('localhost')
-        text = msg.as_string()
-        server.sendmail(fromaddr, toaddr, text)
-        server.quit()
-    except Exception as e:
-        returnJson({'error': "Server Error: %s" % e})
-        exit()
-    # if everything worked send data back for custom confirmation
-    fs['message'] = {
-        'title': "Success",
-        'message': """%s, your message has been sent.
-                Please expect a response soon""" % fs['name']
-    }
-    sys.stderr.write("{}".format(locals()))
-    returnJson(fs)
+                toaddr = 'tonym415@gmail.com'
+                heading = " Concerns from %s" % name
+
+                if category != '0':
+                    category = Feedback(fs).getCategoryByID()[0]['fbc_name']
+                    subject = 'Category: ' + category + " " + heading
+                else:
+                    subject = 'Uncategorized ' + heading
+
+                msg = MIMEMultipart()
+                msg['From'] = fromaddr
+                msg['To'] = toaddr
+                msg['Subject'] = subject
+
+                msg.attach(MIMEText(msgBody, 'plain'))
+
+                server = smtplib.SMTP('localhost')
+                text = msg.as_string()
+                server.sendmail(fromaddr, toaddr, text)
+                server.quit()
+            except Exception as e:
+                returnJson({'error': "{}".format(e)})
+                exit()
+            # if everything worked send data back for custom confirmation
+            returnVal['title'] = "Success"
+            returnVal['message'] = "%s, your message has been sent. Please expect a response soon" % name
+            # sys.stderr.write("{}".format(locals()))
+            returnJson(returnVal)
+        elif fs['id'] == 'feedback_categories':
+            returnJson(Feedback(fs).getAllCategories())
 
 
 def modifyCategory(fs):
@@ -315,8 +339,8 @@ def doFunc(fStor):
         globals()['userAvailabilityCheck'](fStor)
     elif funcName in ["GMD", "GG", "CG", "SUG", "SVG", "GCG", "GVG"]:
         globals()['gameFunctions'](fStor)
-    elif funcName in ["CU"]:
-        globals()['contactUs'](fStor)
+    elif funcName in ["FB", "FBC"]:
+        globals()['feedback'](fStor)
     elif funcName in ["LOG", 'GL']:
         globals()['logAction'](fStor)
     elif funcName in ['GUP', "UP", "UP"]:
@@ -344,10 +368,8 @@ def main():
     #                   function="GG",
     #                   counter="2")
 
-    form = formMockup(function="GVG",
-                      id="votePoll",
-                      game_id="1",
-                      counter='0')
+    form = formMockup(function="FB",
+                      id="frmFeedback")
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

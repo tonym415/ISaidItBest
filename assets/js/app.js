@@ -11,7 +11,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	var navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
-			'feedback': 'contact.html',
+			'feedback': 'feedback.html',
 			'profile': 'profile.html',
 			'about': 'about.html',
 			'admin': 'admin.html'
@@ -65,11 +65,12 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	var init = function(page){
 		var returnValue,
+			selectMenuOpt = { width: '60%'},
 			showLogin = false;
 		this.currentPage = page;
 		// show active page
 		$('.main-nav li').removeClass();
-		$('#' + page).addClass('ui-state-highlight');
+		$('#' + page).addClass('ui-state-active pageLinks');
 
 		// TODO: allow login and signup to work on all allowedPages
 		// pages allowed to be viewed without logging in
@@ -98,7 +99,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				returnValue = showLogin;
 				break;
 			case 'game':
-				$(".sel").selectmenu({ width: '80%' });
+				$(".sel").selectmenu(selectMenuOpt);
 				// load category selectmenu
 				this.getCategories();
 				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
@@ -119,12 +120,24 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				// create counter for sub-category templates
 				$('#subCatTemplate').data("tempCount",0);
 				break;
+			case 'feedback':
+				optCategory = {
+					change: function(){
+						// validate select
+						$(this).closest('form').validate().element(this);
+					}
+				}
+				settings = $.extend({}, selectMenuOpt, optCategory);
+				$(".sel").selectmenu(settings);
+				$("input").not('[type=submit]').width('100%');
+				break;
 			default:
 
 		}
 
 		// jquery-fy page with Page Stylings
 		$("input[type=submit]").button();
+		$("input[type=button]").button();
 
 		// final page setup
 		// add event listener for logout
@@ -170,7 +183,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		$('body').wrapInner("<div id='content'></div>");
 		$('#content').wrap('<div id="container" />');
 		$('<div class="footer"> </div>').insertAfter('#container');
-		$('.footer').html(txtFooter + tplRules).addClass('ui-widget-content');
+		$('.footer').html(txtFooter + tplRules);
 	}
 
 	function agreement(){
@@ -315,7 +328,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			$('.cd-signin, .cd-signup').toggle();
 			// if (page === 'home') return false;
 			userSpan = "<span id='welcome' class='ui-widget'>Welcome, <a href='" +  navPages.profile + "'>   "  + info.username  ;
-			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar'></a>";
+			userSpan += "<img src='" + getAvatar() + "' title='Edit " + info.username + "' class='avatar_icon'></a>";
 			userSpan += "<br /><span class='skill_level ui-widget'><span class='skill_level_text rankInfo'>Level</span>:<img src='/assets/css/images/trans1.png' class=''></span></span>";
 			$("header").after(userSpan);
 
@@ -400,7 +413,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 					url: app_engine
 					})
 					.done(function(data, textStatus, jqXHR){
-						console.log("Logged data: " + JSON.stringify(data, null, 4));
+						// NOTE: comment line below for production
+						// console.log("Logged data: " + JSON.stringify(data, null, 4));
 					})
 					.fail(function(jqXHR, textStatus, errorThrown) { console.log('log request failed! ' + textStatus); })
 					.always(function() { return false; });
@@ -643,7 +657,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
     // validator selectmenu method
     $.validator.addMethod("selectNotEqual", function(value, element, param) {
-        return param != value;
+		return param != value;
     },"Please choose a subcategory");
 
 	// validator defaults
@@ -687,6 +701,24 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
           }
 	});
 
+	function get_mboxDefaults(title, message){
+		return {
+			autoResize: true,
+			dialogClass: 'no-close',
+			modal: true,
+		    title: title,
+			open: function(){
+				icon = '<span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 5px 0;"></span>';
+				$(this).parent().find("span.ui-dialog-title").prepend(icon);
+				$(this).html(message);
+			},
+		   buttons: {
+			    Ok: function () {
+				   $(this).dialog("close");
+			    }
+		   }
+	    }
+	};
 
 	/** return the app object with var/functions built in */
 	return {
@@ -694,6 +726,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		defaultTheme: defaultTheme,
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,
+		// get message box default options (params: title, message)
+		mboxDefaults: get_mboxDefaults,
 		// CGI script that does all the work
 		engine : app_engine,
 		objCategories: objCategories,
@@ -716,33 +750,15 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		setFooter: setFooter,
 		rankInfo: rankInfo,
 		dMessage : function(title, message, options){
-			app = this;
 			title = (title === undefined) ? "Error" : title;
 			if (message !== undefined){
 				// print objects in readable form
-				message = (typeof(message) === 'object') ? app.prettyPrint(message) : message;
+				message = (typeof(message) === 'object') ? this.prettyPrint(message) : message;
 			}else{
 				message = "";
 			}
-			defaultOpts = {
-				autoResize: true,
-				dialogClass: 'no-close',
-				modal: true,
-			    title: title,
-				open: function(){
-					icon = '<span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 5px 0;"></span>';
-					$(this).parent().find("span.ui-dialog-title").prepend(icon);
-					var markup = message;
-					$(this).html(markup);
-				},
-			   buttons: {
-				    Ok: function () {
-					   $(this).dialog("close");
-				    }
-			   }
-		    };
-			settings = defaultOpts;
-			if (options) settings = $.extend({}, defaultOpts, options);
+			settings = this.mboxDefaults(title, message);
+			if (options) settings = $.extend({}, this.mboxDefaults(title, message), options);
 			$('<div />').dialog(settings);
 		},
 		getTheme: function(){

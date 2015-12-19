@@ -10,7 +10,6 @@ require([
 	'jqueryUI',
 	'livequery',
 	'cookie',
-	'tooltipster',
 	'blockUI'
 	], function($, app){
 		// game parameters global var
@@ -108,21 +107,7 @@ require([
 						}else if(data.status === 'complete'){
 							// update game ui
 							clearTimeout(timeout);
-							$('#game_id').val(data.game_id);
-							$.each(data.users, function(){
-								$('<div />')
-									.attr({ id: this.username })
-									.appendTo('#players');
-								$('<img  />')
-									.attr({
-										class: 'avatar',
-										src: app.getAvatar(this.avatar),
-										title: this.username
-									})
-									.appendTo('#' + this.username);
-								$('<br />').appendTo('#players');
-							});
-							loadDebate();
+							loadDebate(data);
 						}else if(data.queue){
 							// set the created queue_id to params
 							params.queue_id = data.queue.queue_id;
@@ -427,16 +412,114 @@ require([
 		if (!$('h3:contains("Game Results")').is(':visible')){
 			$('h3:contains("Game Results")').toggle();
 		}
-		$('h3:contains("Game Results")').click();
-			$('#results_title')
-				.after(
-					$('<span />')
-						.text(app.prettyPrint(users))
-						.wrap('<div />')
-				);
 
-		app.dMessage("Winner", users);
+		// build winner info
+		// find winner by most votes
+		var res = Math.max.apply(Math,users.map(function(o){return o.votes;}))
+		var obj = users.find(function(o){ return o.votes == res; })
+
+		strVote ='<span style="padding-left:20px;"><b>{0}</b> with <i>{1}</i> votes</span></p>';
+		var winner = $('<div />')
+						.addClass('winnerDiv')
+						.append(
+							$('<p><b><i>Winner</i></b>'),
+							$('<img src="/assets/avatars/' + obj.avatar + '" class="avatar_large" />'),
+							$($.validator.format(strVote, [obj.username, obj.votes]))
+						)
+
+		// display winner info
+		$('h3:contains("Game Results")').click();
+			$('#results_panel').find("p").remove();
+			$('#results_footer')
+				.before( $('<p />').append(winner));
+
+		// display the rest of the players
+		$.each(users, function(){
+			if (this.user_id !== obj.user_id){
+				$('#results_footer')
+					.before(
+						$('<div />')
+							.append(
+								$('<img src="/assets/avatars/' + this.avatar + '" class="avatar_small" />'),
+								$($.validator.format(strVote, [this.username, this.votes]))
+							)
+					);
+			}
+		})
+
+		resTitle = (obj.user_id == user.user_id) ? "Congratulations!!! You won!" : "Maybe next time";
+		$('#results_footer').html(resTitle)
+		$('#results_footer')
+			.append(
+				$('<p />')
+					.append(
+						$('<a />')
+							.prop('href', app.pages.game)
+							.html('Play Again?')
+					)
+			);
+		// app.dMessage("Winner", users);
 	}
+
+	var gameStartData = [
+	    {
+	        "users": [
+	            {
+	                "avatar": "54_avatar.jpg",
+	                "username": "bobs"
+	            },
+	            {
+	                "avatar": "52_avatar.jpg",
+	                "username": "user"
+	            },
+	            {
+	                "avatar": "36_avatar.jpg",
+	                "username": "tonym415"
+	            }
+	        ],
+	        "game_id": 1,
+	        "status": "complete"
+	    }
+	]
+	var voteResultData = [{
+		"votes": 2,
+			"user_id": 36,
+		    "avatar": "36_avatar.jpg",
+		    "username": "tonym415"
+		  },
+		  {
+		    "votes": 0,
+		    "user_id": 52,
+		    "avatar": "52_avatar.jpg",
+		    "username": "user"
+		  },
+		  {
+		    "votes": 1,
+		    "user_id": 54,
+		    "avatar": "54_avatar.jpg",
+		    "username": "bobs"
+		  }
+		]
+
+
+	$('#LD').click(function(){
+		// load data to display function
+		loadDebate(gameStartData[0])
+	})
+
+	$('#TGV').click(function(){
+		toggleGame()
+	})
+
+	$('#TW').click(function(){
+		if (!$('h3:contains("Game Results")').is(':visible')){
+			loadWinner(voteResultData)
+		}else{
+			toggleParams();
+			$('h3:contains("Game Results")').toggle();
+			$('h3:contains("Debate Game")').click();
+		}
+	})
 
 	function toggleParams(){
 		// disable/enable params
@@ -481,7 +564,29 @@ require([
 			}
 		});
 
-	function loadDebate(){
+	function loadDebate(data){
+		// set game id
+		$('#game_id').val(data.game_id);
+
+		// load player avatars
+		$('#players')
+			.empty()
+			.html("Players");
+
+		$.each(data.users, function(){
+			$('<div />')
+				.attr({ id: this.username })
+				.appendTo('#players');
+			$('<img  />')
+				.attr({
+					class: 'avatar',
+					src: app.getAvatar(this.avatar),
+					title: this.username
+				})
+				.appendTo('#' + this.username);
+			$('<br />').appendTo('#players');
+		});
+
 		// disable waiting message
 		$('#game_panel').unblock();
 
@@ -639,4 +744,31 @@ require([
 				}
 			);
 		});
+
+
+
+
+
+
+	/* Facebook Code */
+
+
+
+
+
+
+	window.fbAsyncInit = function() {
+       FB.init({
+         appId      : '1518603065100165',
+         xfbml      : true,
+         version    : 'v2.5'
+       });
+     };
+		(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=1518603065100165";
+		fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
 });

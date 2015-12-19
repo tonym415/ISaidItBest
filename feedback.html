@@ -16,7 +16,7 @@
 			<ul class='ui-widget-default'>
 				<li id='home'><a href='index.html'>Home</a></li>
 				<li id='game'><a href='game.html'>Game</a></li>
-				<li id='feedback'><a href='contact.html'>Feedback</a></li>
+				<li id='feedback'><a href='feedback.html'>Feedback</a></li>
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
 				<li id='about'><a href='about.html'>About</a></li>
@@ -29,19 +29,23 @@
 	</header>
 	<center>
 		<h1>Feedback</h1>
-		<form id="contact">
+		<form id="frmFeedback">
 			<fieldset>
 				<p>
+					<label for="name">Category:</label>
+					<select id="category" name="category" class="sel"> </select>
+				</p>
+				<p>
 					<label for="name">Name:</label>
-					<input type="text" id="name" name="name" required>
+					<input type="text" id="name" name="name" class="required" required>
 				</p>
 				<p>
 					<label for="email">Email:</label>
-					<input type="email" id="email" name="email" required>
+					<input type="email" id="email" name="email" class="required" required>
 				</p>
 				<p>
 					<label for="message">Message:</label>
-					<textarea type="text" id="message" name="message" required rows="6" cols="50"></textarea>
+					<textarea type="text" id="message" name="message" class="required" required rows="6" cols="50"></textarea>
 				</p>
 					<input type="submit" value="Submit" >
 			</fieldset>
@@ -51,7 +55,7 @@
 	<script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>
 		require(['common'], function(){
-			require(['pages/contact']);
+			require(['pages/feedback']);
 		});
 	</script>
 </html>

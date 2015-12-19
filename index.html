@@ -1,15 +1,32 @@
-<!doctype html>
-<html lang="en" class="no-js">
+<!DOCTYPE html PUBLIC
+  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:fb="http://www.facebook.com/2008/fbml"
+  lang="en" class="no-js">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	<link rel="shortcut icon" href="/assets/css/images/debate.ico" type="image/x-icon" />
+	<link rel="canonical" href="http://71.58.76.47:8181/" />
+	<!-- You can use Open Graph tags to customize link previews.
+	Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
+	<meta property="fb:app_id"        content='1518603065100165' />
+	<meta property="og:url"           content="	http://71.58.76.47:8181/" />
+	<meta property="og:type"          content="website" />
+	<meta property="og:title"         content="I Said It Best" />
+	<meta property="og:site_name"     content="I Said It Best" />
+	<meta property="og:description"   content="Finally, a website that proves you won the argument. Debate other people, so that you can win money and brag to your friends." />
+	<meta property="og:image:width"   content="250" />
+	<meta property="og:image:height"  content="250" />
+	<meta property="og:image"         content="	http://71.58.76.47:8181/assets/css/images/rsz_debate.png" />
     <link rel="stylesheet" href="assets/css/plugins/jquery-steps.css">
     <link rel="stylesheet" href="assets/css/styles.css"> <!-- Gem style -->
-
 	<title>I Said It Best!</title>
 </head>
 <body class='ui-widget-content'>
+	<div id='fb-root'></div>
 	<header role="banner" class="ui-widget-header">
 		<div id="cd-logo">
 			<a href="http://ISaidItBest.ddns.net">
@@ -21,7 +38,7 @@
 			<ul>
 				<li id='home'><a href='index.html'>Home</a></li>
 				<li id='game'><a href='game.html'>Game</a></li>
-				<li id='feedback'><a href='contact.html'>Feedback</a></li>
+				<li id='feedback'><a href='feedback.html'>Feedback</a></li>
 				<li id='profile'><a href='profile.html'>Profile</a></li>
 				<li id='admin'><a href='admin.html'>Admin</a></li>
 				<li id='about'><a href='about.html'>About</a></li>
@@ -41,6 +58,9 @@
 	<div class='text-content'>
 	Debate other people, so that you can win money and brag to your friends.
 	</div>
+	<!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"> </fb:login-button>
+	<div id="status"> </div> -->
+
 	<div class='modal-window' style='display:none'> <!-- this is the entire modal form, including the background -->
 		<div class="modal-container full-width"> <!-- this is the container wrapper -->
 			<ul class="cd-switcher ui-widget">
@@ -50,6 +70,13 @@
 			</ul>
 
 			<div id="login-tab"> <!-- log in form -->
+				<!-- <div class="fb-login-button center-content" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="true"></div><br /> -->
+				<div class="center-content loginButtonWrapper">
+					<fb:login-button onlogin='fb_login();' size="large" background="white" length="long"> </fb:login-button>
+				</div>
+				<div class="groupSeparatorWrapper">
+					<div class="groupSeparator"> <p>or</p> </div>
+				</div>
 				<form id="login">
 					<div class="group">
 	                    <fieldset>
@@ -61,12 +88,15 @@
 	                            <label for="password">  Password:</label>
 	                            <input type="password" id="password" name="password" required>
 	                        </p>
-							<p>
-							</p>
+							<!-- <p>
+								<span>Or login with Facebook:</span> <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true"></div>
+							</p> -->
 	                    </fieldset>
 					</div>
-					<p class="submit"><input form='login' type="submit" value="Submit" >
-					<span class="cd-form-bottom-message"><a href="#0">Forgot your password?</a></span/</p>
+					<p class="submit">
+						<input form='login' type="submit" value="Submit" >
+						<span class="cd-form-bottom-message"><a href="#0">Forgot your password?</a></span>
+					</p>
                 </form>
 
 			</div> <!-- login -->
