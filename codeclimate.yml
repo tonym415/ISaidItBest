@@ -1,7 +1,0 @@
-languages:
-  JavaScript: true
-  Python: true
-exclude_paths:
-- "assets/js/lib/flipclock.js"
-- "assets/js/lib/jquery-1.11.3.js"
-- "assets/js/lib/jquery.steps.js"

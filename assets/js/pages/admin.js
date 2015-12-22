@@ -13,6 +13,7 @@ require([
 	// page setup
 	app.init('admin');
 
+
 	function submitInfo(data, desc){
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
@@ -127,12 +128,14 @@ require([
 		});
 	}
 
-	$( "[id$=tabs]" ).tabs({
-		width: 650,
+	var tabOpts = {
+		// width: 650,
 		create: formLoad,
 		activate: formLoad,
-		heightStyle: 'fill'
-	});
+		// heightStyle: 'fill'
+	};
+	settings = $.extend({}, app.tabOptions, tabOpts);
+	$( "[id$=tabs]" ).tabs(settings);
 
 	$( "[id$=Accordion]" ).accordion({
 		width: 550,

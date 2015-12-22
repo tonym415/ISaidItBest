@@ -29,6 +29,11 @@ require([
 		app.init('game');
 		user = app.getCookie('user');
 
+	// following line must be commented for production
+	$(document).on('click', '.test', function(){
+		$('#btnTest').toggleClass('hidden');
+	});
+
 	function enrichMeta(){
 		// created inbuilt search function
 		paramMeta.getTimeById = function(id){
@@ -163,7 +168,10 @@ require([
 			toggleParams();
 
 			openAccordionPanel('next');
-			$('#game_panel').block({message: $('#cancelSearch'), css:{ width: '275px'}});
+			$('#game_panel').block({
+				message: $('#cancelSearch'),
+				css:{ width: '275px'}
+			});
 			game();
 		} else {
 			// if polling

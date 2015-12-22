@@ -191,7 +191,8 @@
 		</div>
 	</div>
 </center>
-<div id='subCatTemplate' class='hidden'>
+<div id='placeHolder' class='hidden'></div>
+<!-- <div id='subCatTemplate' class='hidden'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category:</label>
 		<select id='temp_subCategory' name='temp_subCategory' >
@@ -202,14 +203,14 @@
 		<div class="clear"></div>
 		<span errorfor="temp_subCategory"></span>
 	</p>
-</div>
+</div> -->
 <div id='gameWait' class='hidden ui-widget-content'>
 	<center>
 		Your game will start in 10 seconds...
 		<div id='wait_timer' class='countdown_timer'></div>
 	</center>
 </div>
-<div class="center-content" style="display:flex;">
+<div id='btnTest' class="center-content hidden" style="display:flex;">
 	<input type='button' value='Load Data' id='LD'/><br>
 	<input type='button' value='Load Comments' id='LC'/><br>
 	<input type='button' value='Toggle Game/Vote' id='TGV'/><br>
@@ -221,6 +222,7 @@
 		<img src='/assets/css/images/search1.gif' class='avatar' style="height:250px;width:200px" /><br />
         <input type="button" id="cancel" value="cancel" />
 	</center>
+</div>
 <script data-main="assets/js/common" src="assets/js/lib/require.js"></script>
 	<script>
 		require(['common'], function(){

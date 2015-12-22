@@ -43,73 +43,87 @@
 						<h3>C.R.U.D Category</h3>
 				    	<div id='catAccordion'>
 							<h3>Create Category</h3>
-							<form id='createCategory'>
-								<div class='errors'></div>
-								<p >
-									<label for='c_Category'>Category Name:</label>
-									<input id='c_Category' name='c_Category' type='text' class="required" />
-								</p>
-								<input type='submit' value="New Category" />
-							</form>
+							<div>
+								<form id='createCategory'>
+									<div class="group">
+										<p >
+											<label for='c_Category'>Category Name:</label>
+											<input id='c_Category' name='c_Category' type='text' class="required" />
+										</p>
+									</div>
+									<p class="submit">
+										<input type='submit' value="New Category" />
+									</p>
+								</form>
+							</div>
 							<h3>Rename/Update Category</h3>
-							<form id='renameCategory'>
-								<div class='errors'></div>
-								<p class="orig">
-									<label for='r_currentCategory'>Category to Change:</label>
-									<select id='r_currentCategory' name='r_currentCategory' required>
-										<option value="">None</option>
-									</select>
-									<label for='r_parentCategoryChk' >Sub?</label>
-									<input id='r_parentCategoryChk' name='r_parentCategoryChk' type='checkbox' />
-									<br />
-								</p>
-								<p class="orig">
-									<label for='r_newCategory'>New Name:</label>
-									<input id='r_newCategory' name='r_newCategory' type='text' required />
-									<br />
-								</p>
-								<p>
-									<input type='submit' value="Rename Category" />
-								</p>
-							</form>
+							<div>
+								<form id='renameCategory'>
+									<div class='group'>
+										<p class="orig">
+											<label for='r_currentCategory'>Category to Change:</label>
+											<select id='r_currentCategory' name='r_currentCategory' required>
+												<option value="">None</option>
+											</select>
+											<label for='r_parentCategoryChk' >Sub?</label>
+											<input id='r_parentCategoryChk' name='r_parentCategoryChk' type='checkbox' />
+											<br />
+										</p>
+										<p class="orig">
+											<label for='r_newCategory'>New Name:</label>
+											<input id='r_newCategory' name='r_newCategory' type='text' required />
+											<br />
+										</p>
+									</div>
+									<p class="submit">
+										<input type='submit' value="Rename Category" />
+									</p>
+								</form>
+							</div>
 							<h3>Delete Category</h3>
-							<form id='deleteCategory'>
-								<div class='errors'></div>
-								<p class="orig">
-									<label for='d_Category'>Category to Remove:</label>
-									<select id='d_Category' name='d_Category' class="required">
-										<option value="">None</option>
-									</select>
-									<label for='d_parentCategoryChk'>Sub?</label>
-									<input id='d_parentCategoryChk' name='d_parentCategoryChk' type='checkbox' />
-									<br />
-								</p>
-								<p>
-									<input type='submit' value="Delete Category" />
-								</p>
-							</form>
+							<div>
+								<form id='deleteCategory'>
+									<div class='group'>
+									<p class="orig">
+										<label for='d_Category'>Category to Remove:</label>
+										<select id='d_Category' name='d_Category' class="required">
+											<option value="">None</option>
+										</select>
+										<label for='d_parentCategoryChk'>Sub?</label>
+										<input id='d_parentCategoryChk' name='d_parentCategoryChk' type='checkbox' />
+										<br />
+									</p>
+								</div>
+									<p class='submit'>
+										<input type='submit' value="Delete Category" />
+									</p>
+								</form>
+							</div>
 							<h3>Category Adoption</h3>
-							<form id='adoptCategory'>
-								<div class='errors'></div>
-								<p class="orig">
-									<label for='a_parentCategory'>Parent Category:</label>
-									<select id='a_parentCategory' name='a_parentCategory' class="required">
-										<option value="">None</option>
-									</select>
-									<label for='a_parentCategoryChk'>Sub?</label>
-									<input id='a_parentCategoryChk' name='a_parentCategoryChk' type='checkbox' />
-									<br />
-								</p>
-								<p class="orig">
-									<label for='a_Category'>Categories:</label>
-									<select id='a_Category' name='a_Category' class="required allCategories">
-										<option value="">None</option>
-									</select>
-								</p>
-								<p>
-									<input type='submit' value="Adopt Category" />
-								</p>
-							</form>
+							<div>
+								<form id='adoptCategory'>
+									<div class='group'>
+										<p class="orig">
+											<label for='a_parentCategory'>Parent Category:</label>
+											<select id='a_parentCategory' name='a_parentCategory' class="required">
+												<option value="">None</option>
+											</select>
+											<label for='a_parentCategoryChk'>Sub?</label>
+											<input id='a_parentCategoryChk' name='a_parentCategoryChk' type='checkbox' />
+											<br />
+										</p>
+										<p class="orig">
+											<label for='a_Category'>Categories:</label>
+											<select id='a_Category' name='a_Category' class="required allCategories">
+												<option value="">None</option>
+											</select>
+										</p>
+									</div>
+									<p class='submit'>
+										<input type='submit' value="Adopt Category" />
+									</p>
+								</form>
+							</div>
 					    </div> <!-- end of category CRUD Accordion -->
 				    </div> <!-- end of category CRUD Accordion -->
 
@@ -119,70 +133,81 @@
 					<h2>Question Management</h2>
 			    	<div id='questionAccordion'> <!-- begin subcategory CRUD Accordion -->
 						<h3>Create Question</h3>
-						<form id='createQuestion'>
-							<div class='errors'></div>
-							<p >
-								<label for='q_Category'>Category:</label>
-								<select id='q_Category' name='q_category' required>
-									<option value="">None</option>
-								</select>
-								<label for='q_parentCategoryChk'>Sub?</label>
-								<input id='q_parentCategoryChk' name='q_parentCategoryChk' type='checkbox' />
-							</p>
-							<p >
-								<label for='q_text'>Question text:</label>
-								<input id='q_text' name='q_text' required />
-								<!-- <textarea id='q_text' name='q_text' rows="3" cols="50" required/> -->
-							</p>
-							<p >
-							<input class='full-width' type='submit' value="New Question" />
-							</p>
-						</form>
+						<div>
+							<form id='createQuestion'>
+								<div class="group">
+									<p >
+										<label for='q_Category'>Category:</label>
+										<select id='q_Category' name='q_category' required>
+											<option value="">None</option>
+										</select>
+										<label for='q_parentCategoryChk'>Sub?</label>
+										<input id='q_parentCategoryChk' name='q_parentCategoryChk' type='checkbox' />
+									</p>
+									<p >
+										<label for='q_text'>Question text:</label>
+										<input id='q_text' name='q_text' required />
+										<!-- <textarea id='q_text' name='q_text' rows="3" cols="50" required/> -->
+									</p>
+								</div>
+								<p class='submit'>
+								<input class='full-width' type='submit' value="New Question" />
+								</p>
+							</form>
+						</div>
 						<h3>Edit Question</h3>
-						<form id='editQuestion'>
-							<div class='errors'></div>
-							<p >
-								<label for='q_currentCategory'>Category to Change:</label>
-								<select  id='q_currentCategory' name='q_currentCategory' required>
-									<option value="---">None</option>
-								</select>
-								<label for='q_currentCategoryChk'>Sub?</label>
-								<input id='q_currentCategoryChk' name='q_currentCategoryChk' type='checkbox' />
-							</p>
-							<p >
-								<label for='q_currentQuestion'>Category Questions:</label>
-								<select  id='q_currentQuestion' name='q_currentQuestion' required>
-									<option value="">None</option>
-								</select>
-							</p>
-							<p >
-								<label for='q_editText'>Edit Question:</label>
-								<textarea id='q_editText' name='q_editText' rows="3" cols="50" required></textarea>
-								<!-- <input id='q_editText' name='q_editText' type='text' disabled/><br /> -->
-							</p>
-							<p>
-								<input type='submit' value="Save Question" />
-							</p>
-						</form>
+						<div>
+							<form id='editQuestion'>
+								<div class='group'>
+									<p >
+										<label for='q_currentCategory'>Category to Change:</label>
+										<select  id='q_currentCategory' name='q_currentCategory' required>
+											<option value="---">None</option>
+										</select>
+										<label for='q_currentCategoryChk'>Sub?</label>
+										<input id='q_currentCategoryChk' name='q_currentCategoryChk' type='checkbox' />
+									</p>
+									<p >
+										<label for='q_currentQuestion'>Category Questions:</label>
+										<select  id='q_currentQuestion' name='q_currentQuestion' required>
+											<option value="">None</option>
+										</select>
+									</p>
+									<p >
+										<label for='q_editText'>Edit Question:</label>
+										<textarea id='q_editText' name='q_editText' rows="3" cols="50" required></textarea>
+										<!-- <input id='q_editText' name='q_editText' type='text' disabled/><br /> -->
+									</p>
+								</div>
+								<p class='submit'>
+									<input type='submit' value="Save Question" />
+								</p>
+							</form>
+						</div>
 						<h3>Delete Question</h3>
-						<form id='deleteQuestion'>
-							<div class='errors'></div>
-							<p>
-								<label for='q_deleteCategory'>Category of question:</label>
-								<select id='q_deleteCategory'>
-									<option value="---">None</option>
-								</select>
-								<label for='q_deleteCategoryChk'>Sub?</label>
-								<input id='q_deleteCategoryChk' name='q_deleteCategoryChk' type='checkbox' />
-							</p>
-							<p >
-								<label for='q_Question'>Category Questions:</label>
-								<select  id='q_Question' name='q_Question' required>
-									<option value="">None</option>
-								</select>
-							</p>
-							<input form='deleteQuestion' type='submit' value="Delete Question" />
-						</form>
+						<div>
+							<form id='deleteQuestion'>
+								<div class='group'>
+									<p>
+										<label for='q_deleteCategory'>Category of question:</label>
+										<select id='q_deleteCategory'>
+											<option value="---">None</option>
+										</select>
+										<label for='q_deleteCategoryChk'>Sub?</label>
+										<input id='q_deleteCategoryChk' name='q_deleteCategoryChk' type='checkbox' />
+									</p>
+									<p >
+										<label for='q_Question'>Category Questions:</label>
+										<select  id='q_Question' name='q_Question' required>
+											<option value="">None</option>
+										</select>
+									</p>
+								</div>
+								<p class='submit'>
+									<input form='deleteQuestion' type='submit' value="Delete Question" />
+								</p>
+							</form>
+						</div>
 				    </div> <!-- End SubCat Accordion -->
 				</div> <!-- End of Question Tab -->
 				<div id="users"> <!-- Begin User Tab -->
@@ -214,7 +239,6 @@
 
 
 <!-- BEGIN PAGE UTILITY STRUCTURES -->
-
 <div id='subCatTemplate' style='display:none'>
 	<p>
 		<label for='temp_subCategory'>Sub-Category Name:</label>

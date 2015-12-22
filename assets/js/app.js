@@ -4,53 +4,59 @@
  * @return {Object} object with specific initialization and data handling for game.html
  */
 define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], function($){
-	var objCategories = {};
-	var defaultTheme = 'ui-lightness';
-	var app_engine = "/assets/cgi-bin/engine.py";
-	var default_avatar = 'assets/css/images/anon_user.png';
-	var selectMenuOpt = { width: '85%'};
-	var navPages = {
+	var objCategories = {},
+		defaultTheme = 'ui-lightness',
+		app_engine = "/assets/cgi-bin/engine.py",
+		default_avatar = 'assets/css/images/anon_user.png',
+		selectMenuOpt = { width: '65%'},
+		tabOptions = {
+			active: false,
+			collapsible: true,
+			heightStyle: 'content',
+			hide: { effect: "explode", duration: 1000 },
+			// hide: { effect: "slide", direction: 'right', duration: 1000 },
+			show: { effect: "slide", duration: 800 }
+		},
+		navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
 			'feedback': 'feedback.html',
 			'profile': 'profile.html',
 			'about': 'about.html',
 			'admin': 'admin.html'
-		};
-
-	var skillLevels = [
-		{
-			"title" : "Blowhard",
-			"description" : "Look who hasn't even won eleven games....."
-		},{
-			"title" : "Bigmouth",
-			"description" : "Get some games under you belt and we'll talk"
-		},{
-			"title" : "Conversationalist",
-			"description" : "Looks like someone is making money"
-		},{
-			"title" : "Commentator",
-			"description" : "Gaining momentum"
-		},{
-			"title" : "Scholar",
-			"description" : "Look who can argue!"
-		},{
-			"title" : "Lecturer",
-			"description" : "Debater Spectacular"
-		},{
-			"title" : "Advocate",
-			"description" : "You know your stuff"
-		},{
-			"title" : "Orator",
-			"description" : "Basically, Winston Churchill."
-		},{
-			"title" : "Elocutionist",
-			"description" : "Straight winning"
-		},{
-			"title" : "Rhetorician",
-			"description" : "Apex"
-		}
-	];
+		},
+		skillLevels = [{
+				"title" : "Blowhard",
+				"description" : "Look who hasn't even won eleven games....."
+			},{
+				"title" : "Bigmouth",
+				"description" : "Get some games under you belt and we'll talk"
+			},{
+				"title" : "Conversationalist",
+				"description" : "Looks like someone is making money"
+			},{
+				"title" : "Commentator",
+				"description" : "Gaining momentum"
+			},{
+				"title" : "Scholar",
+				"description" : "Look who can argue!"
+			},{
+				"title" : "Lecturer",
+				"description" : "Debater Spectacular"
+			},{
+				"title" : "Advocate",
+				"description" : "You know your stuff"
+			},{
+				"title" : "Orator",
+				"description" : "Basically, Winston Churchill."
+			},{
+				"title" : "Elocutionist",
+				"description" : "Straight winning"
+			},{
+				"title" : "Rhetorician",
+				"description" : "Apex"
+			}
+		];
 
 	$.fn.tooltipster('setDefaults',{
 		trigger: 'custom',
@@ -105,7 +111,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
 				$("#debateResults").toggle();
 				// create counter for sub-category templates
-				$('#subCatTemplate').data("tempCount",0);
+				$(document).data("tempCount",0);
 
 				// disable game until params established
 				// $("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
@@ -113,19 +119,14 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$('h3:contains("Game Results")').toggle();
 
 				$("h3:contains('Pre Game')").toggle();
-				$('#paramOptions').tabs({
-					active: false,
-					collapsible: true,
-					heightStyle: 'content',
-					hide: { effect: "slide", direction: 'right', duration: 1000 },
-					show: { effect: "slide", duration: 800 }
-				});
+				$('#paramOptions').tabs(tabOptions);
 				break;
 			case 'admin':
 				// load category selectmenu
 				this.getCategories();
+				$('select').selectmenu(selectMenuOpt);
 				// create counter for sub-category templates
-				$('#subCatTemplate').data("tempCount",0);
+				$(document).data("tempCount",0);
 				break;
 			case 'feedback':
 				optCategory = {
@@ -189,8 +190,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		// wrap the content of the body with a container and wrap that with container to accomodate the footer stylings
 		$('body').wrapInner("<div id='content'></div>");
 		$('#content').wrap('<div id="container" />');
-		$('<div class="footer"> </div>').insertAfter('#container');
-		$('.footer').html(txtFooter + tplRules);
+		$('<div class="footer"> </div>')
+			.html(txtFooter + tplRules)
+			.prepend( $('<div class="test" />') )
+			.insertAfter('#container');
 	}
 
 	function agreement(){
@@ -749,6 +752,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		init: init,
 		defaultTheme: defaultTheme,
 		selectMenuOpt: selectMenuOpt,
+		tabOptions: tabOptions,
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,
 		// CGI script that does all the work
@@ -821,66 +825,75 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	        	/* create subcategory select, fill and new subs checkbox */
 
 	        	// get the template paragraph element
-	        	parentP = $('#subCatTemplate');
-	        	// clone it
-	        	var clone = parentP.children().clone();
-				// add identifying class for later removal
-				clone.addClass('clone');
+	        	$('#placeHolder').load('templates.html #subCatTemplate', function(response, status, xhr){
+					if (status != 'error'){
+			        	parentP = $('#subCatTemplate');
+			        	// clone it
+			        	var clone = parentP.children().clone();
 
-	        	// get current iteration of instantiation of the template for naming
-				var iteration = parentP.data('tempCount');
-				// increment iteration as index and save new iteration
-	    		index = ++iteration;
-	    		parentP.data('tempCount', iteration);
+						// add identifying class for later removal
+						clone.addClass('clone');
 
-	        	// loop through all child elements to modify before appending to the dom
-	        	clone.children().each(function(){
-	        		changeID = true;
-					elName = null;
-					elID = null;
-	        		// get the id ov the current element
-	        		var templateID = $(this).prop('id');
-	        		// make sure there are no blank ids
-	        		switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
-						case 'label':
-		        			strFor = $(this).prop('for');
-		        			origPrefix = strFor.prefix();
-		        			strFor = strFor.replace(origPrefix, element_id_prefix) + index;
-		        			// change 'for' property for label
-		        			$(this).prop('for', strFor);
-		        			changeID = false;
-		        			break;
-	        			case 'select':
-	        			case 'select-one':
-		        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
-		        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
-		        			// add new option to select menu based on parent id
-		        			$(this)
-								.addClass('required')
-								.empty()
-								.append(new Option("None", ""));
-								tmpSelect = $(this);
-								$.each(catCollection, function(idx, objCat){
-									cat = objCat.category;
-									id = objCat.category_id;
-									tmpSelect.append(new Option(cat, id));
-								});
-								break;
-						case 'checkbox':
-		        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
-							elName = elID;
-		        			break;
-		        		default:
-		        			changeID = false;
-	        		}
-	        		// only change the id of necessary elements
-	        		if (changeID)  {
+			        	// get current iteration of instantiation of the template for naming
+						var iteration = $(document).data('tempCount');
+						// increment iteration as index and save new iteration
+			    		index = ++iteration;
+			    		$(document).data('tempCount', iteration);
 
-						$(this).prop({"id":elID, "name": elName });
+			        	// loop through all child elements to modify before appending to the dom
+			        	clone.children().each(function(){
+			        		changeID = true;
+							elName = null;
+							elID = null;
+			        		// get the id ov the current element
+			        		var templateID = $(this).prop('id');
+			        		// make sure there are no blank ids
+			        		switch ($(this).prop('type') || $(this).prop('nodeName').toLowerCase()){
+								case 'label':
+				        			strFor = $(this).prop('for');
+				        			origPrefix = strFor.prefix();
+				        			strFor = strFor.replace(origPrefix, element_id_prefix) + index;
+				        			// change 'for' property for label
+				        			$(this).prop('for', strFor);
+				        			changeID = false;
+				        			break;
+			        			case 'select':
+			        			case 'select-one':
+				        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + "[" + index + "]";
+				        			elName = templateID.replace(templateID.prefix(), element_id_prefix) + "[]";
+				        			// add new option to select menu based on parent id
+				        			$(this)
+										.addClass('required')
+										.empty()
+										.append(new Option("None", ""));
+										tmpSelect = $(this);
+										$.each(catCollection, function(idx, objCat){
+											cat = objCat.category;
+											id = objCat.category_id;
+											tmpSelect.append(new Option(cat, id));
+										});
+										break;
+								case 'checkbox':
+				        			elID = templateID.replace(templateID.prefix(), element_id_prefix) + index;
+									elName = elID;
+				        			break;
+				        		default:
+				        			changeID = false;
+			        		}
+			        		// only change the id of necessary elements
+			        		if (changeID)  {
 
+								$(this).prop({"id":elID, "name": elName });
+
+							}
+			        	});
+			        	element.parent().after(clone);
+						$('#placeHolder').empty();
+					}else{
+						app.dMessage(status.capitlize() + ' - Template File', xhr.statusText);
 					}
-	        	});
-	        	element.parent().after(clone);
+				});
+
 	        }else{
 	        	// category is top-level
 	        	msg = "No Sub-category found for: " + current_selection;
