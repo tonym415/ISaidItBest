@@ -55,34 +55,42 @@ require([
 			type: 'POST',
 			dataType: 'json',
 			desc: 'utility (load metadata)',
-			success: function(data){
+			 success: function(data){
 				paramMeta = data;
 				// call enhancing function
 				enrichMeta();
-				$('#wager')
-					.empty()
-					.append(new Option("None", ""));
-				// load question selectmenu
-				$.each(data.wagers, function(){
-					$('#wager')
-						.append($('<option />')
-						.val(this.credit_id)
-						.text(this.credit_value + ' credit(s)'))
-						.val("")
-						.selectmenu('refresh');
+				$.each($('[id=wager]'), function(){
+					$(this)
+						.empty()
+						.append(new Option("None", ""));
+						// load question selectmenu
+						element = $(this);
+						$.each(data.wagers, function(){
+							$(element)
+								.append($('<option />')
+								.val(this.credit_id)
+								.text(this.credit_value + ' credit(s)'))
+								.val("")
+								.selectmenu('refresh');
+						});
 				});
-				$('#timeLimit')
-					.empty()
-					.append(new Option("None", ""));
-				// load question selectmenu
-				$.each(data.times, function(){
-					$('#timeLimit')
-						.append($('<option />')
-						.val(this.time_id)
-						.text(this.time_in_seconds.toString().toMMSS()))
-						.val("")
-						.selectmenu('refresh');
+
+				$.each($('[id=timeLimit]'), function(){
+					$(this)
+						.empty()
+						.append(new Option("None", ""));
+					element = $(this);
+					// load question selectmenu
+					$.each(data.times, function(){
+						$(element)
+							.append($('<option />')
+							.val(this.time_id)
+							.text(this.time_in_seconds.toString().toMMSS()))
+							.val("")
+							.selectmenu('refresh');
+					});
 				});
+
 			}
 		});
 	})();
@@ -164,28 +172,36 @@ require([
 	}
 
 
-	// set up parameter form validation
-	$('#gameParameters').validate({
-		submitHandler: function(){
-			params = $(this.currentForm).serializeForm();
-			params.user_id = user.user_id;
-			params.function = 'GG';
-			params.counter = pollCounter;
-			getGame();
-		},
-		rules: {
-			p_paramCategory: { selectNotEqual: "" },
-			paramQuestions: { selectNotEqual: "" },
-			timeLimit: { selectNotEqual: "" },
-			wager: { selectNotEqual: "" }
-		},
-		messages: {
-			p_paramCategory: "You must choose a category",
-			paramQuestions: "You must choose a question",
-			timeLimit: 'You must choose a time limit',
-			wager: 'You must choose a wager'
-		}
-	});
+	// set up parameter forms for validation
+	(function(){
+		// retrieve a param forms
+		forms = $('div.paramDiv').children('form');
+
+		// for each form
+		$.each(forms, function(){
+			// add validation w/ handler
+			$(this).validate({
+				submitHandler: function(){
+					params = $(this.currentForm).serializeForm();
+					params.user_id = user.user_id;
+					params.function = 'GG';
+					params.counter = pollCounter;
+					getGame();
+				}
+			});
+
+			// for each of the selects in the form
+			elSelects = $(this).find('select');
+			// add rule
+			$.each(elSelects, function(){
+				$(this).rules("add", {
+					required: true,
+					selectNotEqual: ""
+				});
+			});
+		});
+	})();
+
 	// validation for debate game ui
 	$('#gameUI').validate({
 		submitHandler: function(){
@@ -415,8 +431,8 @@ require([
 
 		// build winner info
 		// find winner by most votes
-		var res = Math.max.apply(Math,users.map(function(o){return o.votes;}))
-		var obj = users.find(function(o){ return o.votes == res; })
+		var res = Math.max.apply(Math,users.map(function(o){return o.votes;}));
+		var obj = users.find(function(o){ return o.votes == res; });
 
 		strVote ='<span style="padding-left:20px;"><b>{0}</b> with <i>{1}</i> votes</span></p>';
 		var winner = $('<div />')
@@ -425,7 +441,7 @@ require([
 							$('<p><b><i>Winner</i></b>'),
 							$('<img src="/assets/avatars/' + obj.avatar + '" class="avatar_large" />'),
 							$($.validator.format(strVote, [obj.username, obj.votes]))
-						)
+						);
 
 		// display winner info
 		$('h3:contains("Game Results")').click();
@@ -440,15 +456,15 @@ require([
 					.before(
 						$('<div />')
 							.append(
-								$('<img src="/assets/avatars/' + this.avatar + '" class="avatar_small" />'),
+								$('<img src="/assets/avatars/' + this.avatar + '" class="avatar_icon" />'),
 								$($.validator.format(strVote, [this.username, this.votes]))
 							)
 					);
 			}
-		})
+		});
 
 		resTitle = (obj.user_id == user.user_id) ? "Congratulations!!! You won!" : "Maybe next time";
-		$('#results_footer').html(resTitle)
+		$('#results_footer').html(resTitle);
 		$('#results_footer')
 			.append(
 				$('<p />')
@@ -461,65 +477,98 @@ require([
 		// app.dMessage("Winner", users);
 	}
 
-	var gameStartData = [
+	var gameStartData = {
+		    "wager": 1,
+		    "users": [{
+		            "username": "bobs",
+		            "avatar": "54_avatar.jpg"
+		        },{
+		            "username": "user",
+		            "avatar": "52_avatar.jpg"
+		        },{
+		            "username": "tonym415",
+		            "avatar": "36_avatar.jpg"
+	        }],
+		    "status": "complete",
+		    "time": 60,
+		    "question": "Is the introduction of $15 minimum wage good?",
+		    "game_id": 5
+		};
+
+	var commentResultData = [
 	    {
+	        "pending": 0,
+	        "status": "complete",
 	        "users": [
 	            {
-	                "avatar": "54_avatar.jpg",
-	                "username": "bobs"
-	            },
-	            {
-	                "avatar": "52_avatar.jpg",
-	                "username": "user"
-	            },
-	            {
+	                "thoughts": "Bacon ipsum dolor amet jerky rump ham hock, shank shankle venison brisket kielbasa drumstick. Brisket swine short ribs ribeye ball tip spare ribs. Chicken pork loin shoulder pancetta pork ham venison drumstick chuck boudin kevin cow fatback porchetta pastrami. Shank pork belly ham, capicola beef kielbasa salami tail short ribs ground round cow shoulder turkey. Jerky pig doner, capicola kevin bresaola meatball tongue cow short loin ground round pork belly filet mignon. Ground round salami hamburger, beef picanha swine prosciutto bacon pork chop cow tongue ball tip. Pork chop rump porchetta t-bone, short ribs pork loin sausage filet mignon tri-tip picanha salami shoulder.",
 	                "avatar": "36_avatar.jpg",
-	                "username": "tonym415"
+	                "username": "tonym415",
+	                "user_id": 36
+	            },
+	            {
+	                "thoughts": "Bresaola biltong chuck shank sirloin bacon venison ground round prosciutto short loin. Brisket venison jowl salami sirloin landjaeger. Short ribs ham hock filet mignon jowl. Bresaola pig porchetta tri-tip drumstick prosciutto tenderloin rump capicola bacon tongue flank short loin ham hock t-bone. Meatball venison chicken, cupim pork loin frankfurter sirloin tail. Drumstick chuck fatback turkey, bresaola ham shoulder meatball sausage biltong strip steak sirloin filet mignon beef.",
+	                "avatar": "52_avatar.jpg",
+	                "username": "user",
+	                "user_id": 52
+	            },
+	            {
+	                "thoughts": "sBeef ribs meatloaf kielbasa ham, rump tail flank doner ground round turducken t-bone. Doner turkey kevin tail, cupim shank bacon venison. Flank boudin pork chop, shoulder tenderloin picanha bresaola capicola leberkas pig shank fatback rump ball tip beef. Rump biltong pig, sirloin short loin jowl kevin tongue short ribs leberkas corned beef pancetta. ",
+	                "avatar": "54_avatar.jpg",
+	                "username": "bobs",
+	                "user_id": 54
 	            }
-	        ],
-	        "game_id": 1,
-	        "status": "complete"
+	        ]
 	    }
-	]
+	];
 	var voteResultData = [{
-		"votes": 2,
+		"votes": 1,
 			"user_id": 36,
 		    "avatar": "36_avatar.jpg",
 		    "username": "tonym415"
 		  },
 		  {
-		    "votes": 0,
+		    "votes": 2,
 		    "user_id": 52,
 		    "avatar": "52_avatar.jpg",
 		    "username": "user"
 		  },
 		  {
-		    "votes": 1,
+		    "votes": 0,
 		    "user_id": 54,
 		    "avatar": "54_avatar.jpg",
 		    "username": "bobs"
 		  }
-		]
+		];
 
 
 	$('#LD').click(function(){
 		// load data to display function
-		loadDebate(gameStartData[0])
-	})
+		$('h3:contains("Debate Game")').click();
+		loadDebate(gameStartData);
+	});
+
+	$('#LC').click(function(){
+		// load data to display function
+		$('h3:contains("Debate Game")').click();
+		$('#selectable').remove();
+		displayComments(commentResultData[0].users);
+	});
+
 
 	$('#TGV').click(function(){
-		toggleGame()
-	})
+		toggleGame();
+	});
 
 	$('#TW').click(function(){
 		if (!$('h3:contains("Game Results")').is(':visible')){
-			loadWinner(voteResultData)
+			loadWinner(voteResultData);
 		}else{
 			toggleParams();
 			$('h3:contains("Game Results")').toggle();
 			$('h3:contains("Debate Game")').click();
 		}
-	})
+	});
 
 	function toggleParams(){
 		// disable/enable params
@@ -592,16 +641,16 @@ require([
 
 		//set game title(question)/wager
 		$("#question")
-			.html($('#paramQuestions :selected').text())
+			.html(data.question)
 			.append(
 				$('<h5>')
-					.html("(Wager: " + $('#wager :selected').text() + ")")
+					.html("(Wager: " + data.wager + " credit(s))")
 			);
 
 
 		// set clock based on time limit parameter
-		min = paramMeta.getTimeById($('#timeLimit').val());
-		gameClock.setTime(min);
+		// min = paramMeta.getTimeById(data.time);
+		gameClock.setTime(data.time);
 		$.blockUI({message: $('#gameWait'), css:{ width: '305px'}});
 		waitClock.start();
 	}
@@ -681,19 +730,14 @@ require([
 	// set a watch for additions/removal on the dom for select boxes (not including template)
 	$("select[id*=Category]:not([id*=temp])")
 		.livequery(function(){
-			id = $(this).prop('id');
+			// id = $(this).prop('id');
+			id = '#' + $(this)[0].form.id + " " +  $(this).prop('id');
 			// add validation
 			$(this).closest('form').validate();
-			$(this).rules("add", {
-				selectNotEqual : "",
-				messages: {
-					id : "Please choose a subcategory"
-				}
-			});
+			$(this).rules("add", { selectNotEqual : "" });
 
-			// initialize selectmenu
-			$(this).selectmenu({
-				width: 200,
+			// selectmenu options
+			mnuOpts = {
 				change: function(){
 					// load appropriate questions for selection
 					primeQBox($(this).val());
@@ -716,9 +760,10 @@ require([
 
 					// if sub-categories are requested
 					if (boolSubs) app.subCheck($(this));
-
 				}
-			});
+			};
+			settings = $.extend({}, app.selectMenuOpt, mnuOpts);
+			$(this).selectmenu(settings);
 		});
 
 	// set watch for additions/removal on the dom for checkboxes (not including template)
@@ -744,10 +789,6 @@ require([
 				}
 			);
 		});
-
-
-
-
 
 
 	/* Facebook Code */

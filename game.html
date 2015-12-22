@@ -46,48 +46,107 @@
 
 	<div id="accordion">
 		<h3>Parameter Selection</h3>
-		<div id="paramDiv">
-			<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
-			<form id="gameParameters">
-				<div class='group'>
-					<p>
-						<label for='p_paramCategory'>Category</label>
-						<select id="p_paramCategory" name="p_paramCategory" class="sel required" required> </select>
-						<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
-						<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+		<div id='paramOptions'>
+			<ul>
+				<li><a href='#Alldiv'>All Parameters</a></li>
+				<li><a href="#RandomQuestiondiv">Random Questions</a></li>
+				<li><a href='#CategoryOnlydiv'>Category Only</a></li>
+				<li><a href="#Randomdiv">Random Game</a></li>
+			</ul>
+			<div class="paramDiv" id="Alldiv">
+				<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
+				<form id="All">
+					<div class='group'>
+						<p>
+							<label for='p_paramCategory'>Category</label>
+							<select id="p_paramCategory" name="p_paramCategory" class="sel required" required title="You must choose a category"> </select>
+							<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
+							<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+						</p>
+						<p>
+							<label for="paramQuestions">Category questions</label>
+							<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required title="You must select a question">
+								<option value="">None</option>
+							</select>
+						</p>
+						<p>
+							<label for='timeLimit'>Time Limit (in min)</label>
+							<select id="timeLimit" name="timeLimit" class="sel" required title="You must select a time limit">
+							</select>
+						</p>
+						<p>
+						<label for='wager'>Wager</label>
+							<select id="wager" name="wager" class="sel" required title="You must select a wager">
+							</select>
+						</p>
+					</div>
+					<p class='submit'>
+						<input type="submit" value="Submit Parameters">
 					</p>
-					<p>
-						<label for="paramQuestions">Category questions</label>
-						<select id="paramQuestions" name="paramQuestions" class="sel q_sel required" required>
-							<option value="">None</option>
-						</select>
+				</form>
+			</div>
+			<div class="paramDiv" id="RandomQuestiondiv">
+				<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
+				<form id="randomQuestion">
+					<div class='group'>
+						<p>
+							<label for='p_paramCategory'>Category</label>
+							<select id="p_paramCategory" name="p_paramCategory" class="sel required" required title="You must choose a category"> </select>
+							<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
+							<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+						</p>
+						<p>
+							<label for='timeLimit'>Time Limit (in min)</label>
+							<select id="timeLimit" name="timeLimit" class="sel" required title="You must select a time limit">
+							</select>
+						</p>
+						<p>
+						<label for='wager'>Wager</label>
+							<select id="wager" name="wager" class="sel" required title="You must select a wager">
+							</select>
+						</p>
+					</div>
+					<p class='submit'>
+						<input type="submit" value="Submit Parameters">
 					</p>
-					<p>
-						<label for='timeLimit'>Time Limit (in min)</label>
-						<select id="timeLimit" name="timeLimit" class="sel" required>
-						</select>
+				</form>
+			</div>
+			<div class="paramDiv" id="CategoryOnlydiv">
+				<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
+				<form id="CategoryOnly">
+					<div class='group'>
+						<p>
+							<label for='p_paramCategory'>Category</label>
+							<select id="p_paramCategory" name="p_paramCategory" class="sel required" required title="You must choose a category"> </select>
+							<label for='p_paramCategoryChk' class='subCheck'>Sub?</label>
+							<input id='p_paramCategoryChk' name='p_paramCategoryChk' class='subCheck' type='checkbox' />
+						</p>
+					</div>
+					<p class='submit'>
+						<input type="submit" value="Submit Parameters" />
 					</p>
-					<p>
-					<label for='wager'>Wager</label>
-						<select id="wager" name="wager" class="sel" required>
-						</select>
+				</form>
+			</div>
+			<div class="paramDiv" id="Randomdiv">
+				<h4 class='ui-state-active no-border'><b><i>CAUTION:</i></b> Longest wait! Slowest search!</h4>
+				<form id="random">
+					<p class='submit'>
+						<input type="submit" value="Get Random Game" />
 					</p>
-				</div>
-				<p class='submit'>
-					<input type="submit" value="Submit Parameters" form='gameParameters'>
-				</p>
-			</form>
+				</form>
+			</div>
 		</div>
 		<h3>Debate Game</h3>
 		<div id="game_panel">
 				<div id="debate">
 				<span class='timer_text ui-state-active no-border'>Minutes left to win!</span> <div class='countdown_timer game_clock' id='game_timer'></div>
-				<center>
 					<h3 id="question"></h3>
 					<form id='gameUI'>
 						<div class='group'>
 							<fieldset>
+								<center>
 								<legend>What do you think?</legend>
+								</center>
 									<div id='players' class='debatePlayers'>Players</div>
 									<p>
 										<label for="thoughts">Thoughts:</label>
@@ -99,6 +158,7 @@
 						<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
 					</form>
 				</div>
+				<center>
 				<div class='debateVote hidden'>
 					<form id='debateVote'>
 						<div class="group">
@@ -151,6 +211,7 @@
 </div>
 <div class="center-content" style="display:flex;">
 	<input type='button' value='Load Data' id='LD'/><br>
+	<input type='button' value='Load Comments' id='LC'/><br>
 	<input type='button' value='Toggle Game/Vote' id='TGV'/><br>
 	<input type='button' value='Toggle Winner' id='TW'/>
 </div>

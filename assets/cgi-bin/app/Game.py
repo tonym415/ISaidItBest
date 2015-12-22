@@ -25,9 +25,26 @@ class Game(Entity):
             setattr(self, key, kwargs[key])
 
     def sanitizeParams(self):
-        return {k[5:]: v
-                for k, v in self.__dict__.items()
-                if k.startswith('user')}
+        params = {k[5:]: v
+                  for k, v in self.__dict__.items()
+                  if k.startswith('user')}
+
+        if "p_paramCategory" not in params.keys():
+            params['category_id'] = 0
+        else:
+            params['category_id'] = params["p_paramCategory"]
+            params.pop('p_paramCategory')
+        if "p_subCategory" in params.keys():
+            params['category_id'] = params["p_subCategory"]
+            params.pop("p_subCategory")
+        if "paramQuestions" not in params:
+            params['paramQuestions'] = 0
+        if "wager" not in params:
+            params['wager'] = 0
+        if "timeLimit" not in params:
+            params['timeLimit'] = 0
+
+        return params
 
     def removeFromQueue(self):
         """ add user params to queue"""
@@ -38,12 +55,12 @@ class Game(Entity):
     def addToQueue(self):
         """ add user params to queue"""
         returnDict = {}
-        query = ("INSERT INTO game_queue (user_id, question_id, wager_id, "
-                 "time_id) VALUES (%(user_id)s, %(paramQuestions)s, %(wager)s, "
-                 "%(timeLimit)s)")
-        params = self.sanitizeParams()
-
         try:
+            # load params
+            params = self.sanitizeParams()
+            query = ("INSERT INTO game_queue (user_id, category_id, question_id, wager_id, "
+                     "time_id) VALUES (%(user_id)s, %(category_id)s, %(paramQuestions)s, %(wager)s, "
+                     "%(timeLimit)s)")
             returnVal = self.executeModifyQuery(query, params)
             query = ("SELECT * FROM game_queue WHERE queue_id = %s")
             returnDict['queue'] = self.executeQuery(query, (self.cursor.lastrowid,))[0]
@@ -53,29 +70,32 @@ class Game(Entity):
 
         return returnDict
 
-    def getPlayerQueue(self):
-        """ get all user in queue ready for game """
-        query = ("SELECT queue_id, user_id, game_queue.question_id, "
-                 "game_queue.wager_id, game_queue.time_id, active FROM "
-                 "game_queue JOIN  (SELECT question_id, wager_id, time_id FROM "
-                 "game_queue WHERE active = 1 GROUP BY question_id, wager_id, "
-                 "time_id HAVING count(*) >= 3) AS sub ON "
-                 "(game_queue.question_id=sub.question_id) AND "
-                 "(game_queue.wager_id=sub.wager_id) "
-                 "AND(game_queue.time_id=sub.time_id)")
-        return self.executeQuery(query, (), True)
+    # def getPlayerQueue(self):
+    #     """ get all user in queue ready for game """
+    #     query = ("SELECT queue_id, user_id, game_queue.category_id, game_queue.question_id, "
+    #              "game_queue.wager_id, game_queue.time_id, active FROM "
+    #              "game_queue JOIN  (SELECT category_id, question_id, wager_id, time_id FROM "
+    #              "game_queue WHERE active = 1 GROUP BY category_id, question_id, wager_id, "
+    #              "time_id HAVING count(*) >= 3) AS sub ON "
+    #              "(game_queue.category_id=sub.category_id) AND "
+    #              "(game_queue.question_id=sub.question_id) AND "
+    #              "(game_queue.wager_id=sub.wager_id) "
+    #              "AND(game_queue.time_id=sub.time_id)")
+    #     return self.executeQuery(query, (), True)
 
     def getQueuedUsers(self):
         """ get available user in queue """
+        returnObj = {}
         params = self.sanitizeParams()
-        query = ("SELECT queue_id, game_id, user_id FROM game_queue WHERE question_id = "
-                 "%(paramQuestions)s and wager_id = %(wager)s and time_id = "
-                 "%(timeLimit)s and active = 1 limit 0, 3")
+        query = ("SELECT queue_id, game_id, user_id FROM game_queue WHERE "
+                 "question_id= %(paramQuestions)s and wager_id = %(wager)s "
+                 "and time_id = %(timeLimit)s and category_id = %(category_id)s "
+                 "and active = 1 limit 0, 3")
         return self.executeQuery(query, params, True)
 
     def getGameID(self):
         """ get next game_id """
-        query = ("SELECT COALESCE(MAX(game_id), 1) as game_id FROM game WHERE 1")
+        query = ("SELECT COALESCE(MAX(game_id), 0) + 1 as game_id FROM game WHERE 1")
         return self.executeQuery(query, ())[0]['game_id']
 
     def submitVote(self):
@@ -110,6 +130,49 @@ class Game(Entity):
                 uinfo['avatar'] = ""
         return playerVotes
 
+    def getCategory(self):
+        """ get random question  """
+        params = self.sanitizeParams()
+        stmWhere = " "
+        # if a category is available choose question from category pool
+        if params['category_id'] != 0:
+            stmWhere = " q.category_id = %(category_id)s AND "
+
+        query = ("SELECT question_id, q.category_id, question_text as text "
+                 "from questions q INNER JOIN question_categories qc "
+                 "USING(category_id) WHERE %s q.active = 1 ORDER BY RAND() LIMIT 1")
+        query = query % stmWhere
+
+        return self.executeQuery(query, params, True)[0]
+
+    def getWager(self):
+        """ get random question  """
+        params = self.sanitizeParams()
+        stmWhere = " "
+        # if a category is available choose question from category pool
+        if params['wager'] != 0:
+            stmWhere = " credit_id = %(wager)s AND "
+
+        query = ("SELECT credit_id, credit_value FROM credit_options "
+                 "WHERE %s active = 1 ORDER BY RAND() LIMIT 1")
+        query = query % stmWhere
+
+        return self.executeQuery(query, params, True)[0]
+
+    def getTimeLimit(self):
+        """ get random question  """
+        params = self.sanitizeParams()
+        stmWhere = " "
+        # if a category is available choose question from category pool
+        if params['timeLimit'] != 0:
+            stmWhere = " time_id = %(timeLimit)s AND "
+
+        query = ("SELECT time_id, time_in_seconds FROM time_options "
+                 "WHERE %s active = 1 ORDER BY RAND() LIMIT 1")
+        query = query % stmWhere
+
+        return self.executeQuery(query, params, True)[0]
+
     def getGame(self):
         # game id
         g_id = None
@@ -122,17 +185,34 @@ class Game(Entity):
         if len(users) >= 3:
             # set game_id
             g_id = self.getGameID()
+            params = self.sanitizeParams()
 
             returnDict['game_id'] = g_id
             returnDict['users'] = []
+
+            # game specific creation based on parameters
+            category = self.getCategory()   # [{question_id}, {text}, {category_id}]
+            wager = self.getWager()         # [{credit_id}, {credit_value}]
+            timeLimit = self.getTimeLimit()  # [{time_id}, {time_in_seconds}]
+
+            # set return object
+            returnDict['question'] = category['text']
+            returnDict['wager'] = wager['credit_value']
+            returnDict['time'] = timeLimit['time_in_seconds']
+
             # move users from queue to game
             for qUser in users:
+                qUser['category_id'] = category['category_id']
+                qUser['question_id'] = category['question_id']
+                qUser['wager_id'] = wager['credit_id']
+                qUser['time_id'] = timeLimit['time_id']
                 qUser['game_id'] = g_id
                 # update queue
-                query = ("UPDATE game_queue SET game_id = %(game_id)s  "
-                         " WHERE queue_id = %(queue_id)s")
+                query = ("UPDATE game_queue SET game_id = %(game_id)s, "
+                         "category_id = %(category_id)s, question_id = %(question_id)s, "
+                         "wager_id = %(wager_id)s, time_id = %(time_id)s "
+                         "WHERE queue_id = %(queue_id)s")
                 self.executeModifyQuery(query, qUser)
-
                 # update game
                 query = ("INSERT INTO game (user_id, game_id) VALUES "
                          "(%(user_id)s, %(game_id)s)")
@@ -214,11 +294,7 @@ if __name__ == "__main__":
     #     'user_id': '36'
     # }
     info = {
-        'id': 'gameParameters',
-        'p_paramCategory': '1',
-        'paramQuestions': '8',
-        'timeLimit': '2',
-        'wager': '1',
+        'id': 'gameParametersCategoryOnly',
         'user_id': '36',
         'function': 'GG',
         'counter': '0'
@@ -226,6 +302,5 @@ if __name__ == "__main__":
     """ modify user information for testing """
     # info['stuff'] = "stuff"
 
-    # print(Game(info).addToQueue())
+    print(Game(info).addToQueue())
     print(Game(info).getGame())
-    # print(Game(info).submitThoughts())

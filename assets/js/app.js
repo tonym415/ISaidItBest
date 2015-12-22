@@ -8,6 +8,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	var defaultTheme = 'ui-lightness';
 	var app_engine = "/assets/cgi-bin/engine.py";
 	var default_avatar = 'assets/css/images/anon_user.png';
+	var selectMenuOpt = { width: '85%'};
 	var navPages = {
 			'home' : 'index.html',
 			'game' : 'game.html',
@@ -65,7 +66,6 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 
 	var init = function(page){
 		var returnValue,
-			selectMenuOpt = { width: '60%'},
 			showLogin = false;
 		this.currentPage = page;
 		// show active page
@@ -83,9 +83,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		}else{
 			// if location is home page after redirection (see above) set value to open login form
 			locParams = window.location;
-			webPage = locParams.pathname.split('/')[1]
-			search = locParams.search.split('?')[1]
-			showLogin = (webPage === this.pages.home && search !== undefined)
+			webPage = locParams.pathname.split('/')[1];
+			search = locParams.search.split('?')[1];
+			showLogin = (webPage === this.pages.home && search !== undefined);
 		}
 
 		//  Initalize app setup functions
@@ -113,6 +113,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				$('h3:contains("Game Results")').toggle();
 
 				$("h3:contains('Pre Game')").toggle();
+				$('#paramOptions').tabs({
+					active: false,
+					collapsible: true,
+					heightStyle: 'content',
+					hide: { effect: "slide", direction: 'right', duration: 1000 },
+					show: { effect: "slide", duration: 800 }
+				});
 				break;
 			case 'admin':
 				// load category selectmenu
@@ -126,10 +133,10 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 						// validate select
 						$(this).closest('form').validate().element(this);
 					}
-				}
+				};
 				settings = $.extend({}, selectMenuOpt, optCategory);
 				$(".sel").selectmenu(settings);
-				$("input").not('[type=submit]').width('100%');
+				$("input").not('[type=submit]').width('110%');
 				break;
 			default:
 
@@ -175,7 +182,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 							<p> \
 								<a class='agreement_close' href='#'>Close this dialog</a> \
 							</p> \
-						</div>"
+						</div>";
 		txtFooter = "Use of this website constitutes acceptance of the ISaidItBest \
 			<a class=\"agreement\" href=\"#\">Rules Agreement</a>";
 
@@ -217,7 +224,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	}
 
 	function showRanking(){
-		if ($('div#ranks').length == 0) {
+		if ($('div#ranks').length === 0) {
 			$('.footer')
 				.append(
 					$('<div id="ranks" />')
@@ -228,7 +235,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 								.append('<h1>Rank Description</h1>')
 								.append('<dl />')
 					)
-				)
+				);
 
 			$.each(skillLevels,function(idx, value){
 				$('#ranks dl')
@@ -237,8 +244,8 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 								.append(
 									$('<img src="/assets/css/images/trans1.png" />')
 										.removeClass()
-										.addClass('star' + (1 + idx))
-									,$('<span>' + value.title + '</span>')
+										.addClass('star' + (1 + idx)),
+									$('<span>' + value.title + '</span>')
 								)
 						)
 						.append(
@@ -384,7 +391,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 			$('#content').unblock();
 		}
 		$.unblockUI();
-	}
+	};
 
 	$(document)
 		.ajaxStart(function(event, xhr, options) {
@@ -576,6 +583,9 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		});
 	};
 
+	function escapeId(myID){
+		return "#" + myID.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\\\$&");
+	}
 	/**
 	 * Check if a number is in between min and max
 	 * @return {Boolean} Boolean
@@ -631,10 +641,6 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	 */
 	 $.fn.serializeAllArray = function () {
 		return $('input', this);
-		// var disabled = this.find(':input:disabled').removeAttr('disabled');
-		// var serialized = this.serializeArray();
-		// disabled.attr('disabled','disabled');
-	    // return  serialized;
 	 };
 
 	/**
@@ -666,8 +672,21 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		ignore: "",
 		errorPlacement: function (error, element) {
 			// account for jquery selectmenu
-			if (element.context.nodeName === "SELECT"){
-				element = $('#' + element.context.id + '-button');
+			id = escapeId(element.context.id);
+			/* 	I was lazy and copied the forms so ids are duplicated
+				The next if is to specify the element by form
+			*/
+			if (id.indexOf('[') < 0){
+				// the previous test is for dynamic subcategory elements (eg. "#p_subCategory\\[2\\]")
+				currentForm = "#" + $(element).closest('form')[0].id;
+				currentId = currentForm + " " + id;
+				element = $(currentId);
+			}
+			if (element[0].nodeName === "SELECT"){
+				// account for jquery selectmenu structure which
+				// uses a span to display list/button
+				// next() refers to '#' + element.id + '-button'
+				element = element.next();
 			}
 			// last chance to init element if not done already
 			if ($(element).data('tooltipster-ns') === undefined) $(element).tooltipster();
@@ -685,8 +704,13 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		},
 		success: function (label, element) {
 			if (element.nodeName === "SELECT"){
-				element = $('#' + element.id + '-button');
+				// account for jquery selectmenu structure which
+				// uses a span to display list/button
+				// next() refers to '#' + element.id + '-button'
+				element = $(element).next();
 			}
+			// last chance to init element if not done already
+			if ($(element).data('tooltipster-ns') === undefined) $(element).tooltipster();
 			$(element).tooltipster('hide');  // hide tooltip when field passes validation
 		},
 		showErrors: function (errorMap, errorList) {
@@ -717,21 +741,22 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				   $(this).dialog("close");
 			    }
 		   }
-	    }
-	};
+	   };
+	}
 
 	/** return the app object with var/functions built in */
 	return {
 		init: init,
 		defaultTheme: defaultTheme,
+		selectMenuOpt: selectMenuOpt,
 		// site pages referred here so no hard coding is necessary
 		pages: navPages,
-		// get message box default options (params: title, message)
-		mboxDefaults: get_mboxDefaults,
 		// CGI script that does all the work
 		engine : app_engine,
 		objCategories: objCategories,
 		// utility functions
+		// get message box default options (params: title, message)
+		mboxDefaults: get_mboxDefaults,
 		isEmpty: isEmpty,
 		setCookie: setCookie,
 		getCookie: getCookie,

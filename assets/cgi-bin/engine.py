@@ -234,7 +234,7 @@ def gameFunctions(fs):
     returnObj = {}
     if 'id' in fs:
         # id tells what sub function to perform
-        if fs['id'] == 'gameParameters':
+        if fs['id'] in ['random', 'All', 'CategoryOnly', 'RandomQuestion']:
             # counter = 0 indicates first time submitting params
             if fs['counter'] == '0':
                 returnObj = Game(fs).addToQueue()
@@ -368,8 +368,10 @@ def main():
     #                   function="GG",
     #                   counter="2")
 
-    form = formMockup(function="FB",
-                      id="frmFeedback")
+    form = formMockup(id="random",
+                      user_id=36,
+                      function="GG",
+                      counter=1)
     """ valid user in db (DO NOT CHANGE: modify below)"""
     # form = formMockup(function="SUI", confirm_password="password",
     #                   first_name="Antonio", paypal_account="tonym415",

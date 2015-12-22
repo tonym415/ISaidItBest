@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
 	font-family: "Arial";
-    font-size: 85% !important;
+    /*font-size: 85% !important;*/
     border: 0 !important;
 }
 
@@ -408,13 +408,26 @@ img {
 }
 
 /* game styling */
+#paramOptions ul{
+    border: none !important;
+    background: none !important;
+    overflow: hidden;
+}
+
+#paramOptions li {
+    margin: 1em !important;
+    padding: .5em !important;
+    border: 1px solid !important;
+    border-radius: 5px !important;
+
+}
 .debatePlayers {
     border: 5px ridge #ccc;
     border-radius: 10px;
     right: 50px;
     position: absolute;
     width: 115px;
-    /*height: 320px;*/
+    padding-left: 1em;
 }
 
 .userComment {
