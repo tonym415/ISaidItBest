@@ -105,21 +105,34 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 				returnValue = showLogin;
 				break;
 			case 'game':
-				$(".sel").selectmenu(selectMenuOpt);
-				// load category selectmenu
-				this.getCategories();
-				this.accordion = $("#accordion").accordion({ heightStyle: 'content', collapsable: true});
-				$("#debateResults").toggle();
 				// create counter for sub-category templates
 				$(document).data("tempCount",0);
 
-				// disable game until params established
-				// $("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
-				// hide result pane till necessary
-				$('h3:contains("Game Results")').toggle();
+				// init selectmenus
+				$(".sel").selectmenu(selectMenuOpt);
 
-				$("h3:contains('Pre Game')").toggle();
+				// init param tabs
 				$('#paramOptions').tabs(tabOptions);
+
+				// load category selectmenu
+				this.getCategories();
+
+				// activate accordion
+				this.accordion = $("#accordion").accordion({
+					heightStyle: 'content',
+					collapsable: true
+				});
+
+				// hide debate results panel
+				$("#debateResults").toggle();
+
+				// hide result pane till necessary
+				// $("h3:contains('Debate Game')").toggleClass('ui-state-disabled');
+				$("h3:contains('Debate Game')").toggle();
+				$('h3:contains("Game Results")').toggle();
+				$("h3:contains('Pre Game')").toggle();
+
+
 				break;
 			case 'admin':
 				// load category selectmenu
@@ -187,13 +200,19 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 		txtFooter = "Use of this website constitutes acceptance of the ISaidItBest \
 			<a class=\"agreement\" href=\"#\">Rules Agreement</a>";
 
-		// wrap the content of the body with a container and wrap that with container to accomodate the footer stylings
+		// wrap the content of the body with a container and wrap that
+		// with container to accomodate the footer stylings
 		$('body').wrapInner("<div id='content'></div>");
 		$('#content').wrap('<div id="container" />');
-		$('<div class="footer"> </div>')
+		$('<div />')
+			.addClass('footer')
 			.html(txtFooter + tplRules)
-			.prepend( $('<div class="test" />') )
+			.prepend(
+				$('<div class="placeHolder" />'),	// enable subCheck
+				$('<div class="test" />')			// enable test btn toggle
+			)
 			.insertAfter('#container');
+
 	}
 
 	function agreement(){
@@ -825,7 +844,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 	        	/* create subcategory select, fill and new subs checkbox */
 
 	        	// get the template paragraph element
-	        	$('#placeHolder').load('templates.html #subCatTemplate', function(response, status, xhr){
+	        	$('.placeHolder').load('templates.html #subCatTemplate', function(response, status, xhr){
 					if (status != 'error'){
 			        	parentP = $('#subCatTemplate');
 			        	// clone it
@@ -888,7 +907,7 @@ define(['jquery', 'cookie', 'blockUI', 'jqueryUI', 'validate','tooltipster'], fu
 							}
 			        	});
 			        	element.parent().after(clone);
-						$('#placeHolder').empty();
+						$('.placeHolder').empty();
 					}else{
 						app.dMessage(status.capitlize() + ' - Template File', xhr.statusText);
 					}

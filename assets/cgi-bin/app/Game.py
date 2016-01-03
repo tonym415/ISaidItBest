@@ -185,7 +185,6 @@ class Game(Entity):
         if len(users) >= 3:
             # set game_id
             g_id = self.getGameID()
-            params = self.sanitizeParams()
 
             returnDict['game_id'] = g_id
             returnDict['users'] = []
@@ -287,14 +286,12 @@ class Game(Entity):
         return returnObj
 
 if __name__ == "__main__":
-    # info = {
-    #     'id': 'gameUI',
-    #     'thoughts': 'whatever',
-    #     'game_id': '1',
-    #     'user_id': '36'
-    # }
     info = {
-        'id': 'gameParametersCategoryOnly',
+        'id': 'randomQuestion',
+        'p_paramCategory': '1',
+        'p_subCategory': '38',
+        'wager': '1',
+        'timeLimit': '1',
         'user_id': '36',
         'function': 'GG',
         'counter': '0'
@@ -303,4 +300,5 @@ if __name__ == "__main__":
     # info['stuff'] = "stuff"
 
     print(Game(info).addToQueue())
-    print(Game(info).getGame())
+    # print(Game(info).sanitizeParams())
+    # print(Game(info).getCategory())

@@ -234,7 +234,7 @@ def gameFunctions(fs):
     returnObj = {}
     if 'id' in fs:
         # id tells what sub function to perform
-        if fs['id'] in ['random', 'All', 'CategoryOnly', 'RandomQuestion']:
+        if fs['id'] in ['random', 'all', 'categoryOnly', 'randomQuestion']:
             # counter = 0 indicates first time submitting params
             if fs['counter'] == '0':
                 returnObj = Game(fs).addToQueue()

@@ -21,9 +21,14 @@ require([
 			onStateClass = "ui-state-highlight",
 			offStateClass = "ui-widget-content",
 			disableStateClass = "ui-state-disabled",
+			gamePanel = 'h3:contains("Debate Game")',
+			paramPanel = 'h3:contains("Parameter Selection")',
+			resultPanel = 'h3:contains("Game Results")',
 			gameSubmitted = false,
 			paramMeta = {},
 			pollCounter = 0;
+
+	// TODO: replace 'h3:contains' with panel vars
 
 		// handle page setup upon arrival
 		app.init('game');
@@ -31,7 +36,7 @@ require([
 
 	// following line must be commented for production
 	$(document).on('click', '.test', function(){
-		$('#btnTest').toggleClass('hidden');
+		$('#btnTest').toggleClass('no-display');
 	});
 
 	function enrichMeta(){
@@ -550,15 +555,18 @@ require([
 		];
 
 
+	$('#TG').click(function(){
+		toggleParams();
+	});
+
 	$('#LD').click(function(){
 		// load data to display function
-		$('h3:contains("Debate Game")').click();
 		loadDebate(gameStartData);
 	});
 
 	$('#LC').click(function(){
 		// load data to display function
-		$('h3:contains("Debate Game")').click();
+		$(gamePanel).click();
 		$('#selectable').remove();
 		displayComments(commentResultData[0].users);
 	});
@@ -569,20 +577,25 @@ require([
 	});
 
 	$('#TW').click(function(){
-		if (!$('h3:contains("Game Results")').is(':visible')){
+		if (!$(resultPanel).is(':visible')){
 			loadWinner(voteResultData);
 		}else{
 			toggleParams();
-			$('h3:contains("Game Results")').toggle();
-			$('h3:contains("Debate Game")').click();
+			$(resultPanel).toggle();
+			$(gamePanel).click();
 		}
 	});
 
 	function toggleParams(){
-		// disable/enable params
-		$('h3:contains("Parameter Selection")').toggleClass('ui-state-disabled');
-		// disable/enable game
-		$('h3:contains("Debate Game")').toggleClass('ui-state-disabled');
+		// disable/enable parameters
+		paramVis = $(paramPanel).is(':visible');
+		$(paramPanel).toggle(!paramVis);
+		$(gamePanel).toggle(paramVis);
+		if (paramVis){
+			$(gamePanel).click();
+		}else{
+			$(paramPanel).click();
+		}
 	}
 
 	function toggleGame(){

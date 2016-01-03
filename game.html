@@ -55,7 +55,7 @@
 			</ul>
 			<div class="paramDiv" id="Alldiv">
 				<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
-				<form id="All">
+				<form id="all">
 					<div class='group'>
 						<p>
 							<label for='p_paramCategory'>Category</label>
@@ -113,7 +113,7 @@
 			</div>
 			<div class="paramDiv" id="CategoryOnlydiv">
 				<h4 class='ui-state-active no-border'>Select the parameters for the type of debate you want to have.</h4>
-				<form id="CategoryOnly">
+				<form id="categoryOnly">
 					<div class='group'>
 						<p>
 							<label for='p_paramCategory'>Category</label>
@@ -138,26 +138,63 @@
 		</div>
 		<h3>Debate Game</h3>
 		<div id="game_panel">
-				<div id="debate">
+			<div id="debate" class='gameDiv'>
 				<span class='timer_text ui-state-active no-border'>Minutes left to win!</span> <div class='countdown_timer game_clock' id='game_timer'></div>
-					<h3 id="question"></h3>
-					<form id='gameUI'>
-						<div class='group'>
-							<fieldset>
-								<center>
-								<legend>What do you think?</legend>
-								</center>
-									<div id='players' class='debatePlayers'>Players</div>
-									<p>
-										<label for="thoughts">Thoughts:</label>
-										<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
-									</p>
-									<p><input type='hidden' id='game_id' name='game_id'/></p>
-							</fieldset>
-						</div>
-						<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
-					</form>
-				</div>
+				<h3 id="question"></h3>
+				<form id='gameUI'>
+					<div class='group'>
+						<fieldset>
+							<center>
+							<legend>What do you think?</legend>
+							</center>
+								<div id='players' class='debatePlayers'>Players</div>
+								<p>
+									<label for="thoughts">Thoughts:</label>
+									<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
+								</p>
+								<p><input type='hidden' id='game_id' name='game_id'/></p>
+						</fieldset>
+					</div>
+					<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
+				</form>
+			</div>
+				<!-- <div id="debate" class='gameDiv'>
+					<table border="1">
+						<tr>
+							<td colspan="3" align='center'>
+								<span class='timer_text ui-state-active no-border'>Minutes left to win!</span> <div class='countdown_timer game_clock' id='game_timer'></div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align='center'>
+								<h3 id="question"></h3>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<form id='gameUI'>
+									<div class='group'>
+										<fieldset>
+											<center>
+											<legend>What do you think?</legend>
+											</center>
+												<p>
+													<label for="thoughts">Thoughts:</label>
+													<textarea rows="15" cols="45" id="thoughts" name="thoughts"></textarea>
+												</p>
+												<p><input type='hidden' id='game_id' name='game_id'/></p>
+										</fieldset>
+									</div>
+									<p class="submit"><input type="submit" value='Submit Thoughts' /></p>
+								</form>
+							</td>
+							<td rowspan="3">
+								<div id='players' class='debatePlayers'>Players</div>
+							</td>
+						</tr>
+					</table>
+
+				</div> -->
 				<center>
 				<div class='debateVote hidden'>
 					<form id='debateVote'>
@@ -191,28 +228,16 @@
 		</div>
 	</div>
 </center>
-<div id='placeHolder' class='hidden'></div>
-<!-- <div id='subCatTemplate' class='hidden'>
-	<p>
-		<label for='temp_subCategory'>Sub-Category:</label>
-		<select id='temp_subCategory' name='temp_subCategory' >
-			<option value="">None</option>
-		</select>
-		<label for='temp_CategoryChk' class='subCheck'>Sub?</label>
-		<input id='temp_CategoryChk' type='checkbox' class='subCheck'/>
-		<div class="clear"></div>
-		<span errorfor="temp_subCategory"></span>
-	</p>
-</div> -->
 <div id='gameWait' class='hidden ui-widget-content'>
 	<center>
 		Your game will start in 10 seconds...
 		<div id='wait_timer' class='countdown_timer'></div>
 	</center>
 </div>
-<div id='btnTest' class="center-content hidden" style="display:flex;">
+<div id='btnTest' class="center-content no-display" style="display:flex;">
 	<input type='button' value='Load Data' id='LD'/><br>
 	<input type='button' value='Load Comments' id='LC'/><br>
+	<input type='button' value='Toggle Game' id='TG'/><br>
 	<input type='button' value='Toggle Game/Vote' id='TGV'/><br>
 	<input type='button' value='Toggle Winner' id='TW'/>
 </div>
